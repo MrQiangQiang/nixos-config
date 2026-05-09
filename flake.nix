@@ -2,14 +2,14 @@
   description = "My Nixos configuration";
 
   inputs = {
-    nixpkg.url = "github:Nixos/nixpkgs/nixos-25.11";
-    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixpkg.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-25.11&shallow=1";
+    flake-parts.url = "git+https://mirrors.nju.edu.cn/git/flake-parts.git?shallow=1";
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "git+https://mirrors.nju.edu.cn/git/home-manager.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
-      url = "github:nix-community/disko";
+      url = "git+https://mirrors.nju.edu.cn/git/disko.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -24,4 +24,15 @@
         ./home
       ];      
     };
+
+  nixConfig = {
+    extra-substituters = [
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+      "https://mirrors.sjtu.edu.cn/nix-channels/store"
+      "https://cache.nixos.org"
+    ];
+    extra-trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
+  };
 }
