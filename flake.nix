@@ -8,10 +8,10 @@
       url = "git+https://mirrors.nju.edu.cn/git/home-manager.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko = {
-      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/disko.git?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # disko = {
+    #   url = "github:nix-community/disko";
+    #     inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs = inputs @ { flake-parts, ... }:
