@@ -2,10 +2,10 @@
   description = "My Nixos configuration";
 
   inputs = {
-    nixpkg.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-25.11&shallow=1";
+    nixpkg.url = "github:Nixos/nixpkgs/nixos-25.11";
     # flake-parts.url = "gitub:hercules-ci/flake-parts";
     home-manager = {
-      url = "git+https://mirrors.nju.edu.cn/git/home-manager.git?shallow=1";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # disko = {
