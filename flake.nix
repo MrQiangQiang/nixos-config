@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkg.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-25.11&shallow=1";
-    flake-parts.url = "git+https://mirrors.nju.edu.cn/git/flake-parts.git?shallow=1";
+    # flake-parts.url = "gitub:hercules-ci/flake-parts";
     home-manager = {
       url = "git+https://mirrors.nju.edu.cn/git/home-manager.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
