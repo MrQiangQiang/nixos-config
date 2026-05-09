@@ -14,16 +14,17 @@
     # };
   };
 
-  outputs = inputs @ { flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" ];
-      imports = [
-        inputs.home-manager.flakeModules.home-manager
-        ./hosts
-        ./modules
-        ./home
+  outputs = inputs @ { self, nixpkgs, home-manager, ... }:
+  {
+    nixosConfiguration.nixos = nixpkgs.lib.nixosSystem {
+      systems = "x86_64-linux";
+      modules = [ 
+        ./hosts/nixos/configuration.nix
+        ./hosts/nixos/hardware-configuration.nix
+        home-manager.nixosModules.home-manager
       ];      
     };
+  };
 
   nixConfig = {
     extra-substituters = [
