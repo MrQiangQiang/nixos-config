@@ -9,7 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
-      url = "git+https://mirrors.nju.edu.cn/git/disko.git?shallow=1";
+      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/disko.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
