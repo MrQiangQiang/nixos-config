@@ -26,9 +26,9 @@
 
   nixConfig = {
     substituters = [
-      "https://mirror.sjtu.edu.cn/nix-channels/store"
-      "https://mirror.tuna.tsinghua.edu.cn/nix-channels/store"
-      "https://cache.nixos.org"
+      "https://mirror.sjtu.edu.cn/nix-channels/store?priority=10"
+      "https://mirror.tuna.tsinghua.edu.cn/nix-channels/store?priority=11" 	
+      "https://mirror.ustc.edu.cn/nix-channels/store?priority=12"
     ];
    
     trusted-public-keys = [
