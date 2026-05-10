@@ -37,11 +37,7 @@
                 useUserPackages = true;
                 users.a = { pkg, ... }: {
                   home.stateVersion = "25.11";
-                  home.packages = with pkgs;
-		  [ 
-                    git
-                    neovim 
-                  ];    
+                  home.packages = [ pkgs.git pkgs.neovim ];    
                   programs.bash.enable = true;  
 	        };
               };	 
