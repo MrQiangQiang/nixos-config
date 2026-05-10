@@ -11,18 +11,37 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
-
-  outputs = { self, nixpkgs, home-manager, disko, ... } @inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [ 
-        ./hosts/nixos/configuration.nix
-        ./hosts/nixos/hardware-configuration.nix
-        home-manager.nixosModules.home-manager
-      ];      
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  outputs = inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      system = "x86_64-linux";
+      
+      flake = {
+        nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/nixos/hardware-configuration.nix
+            ./hosts/nixos/configuration.nix
+            inputs.home-manager.nixosModules.home-manager
+            ({
+             home-manager.users.a = {
+              home.stateVersion = "25.11";
+              home.packages = with inputs.nixpkgs.legacyPackages.x86_64-linux; [
+               git
+               neovim    
+              ];
+              programs.bash.enable = true;  
+	     };	 
+            })
+          ];
+        };
+      }; 
+    };
 
   # nixConfig = {
   #  substituters = [
