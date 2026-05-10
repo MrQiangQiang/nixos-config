@@ -3,18 +3,17 @@
 
   inputs = {
     nixpkg.url = "github:Nixos/nixpkgs/nixos-25.11";
-    # flake-parts.url = "gitub:hercules-ci/flake-parts";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # disko = {
-    #   url = "github:nix-community/disko";
-    #     inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... } @inputs:
+  outputs = { self, nixpkgs, home-manager, disko, ... } @inputs:
   {
     nixosConfiguration.nixos = nixpkgs.lib.nixosSystem {
       systems = "x86_64-linux";
