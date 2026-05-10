@@ -10,7 +10,7 @@
       ./hardware-configuration.nix
     ];
   
-  nix.setting.experimentla-features = [ "nix-command" "flakes" ];  
+  nix.settings.experimentla-features = [ "nix-command" "flakes" ];  
   
   hardware.enableRedistributableFirmware = true;
   
