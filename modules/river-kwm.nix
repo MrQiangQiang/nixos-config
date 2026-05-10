@@ -14,10 +14,10 @@ let
     src = kwmSrc;
     nativBuildInputs = with pkgs; [ zig scdoc ];
     buildPhase = "zig build -Doptimize=ReleaseFast";
-    installPhase = ``
+    installPhase = "
       mkdir -p $out/bin
       cp zig-out/bin/kwm $out/bin/
-    ``;
+    ";
   };
 
   in {
