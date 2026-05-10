@@ -2,9 +2,9 @@
   description = "My Nixos configuration";
 
   inputs = {
-    nixpkgs.url = "github:Nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:Nixos/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -18,9 +18,10 @@
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" ];
-      
-      perSystem = { config, pkgs, system, ... }: {
+      systems = [ "x86_64-linux" "aarch64-linux" ];
+      import = [ ./modules/river-kwm.nix ];
+
+      perSystem = { config, pkgs, ... }: {
         _module.args.pkgs = pkgs;
       };      
    
