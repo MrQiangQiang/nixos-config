@@ -23,7 +23,7 @@
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDshjY="
       ];
      };
-    package = pkgs.nixVersion.git;
+    package = pkgs.nixVersions.git;
   };
   
   hardware.enableRedistributableFirmware = true;
