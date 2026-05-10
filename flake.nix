@@ -14,7 +14,7 @@
     # };
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager} @inputs:
   {
     nixosConfiguration.nixos = nixpkgs.lib.nixosSystem {
       systems = "x86_64-linux";
