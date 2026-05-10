@@ -20,6 +20,10 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       system = "x86_64-linux";
       
+      perSystem = { config, self`, inputs`, pkgs, system, ... }: {
+        _module.args,pkgs = pkgs;
+      };      
+   
       flake = {
         nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -27,16 +31,17 @@
             ./hosts/nixos/hardware-configuration.nix
             ./hosts/nixos/configuration.nix
             inputs.home-manager.nixosModules.home-manager
-            ({
-             home-manager.users.a = {
-              home.stateVersion = "25.11";
-              home.packages = with inputs.nixpkgs.legacyPackages.x86_64-linux; [
-               git
-               neovim    
-              ];
-              programs.bash.enable = true;  
-	     };	 
-            })
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.a = { config, pkg, ... }: {
+                  home.stateVersion = "25.11";
+                  home.packages = [ pkg.git, pkg.neovim ];    
+                  programs.bash.enable = true;  
+	        };
+              };	 
+            }
           ];
         };
       }; 
