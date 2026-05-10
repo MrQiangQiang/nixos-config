@@ -10,10 +10,10 @@
       ./hardware-configuration.nix
     ];
   
+  nix.setting.experimentla-features = [ "nix-command" "flakes" ];  
+  
   hardware.enableRedistributableFirmware = true;
-  nix.settings.substituters = ["https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"];
-  nix.settings.extra-substituters = ["https://cache.nixos.org"];
-
+  
   networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
 
 
