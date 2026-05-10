@@ -35,9 +35,13 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                users.a = { config, pkg, ... }: {
+                users.a = { pkg, ... }: {
                   home.stateVersion = "25.11";
-                  home.packages = [ pkg.git pkg.neovim ];    
+                  home.packages = with pkgs;
+		  [ 
+                    git
+                    neovim 
+                  ];    
                   programs.bash.enable = true;  
 	        };
               };	 
@@ -46,17 +50,4 @@
         };
       }; 
     };
-
-  # nixConfig = {
-  #  substituters = [
-  #    "https://mirror.sjtu.edu.cn/nix-channels/store?priority=10"
-  #    "https://mirror.tuna.tsinghua.edu.cn/nix-channels/store?priority=11" 	
-  #    "https://mirror.ustc.edu.cn/nix-channels/store?priority=12"
-  #    "https://cache.nixos.org"
-  #  ];
-   
-  #  trusted-public-keys = [
-  #    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-  #  ];
-  #};
 }
