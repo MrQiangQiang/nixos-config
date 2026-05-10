@@ -13,10 +13,9 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ... } @inputs:
-  {
+  outputs = { self, nixpkgs, home-manager, disko, ... } @inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      systems = "x86_64-linux";
+      system = "x86_64-linux";
       modules = [ 
         ./hosts/nixos/configuration.nix
         ./hosts/nixos/hardware-configuration.nix
