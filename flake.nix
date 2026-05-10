@@ -21,7 +21,7 @@
       system = "x86_64-linux";
       
       perSystem = { config, pkgs, system, ... }: {
-        _module.args,pkgs = pkgs;
+        _module.args.pkgs = pkgs;
       };      
    
       flake = {
