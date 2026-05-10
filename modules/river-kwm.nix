@@ -46,7 +46,7 @@ let
       ];
 
       xdg.configFile."river/init" = {
-	text = ''
+	text =
           #!${pkgs.runtimeShell}
 	
 	  ${kwmPackage}/bin/kwm &
@@ -77,7 +77,7 @@ let
 	
 	  ${pkgs.river}/bin/riverctl rule-add -app-id "pavucontrol" float
 	  ${pkgs.river}/bin/riverctl rule-add -app-id "org.gnome.Calculator" float
-        '';
+        ;
         executable = true;
       };
     };
