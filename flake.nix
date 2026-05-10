@@ -37,7 +37,7 @@
                 useUserPackages = true;
                 users.a = { config, pkg, ... }: {
                   home.stateVersion = "25.11";
-                  home.packages = [ pkg.git, pkg.neovim ];    
+                  home.packages = [ pkg.git pkg.neovim ];    
                   programs.bash.enable = true;  
 	        };
               };	 
