@@ -46,7 +46,7 @@ let
       ];
 
       xdg.configFile."river/init" = {
-	text = ``
+	text = "
 	
 	${kwmPackage}/bin/kwm &
 	${pkgs.rivertile}/bin/rivertile-view-padding 6 -outer-padding 6 &
@@ -76,7 +76,7 @@ let
 	
 	${pkgs.river}/bin/riverctl rule-add -app-id "pavucontrol" float
 	${pkgs.river}/bin/riverctl rule-add -app-id "org.gnome.Calculator" float
-        ``;
+        ";
         executable = true;
       };
     };
