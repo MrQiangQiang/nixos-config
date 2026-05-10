@@ -15,7 +15,7 @@
 
   outputs = { self, nixpkgs, home-manager, disko, ... } @inputs:
   {
-    nixosConfiguration.nixos = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       systems = "x86_64-linux";
       modules = [ 
         ./hosts/nixos/configuration.nix
