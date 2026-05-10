@@ -2,15 +2,15 @@
   description = "My Nixos configuration";
 
   inputs = {
-    nixpkg.url = "github:Nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:Nixos/nixpkgs/nixos-25.11";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # disko = {
-    #  url = "github:nix-community/disko";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
     };
@@ -18,7 +18,7 @@
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      system = "x86_64-linux";
+      system = [ "x86_64-linux" ];
       
       perSystem = { config, pkgs, system, ... }: {
         _module.args.pkgs = pkgs;
