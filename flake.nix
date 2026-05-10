@@ -20,7 +20,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       system = "x86_64-linux";
       
-      perSystem = { config, self`, inputs`, pkgs, system, ... }: {
+      perSystem = { config, pkgs, system, ... }: {
         _module.args,pkgs = pkgs;
       };      
    
