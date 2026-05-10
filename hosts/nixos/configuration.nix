@@ -14,6 +14,9 @@
   nix.settings.substituters = ["https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"];
   nix.settings.extra-substituters = ["https://cache.nixos.org"];
 
+  networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
+
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
