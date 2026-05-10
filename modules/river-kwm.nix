@@ -50,7 +50,7 @@ let
           #!${pkgs.runtimeShell}
 	
 	  ${kwmPackage}/bin/kwm &
-	  ${pkgs.rivertile}/bin/rivertile-view-padding 6 -outer-padding 6 &
+	  ${pkgs.rivertile}/bin/rivertile -view-padding 6 -outer-padding 6 &
           ${pkgs.waybar}/bin/waybar &
           ${pkgs.mako}/bin/mako &
 
