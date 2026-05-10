@@ -47,6 +47,7 @@ let
 
       xdg.configFile."river/init" = {
 	text = "
+        #!${pkgs.runtimeShell}
 	
 	${kwmPackage}/bin/kwm &
 	${pkgs.rivertile}/bin/rivertile-view-padding 6 -outer-padding 6 &
