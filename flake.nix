@@ -40,7 +40,6 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 users.a = { pkgs, ... }: {
-                  home.stateVersion = "25.11";
                   home.packages = [ pkgs.git pkgs.neovim ];    
                   programs.bash.enable = true;  
 	        };
