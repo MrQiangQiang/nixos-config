@@ -1,7 +1,7 @@
 { config, pkgs, lib, inputs, ... }:
 
 let
-  kwnSrc = pkgs.fetchFromGitHub {
+  kwmSrc = pkgs.fetchFromGitHub {
     owner = "unixchad";
     repo = "kwm";
     rev = "main";
