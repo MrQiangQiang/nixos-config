@@ -20,8 +20,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
       imports = [ 
-	#./modules/river-kwm.nix
-        inputs.home-manager.flakeModule 
+        inputs.home-manager.flakeModules.home-manager 
       ];
 
       perSystem = { config, pkgs, ... }: {
