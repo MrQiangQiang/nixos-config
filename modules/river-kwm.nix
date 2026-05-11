@@ -31,7 +31,6 @@ let
       home.packages = with pkgs; [
         kwmPackage
 	river
-        rivertile
         waybar
         mako
         swaybg
@@ -44,9 +43,9 @@ let
           #!${pkgs.runtimeShell}
 	
 	  ${kwmPackage}/bin/kwm &
-	  ${pkgs.rivertile}/bin/rivertile -view-padding 6 -outer-padding 6 &
           ${pkgs.waybar}/bin/waybar &
           ${pkgs.mako}/bin/mako &
+          ${pkgs.swaybg}/bin/swaybg -i ${pkgs.nixos-artwork.wallpapers}/share/backgrounds/nixos-wallpaper.png&
 
           ${pkgs.river}/bin/riverctl border-color-focused 0x93cee9
           ${pkgs.river}/bin/riverctl border-color-unfocused 0x444444
