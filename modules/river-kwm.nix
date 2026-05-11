@@ -45,7 +45,7 @@ let
 	  ${kwmPackage}/bin/kwm &
           ${pkgs.waybar}/bin/waybar &
           ${pkgs.mako}/bin/mako &
-          ${pkgs.swaybg}/bin/swaybg -i ${pkgs.nixos-artwork.wallpapers}/share/backgrounds/nixos-wallpaper.png &
+          ${pkgs.swaybg}/bin/swaybg -c '#1e1e2e' &
 
           ${pkgs.river}/bin/riverctl border-color-focused 0x93cee9
           ${pkgs.river}/bin/riverctl border-color-unfocused 0x444444
