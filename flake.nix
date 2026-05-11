@@ -14,7 +14,7 @@
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
     };
-    kwm.url = "github:gnuunixchad/kwm";
+    kwm.url = "github:kewuaa/kwm";
   };
 
   outputs = inputs@{ flake-parts, ... }:
