@@ -20,7 +20,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
       imports = [ 
-	./modules/river-kwm.nix
+	#./modules/river-kwm.nix
         inputs.home-manager.flakeModule 
       ];
 
@@ -34,6 +34,7 @@
           modules = [
             ./hosts/nixos/hardware-configuration.nix
             ./hosts/nixos/configuration.nix
+            ./modules/river-kwm.nix
             inputs.home-manager.nixosModules.home-manager
             {
               home-manager = {
