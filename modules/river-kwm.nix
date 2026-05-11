@@ -1,27 +1,10 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
-  kwmSrc = pkgs.fetchFromGitHub {
-    owner = "gnuunixchad";
-    repo = "kwm";
-    rev = "master";
-    hash = "sha256-3KP3D2150s6lo3S3Ds5rTv9Im24HYtSqhg3U1YeSUfY=";
-  };
-
-  kwmPackage = pkgs.stdenv.mkDerivation {
-    pname = "kwm";
-    version = "unstable";
-    src = kwmSrc;
-    nativeBuildInputs = with pkgs; [ zig scdoc ];
-    buildPhase = "export ZIG_GLOBALCACHE_DIR=$TMPDIR/zig-cache; zig build -Doptimize=ReleaseFast";
-    installPhase = ''
-      mkdir -p $out/bin
-      cp zig-out/bin/kwm $out/bin/
-    '';
-  };
+  kwmPackage = inputs.kwm.packages.${pkgs.system}.default;
 
   in {
-    programs.river.enable = true;
+    programs.river-classic.enable = true;
     services.dbus.enable = true;
     xdg.portal.enable = true;
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-wlr ];

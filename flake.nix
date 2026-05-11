@@ -14,6 +14,7 @@
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
     };
+    kwm.url = "github:gnuunixchad/kwm";
   };
 
   outputs = inputs@{ flake-parts, ... }:
@@ -30,6 +31,7 @@
       flake = {
         nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
           modules = [
             ./hosts/nixos/hardware-configuration.nix
             ./hosts/nixos/configuration.nix
