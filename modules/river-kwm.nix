@@ -5,7 +5,7 @@ let
     owner = "unixchad";
     repo = "kwm";
     rev = "main";
-    hash = lib.fakeSha256;
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
   kwmPackage = pkgs.stdenv.mkDerivation {
