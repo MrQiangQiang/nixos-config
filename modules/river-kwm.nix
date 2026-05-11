@@ -21,10 +21,6 @@ let
   };
 
   in {
-    imports = [
-      inputs.home-manager.nixosModules.default
-    ];
-
     programs.river.enable = true;
     services.dbus.enable = true;
     xdg.portal.enable = true;

@@ -33,8 +33,8 @@
           modules = [
             ./hosts/nixos/hardware-configuration.nix
             ./hosts/nixos/configuration.nix
-            ./modules/river-kwm.nix
             inputs.home-manager.nixosModules.home-manager
+            ./modules/river-kwm.nix
             {
               home-manager = {
                 useGlobalPkgs = true;
