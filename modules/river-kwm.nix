@@ -2,9 +2,9 @@
 
 let
   kwmSrc = pkgs.fetchFromGitHub {
-    owner = "unixchad";
+    owner = "gnuunixchad";
     repo = "kwm";
-    rev = "main";
+    rev = "master";
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
