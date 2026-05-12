@@ -19,6 +19,7 @@
       
       config = lib.mkIf cfg.enable {
         home-manager.users.a = { pkgs, ... }: {
+          home,stateVersion = "25.11";
           home.packages = with pkgs; [
             river
             waybar
