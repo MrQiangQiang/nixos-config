@@ -1,7 +1,8 @@
 {
   lib,
   stdenv,
-  zig_0_15,
+  fetchFromGitHub,
+  zig,
   pkg-config,
   wayland,
   libxkbcommon,
@@ -9,19 +10,23 @@
   fcft,
   wayland-protocols,
   git,
-  src,
 }:
 
 stdenv.mkDerivation {
   pname = "kwm";
   version = "2026-05-11";
 
-  inherit src;
+  src = fetchFromGitHub {
+    owner = "kewuaa";
+    repo = "kwm";
+    rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
+    hash = "";
+  };
 
   strictDeps = true;
  
   nativeBuildInputs = [
-    zig_0_15
+    zig
     pkg-config
     wayland-protocols
     git

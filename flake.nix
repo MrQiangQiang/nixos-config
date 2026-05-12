@@ -9,7 +9,6 @@
     };
     disko.url = "github:nix-community/disko";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    kwm-src.url = "github:kewuaa/kwm";
   };
 
   outputs = inputs@{ flake-parts, ... }:
