@@ -55,7 +55,7 @@ stdenv.mkDerivation {
   preBuild = ''
     export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
     mkdir -p $ZIG_GLOBAL_CACHE_DIR
-    cp -a ${zigDeps}/. $ZIG_GLOBAL_CACHE_DIR
+    cp -a ${zigDeps}/. $ZIG_GLOBAL_CACHE_DIR/
     chmod -R +w $ZIG_GLOBAL_CACHE_DIR
   '';
 
