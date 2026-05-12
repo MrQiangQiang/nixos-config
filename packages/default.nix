@@ -1,6 +1,6 @@
 { ... }:
 {
   perSystem = { pkgs, ... }: {
-    packages.kwm = pkgs.callPackage ./kwm,nix {};
+    packages.kwm = pkgs.callPackage ./kwm.nix {};
   };
 }
