@@ -1,6 +1,6 @@
 { inputs, ... }: {
   imports = [
-    inputs.self.nixosModules/river
+    inputs.self.nixosModules.river
     ./hardware-configuration.nix
   ];
 
