@@ -14,10 +14,6 @@
 
 let
   zig = zig-overlay.packages.${stdenv.hostPlatform.system}.default;
-in
-stdenv.mkDerivation {
-  pname = "kwm";
-  version = "2026-05-11";
 
   src = fetchFromGitHub {
     owner = "kewuaa";
@@ -25,6 +21,17 @@ stdenv.mkDerivation {
     rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
     hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
   };
+
+  deps = zig.fetchDeps {
+    inherit src;
+    name = "kwm-zig-deps";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+in
+stdenv.mkDerivation {
+  inherit src;  
+  pname = "kwm";
+  version = "2026-05-11";
 
   strictDeps = true;
  
@@ -45,12 +52,6 @@ stdenv.mkDerivation {
   preBuild = ''
     export HOME=$TMPDIR
   '';
-
-  deps = zig.fetchDeps {
-    inherit src;
-    name = "kwm-zig-deps";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
 
   buildPhase = ''
     mkdir -p $HOME/.cache/zig
