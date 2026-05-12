@@ -13,7 +13,7 @@
   hardware.enableRedistributableFirmware = true;
 
   boot.loader = {
-    system-boot.enable = true;
+    systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
   };
   
