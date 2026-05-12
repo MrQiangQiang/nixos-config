@@ -1,6 +1,6 @@
 { inputs, ... }: {
   imports = [
-    inputs.self.flakeModules.nixos.river
+    ../../modules/river.nix
     ./hardware-configuration.nix
   ];
 
