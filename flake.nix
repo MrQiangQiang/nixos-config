@@ -1,24 +1,20 @@
 {
-  description = "My Nixos configuration";
-
   inputs = {
     nixpkgs.url = "github:Nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko.url = "github:nix-community/disko";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ flake-parts, nixpkgs, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" "aarch64-linux" ];
+      systems = [ "x86_64-linux"];
       imports = [ 
         inputs.home-manager.flakeModules.home-manager
-        ./modules
+        ./modules/river.nix
         ./packages
-        ./hosts
       ];
       nixConfig = {
         experimental-features = [ "nix-command" "flakes" ];
@@ -30,6 +26,14 @@
         ];
         trusted-public-keys = [
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDshjY="
+        ];
+      };
+      
+      flake.nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/nixos/default.nix
         ];
       };  
     };

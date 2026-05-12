@@ -1,0 +1,28 @@
+warning: Git tree '/home/a/nixos-config' is dirty
+warning: updating lock file "/home/a/nixos-config/flake.lock":
+• Removed input 'disko'
+• Removed input 'disko/nixpkgs'
+error:
+       … while evaluating the attribute 'root.result'
+         at «flakes-internal»/call-flake.nix:94:7:
+           93|     {
+           94|       result =
+             |       ^
+           95|         if node.flake or true then
+
+       … in the left operand of the update (//) operator
+         at «flakes-internal»/call-flake.nix:81:9:
+           80|         # This is shadowed in the next //
+           81|         // sourceInfo
+             |         ^
+           82|         // {
+
+       (stack trace truncated; use '--show-trace' to show the full, detailed trace)
+
+       error: attribute 'xdg.configFile' already defined at /nix/store/zk1xdzd466phzl0pagbgmbhy4s4qwdfj-source/modules/river.nix:30:11
+       at /nix/store/zk1xdzd466phzl0pagbgmbhy4s4qwdfj-source/modules/river.nix:34:11:
+           33|
+           34|           xdg.configFile."river/init" = {
+             |           ^
+           35|             text = ''
+Command 'nix --extra-experimental-features 'nix-command flakes' build --print-out-paths '/home/a/nixos-config#nixosConfigurations."nixos".config.system.build.nixos-rebuild' --no-link' returned non-zero exit status 1.
