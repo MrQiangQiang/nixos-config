@@ -1,8 +1,6 @@
-{ inputs, ... }:
+{ ... }:
 {
   perSystem = { pkgs, ... }: {
-    packages.kwm = pkgs.callPackage ./kwm,nix {
-      src = inputs.kwm-src;
-    };
+    packages.kwm = pkgs.callPackage ./kwm,nix {};
   };
 }
