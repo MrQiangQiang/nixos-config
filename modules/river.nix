@@ -28,7 +28,7 @@
           ] ++ lib.optional (cfg.windowManager == "kwm") inputs.self.packages.${pkgs.system}.kwm;
           
           xdg.configFile = lib.mkMerge [
-            (lib.mkIf cfg.windowManager == "kwm" && cfg.kwmConfig != null) {
+            (lib.mkIf (cfg.windowManager == "kwm" && cfg.kwmConfig != null) {
 	      "kwm/config.zon".source = cfg.kwmConfig;
 	    })
             { 
