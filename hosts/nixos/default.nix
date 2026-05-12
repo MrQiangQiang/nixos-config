@@ -24,7 +24,7 @@
   };
   
   users.users.a = {
-    isNormalUsr = true;
+    isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "video" "input" ];
   };
   
