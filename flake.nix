@@ -7,48 +7,31 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-    };
-    kwm.url = "github:kewuaa/kwm";
+    disko.url = "github:nix-community/disko";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    kwm-src.url = "github:kewuaa/kwm";
   };
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" ];
       imports = [ 
-        inputs.home-manager.flakeModules.home-manager 
+        inputs.home-manager.flakeModules.home-manager
+        ./modules
+        ./packages
+        ./hosts
       ];
-
-      perSystem = { config, pkgs, ... }: {
-        _module.args.pkgs = pkgs;
-      };      
-   
-      flake = {
-        nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/nixos/hardware-configuration.nix
-            ./hosts/nixos/configuration.nix
-            inputs.home-manager.nixosModules.home-manager
-            ./modules/river-kwm.nix
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users.a = { pkgs, ... }: {
-                  home.packages = [ pkgs.git pkgs.neovim ];    
-                  programs.bash.enable = true;  
-	        };
-              };	 
-            }
-          ];
-        };
-      }; 
+      nixConfig = {
+        experimental-features = [ "nix-command" "flakes" ];
+        substituters = [
+          "https://mirror.sjtu.edu.cn/nix-channels/store"
+          "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+          "https://mirrors.ustc.edu.cn/nix-channels/store"
+          "https://cache.nixos.org"
+        ];
+        trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDshjY="
+        ];
+      };  
     };
 }

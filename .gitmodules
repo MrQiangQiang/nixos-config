@@ -1,0 +1,3 @@
+[submodule "kwm-src"]
+	path = sources/kwm-src
+	url = https://github.com/kewuaa/kwm.git
