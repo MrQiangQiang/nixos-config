@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  zig,
+  zig-overlay,
   pkg-config,
   wayland,
   libxkbcommon,
@@ -12,6 +12,9 @@
   git,
 }:
 
+let
+  zig = zig-overlay.packages.${stdenv.hostPlatform.system}.default;
+in
 stdenv.mkDerivation {
   pname = "kwm";
   version = "2026-05-11";
@@ -43,7 +46,15 @@ stdenv.mkDerivation {
     export HOME=$TMPDIR
   '';
 
+  deps = zig.fetchDeps {
+    inherit src;
+    name = "kwm-zig-deps";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+
   buildPhase = ''
+    mkdir -p $HOME/.cache/zig
+    cp -r ${deps}/* $HOME/.cache/zig/
     zig build -Doptimize=ReleaseSafe --prefix $out
   '';
 
