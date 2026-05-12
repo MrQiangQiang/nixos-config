@@ -12,17 +12,19 @@
   git,
 }:
 
-stdenv.mkDerivation {
+let
   pname = "kwm";
   version = "2026-05-11";
-
   src = fetchFromGitHub {
     owner = "kewuaa";
     repo = "kwm";
     rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
     hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
   };
-  
+in
+stdenv.mkDerivation {
+  inherit pname version src;
+ 
   zigCachePrefix = zig.fetchDeps {
     inherit pname version src;
     hash = "";
