@@ -16,7 +16,7 @@
         ./modules/river.nix
         ./packages
       ];
-      nixConfig = {
+      flake.nixConfig = {
         experimental-features = [ "nix-command" "flakes" ];
         substituters = [
           "https://mirror.sjtu.edu.cn/nix-channels/store"
@@ -28,7 +28,6 @@
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDshjY="
         ];
       };
-      
       flake.nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
