@@ -20,7 +20,7 @@ stdenv.mkDerivation {
     owner = "kewuaa";
     repo = "kwm";
     rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
-    hash = "sha256-U1BuQC+kAMOmKBwqmefUvz9PhSDb/TNwcNh5Cxltnc8=";
+    hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
   };
 
   strictDeps = true;
