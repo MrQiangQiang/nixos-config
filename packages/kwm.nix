@@ -22,11 +22,16 @@ stdenv.mkDerivation {
     rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
     hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
   };
+  
+  zigCachePrefix = zig.fetchDeps {
+    inherit pname version src;
+    hash = "";
+  };
 
   strictDeps = true;
  
   nativeBuildInputs = [
-    zig
+    zig.hook
     pkg-config
     wayland-protocols
     git
@@ -38,18 +43,6 @@ stdenv.mkDerivation {
     pixman
     fcft
   ];
-
-  preBuild = ''
-    export HOME=$TMPDIR
-  '';
-
-  buildPhase = ''
-    zig build -Doptimize=ReleaseSafe --prefix $out
-  '';
-
-  installPhase = ''
-    zig build install --perfix $out
-  '';
 
   meta = with lib; {
     description = "Window manager for River Wayland cpmpositor (zig)";
