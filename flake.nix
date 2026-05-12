@@ -9,6 +9,22 @@
   };
 
   outputs = inputs@{ flake-parts, nixpkgs, ... }:
+    let
+      import-tree = path:
+        builtins.concatLists (
+          builtins.attrValues (
+            builtins.mapAttrs
+              (name: type: 
+                if type == "regular" && builtins.match ".*\\.nix" name != null
+		then [ (path + "/${name}") ]
+                else if type == "directory"
+                then import-tree (path + "/${name}")
+                else [ ]
+              )
+              (builtins.readDir path)	
+           )  
+         );
+    in 
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux"];
       imports = [ 

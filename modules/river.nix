@@ -1,6 +1,6 @@
-{ config, inputs, lib,  ... }:
+{ inputs,  ... }:
 {
-  flake.modules.nixos.river = { config, lib, pkgs, inputs, ... }:
+  flake.nixosModules.river = { config, lib, pkgs, ... }:
     let
       cfg = config.custom.river;
     in
