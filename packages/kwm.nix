@@ -55,6 +55,6 @@ stdenv.mkDerivation {
     description = "Window manager for River Wayland cpmpositor (zig)";
     homepage = "https://github.com/kewuaa/kwm";
     license = licenses.gpl3;
-    platforms = platforms.linus;   
+    platforms = platforms.linux;   
   };
 }
