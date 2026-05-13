@@ -11,6 +11,7 @@ inputs.nixpkgs.lib.nixosSystem {
   inherit system;
   specialArgs = { inherit inputs; };
   modules = [
+    inputs.home-manager.nixosModules.home-manager
     {
       networking.hostName = hostName;
       networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
@@ -21,7 +22,7 @@ inputs.nixpkgs.lib.nixosSystem {
       time.timeZone = "Asia/Shanghai";
       
       boot.loader = {
-        systemd-boot.enable = true;
+      systemd-boot.enable = true;
         efi.canTouchEfiVariables = true;
       };
 
