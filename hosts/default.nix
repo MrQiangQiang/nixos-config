@@ -1,10 +1,13 @@
 { inputs, ... }:
 
+let
+  mkHost = import ../lib/mkHost.nix { inherit inputs; };
+in
 {
-  flake.nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
+  flake.nixosConfigurations.nixos = mkHost {
+    hostName = "nixos"
     system = "x86_64-linux";
-    specialArgs = { inherit inputs; };
-    modules = [
+    extraModules = [
       ./nixos/default.nix
     ];
   };

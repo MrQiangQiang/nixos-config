@@ -35,6 +35,7 @@ stdenv.mkDerivation {
     wayland
     wayland-protocols
     pkg-config
+    libinput
   ];
  
   buildInputs = [ 
