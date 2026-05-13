@@ -1,0 +1,49 @@
+building the system configuration...
+evaluation warning: 'system' has been renamed to/replaced by 'stdenv.hostPlatform.system'
+error:
+       … while calling the 'head' builtin
+         at «github:NixOS/nixpkgs/da5ad661ba4e5ef59ba743f0d112cbc30e474f32?narHash=sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA%3D»/lib/attrsets.nix:1712:13:
+         1711|           if length values == 1 || pred here (elemAt values 1) (head values) then
+         1712|             head values
+             |             ^
+         1713|           else
+
+       … while evaluating the attribute 'value'
+         at «github:NixOS/nixpkgs/da5ad661ba4e5ef59ba743f0d112cbc30e474f32?narHash=sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA%3D»/lib/modules.nix:1167:7:
+         1166|     // {
+         1167|       value = addErrorContext "while evaluating the option `${showOption loc}':" value;
+             |       ^
+         1168|       inherit (res.defsFinal') highestPrio;
+
+       … while evaluating the option `system.build.toplevel':
+
+       … while evaluating definitions from `/nix/store/vp1i814m5cqfzh22bl76s1k9bc8iikkv-source/nixos/modules/system/activation/top-level.nix':
+
+       … while evaluating the option `warnings':
+
+       … while evaluating definitions from `/nix/store/vp1i814m5cqfzh22bl76s1k9bc8iikkv-source/nixos/modules/system/boot/systemd.nix':
+
+       … while evaluating the option `systemd.services.home-manager-a.serviceConfig':
+
+       … while evaluating definitions from `/nix/store/wkrs2fv9513vwik235axvjxz6p97v0al-source/nixos':
+
+       … while evaluating the option `home-manager.users.a.home.file."/home/a/.config/fontconfig/conf.d/10-hm-fonts.conf".source':
+
+       … while evaluating definitions from `/nix/store/wkrs2fv9513vwik235axvjxz6p97v0al-source/modules/files.nix':
+
+       … while evaluating the option `home-manager.users.a.home.file."/home/a/.config/fontconfig/conf.d/10-hm-fonts.conf".text':
+
+       … while evaluating definitions from `/nix/store/wkrs2fv9513vwik235axvjxz6p97v0al-source/modules/misc/xdg.nix':
+
+       … while evaluating the option `home-manager.users.a.xdg.configFile."fontconfig/conf.d/10-hm-fonts.conf".text':
+
+       … while evaluating definitions from `/nix/store/wkrs2fv9513vwik235axvjxz6p97v0al-source/modules/misc/fontconfig.nix':
+
+       … while evaluating the option `home-manager.users.a.fonts.fontconfig.configFile.fonts.text':
+
+       … while evaluating definitions from `/nix/store/wkrs2fv9513vwik235axvjxz6p97v0al-source/modules/misc/fontconfig.nix':
+
+       (stack trace truncated; use '--show-trace' to show the full, detailed trace)
+
+       error: empty hash requires explicit hash algorithm
+Command 'nix --extra-experimental-features 'nix-command flakes' build --print-out-paths '/home/a/nixos-config#nixosConfigurations."nixos".config.system.build.toplevel' --no-link --option substituters https://cache.nixos.org' returned non-zero exit status 1.
