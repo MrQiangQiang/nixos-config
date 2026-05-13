@@ -2,14 +2,15 @@
   config,
   lib,
   pkgs,
+  osConfig,
   ...
 }:
 
 let
-  cfg = config.custom.river;
+  cfg = osConfig.custom.river or {};
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable or false) {
     home.packages = with pkgs; [
       pkgs.kwm
       waybar
@@ -20,7 +21,9 @@ in
 
     wayland.windowManager.river = {
       enable = true;
-      systemdIntegration = true;
+      systemd = {
+	enable = true;
+      };
      
       settings = {              
         terminal = "${pkgs.foot}/bin/foot";
@@ -61,7 +64,7 @@ in
         spawn = [
           ''"${pkgs.swaybg}/bin/swaybg" -c "#1e1e2e"''
           ''"${pkgs.waybar}/bin/waybar"''
-          ''"${if cfg.windowManager "kwm"
+          ''"${if cfg.windowManager == "kwm"
                then pkgs.kwm
                else pkgs.rivertile}/bin/${cfg.windowManager}"''
         ];

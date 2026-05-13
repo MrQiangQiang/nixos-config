@@ -28,5 +28,6 @@
   
   home-manager.users.a = {
     imports = [ ../../home/river.nix ];
+    home.stateVersion = "25.11";
   };
 }

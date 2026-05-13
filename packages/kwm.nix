@@ -6,7 +6,6 @@
   pkg-config,
   wayland,
   wayland-protocols,
-  wayland-scanner,
   libxkbcommon,
   pixman,
   fcft
@@ -65,3 +64,4 @@ stdenv.mkDerivation {
     platforms = platforms.linux;
   };
 }
+
