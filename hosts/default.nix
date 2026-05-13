@@ -5,7 +5,7 @@ let
 in
 {
   flake.nixosConfigurations.nixos = mkHost {
-    hostName = "nixos"
+    hostName = "nixos";
     system = "x86_64-linux";
     extraModules = [
       ./nixos/default.nix
