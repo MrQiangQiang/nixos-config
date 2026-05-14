@@ -25,7 +25,8 @@ let
 
   zigDeps = zig_0_15.fetchDeps {
     inherit pname version src;
-    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
+    hash = "";
+#    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
   };
 in
 stdenv.mkDerivation {
