@@ -8,11 +8,13 @@
 
 let
   cfg = osConfig.custom.river or {};
+  
+  kwm-local = pkgs.callPackage ../packages/kwm.nix {};
 in
 {
   config = lib.mkIf (cfg.enable or false) {
     home.packages = with pkgs; [
-      pkgs.kwm
+      kwm-local
       waybar
       swaybg
       foot
@@ -65,7 +67,7 @@ in
           ''"${pkgs.swaybg}/bin/swaybg" -c "#1e1e2e"''
           ''"${pkgs.waybar}/bin/waybar"''
           ''"${if cfg.windowManager == "kwm"
-               then pkgs.kwm
+               then kwm-local
                else pkgs.rivertile}/bin/${cfg.windowManager}"''
         ];
       };

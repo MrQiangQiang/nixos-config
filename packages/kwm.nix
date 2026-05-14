@@ -6,6 +6,7 @@
   pkg-config,
   wayland,
   wayland-protocols,
+  wayland-scanner,
   libxkbcommon,
   pixman,
   fcft
@@ -37,6 +38,7 @@ stdenv.mkDerivation {
     pkg-config
     wayland
     wayland-protocols
+    wayland-scanner
   ];
 
   buildInputs = [
@@ -49,7 +51,7 @@ stdenv.mkDerivation {
   postConfigure = ''
     ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
     export ZIG_GLOBAL_CACHE_DIR
-    cp -r ${zigDeps}/. "ZIG_GLOBAL_CACHE_DIR/p"
+    cp -r ${zigDeps}/. "$ZIG_GLOBAL_CACHE_DIR/p"
     chmod -R +w "$ZIG_GLOBAL_CACHE_DIR"
   '';
 
