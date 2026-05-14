@@ -5,11 +5,12 @@
   zig_0_15,
   pkg-config,
   wayland,
-  wayland-protocols,
   wayland-scanner,
+  wayland-protocols,
   libxkbcommon,
   pixman,
-  fcft
+  fcft,
+  callPackage
 }:
 
 let
@@ -23,22 +24,26 @@ let
     hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
   };
 
-  zigDeps = zig_0_15.fetchDeps {
-    inherit pname version src;
-    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
-  };
+  zigDeps = callPackage ./build.zig.zon.nix {}; 
+
+#  zigDeps = zig_0_15.fetchDeps {
+#    inherit pname version src;
+#    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
+#  };
 in
 stdenv.mkDerivation {
   inherit pname version src;
 
   strictDeps = true;
 
+  depsBuildBuild = [
+    pkg-config
+    wayland-scanner
+  ];
+
   nativeBuildInputs = [
     zig_0_15.hook
-    pkg-config
-    wayland
     wayland-protocols
-    wayland-scanner
   ];
 
   buildInputs = [
@@ -51,8 +56,9 @@ stdenv.mkDerivation {
   postConfigure = ''
     ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
     export ZIG_GLOBAL_CACHE_DIR
-    cp -r ${zigDeps}/. "$ZIG_GLOBAL_CACHE_DIR/p"
-    chmod -R +w "$ZIG_GLOBAL_CACHE_DIR"
+    mkdir -p $ZIG_GLOBAL_CACHE_DIR/p
+    cp -r ${zigDeps}/* "$ZIG_GLOBAL_CACHE_DIR/p"
+    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
   '';
 
   zigBuildFlags = [
