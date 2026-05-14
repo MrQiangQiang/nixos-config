@@ -27,8 +27,7 @@ let
   zigDeps = zig_0_15.fetchDeps {
     inherit pname version src;
 #    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; 
-#    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
-    hash = lib.fakeHash;
+    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
   };
 in
 stdenv.mkDerivation {
@@ -57,8 +56,13 @@ stdenv.mkDerivation {
   ];
 
   postConfigure = ''
+    export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
+    mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
+    cp -af ${zigDeps}/. "$ZIG_GLOBAL_CACHE_DIR/"
+    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
+
     export PKG_CONFIG_PATH="${
-      lib.makeSearchPath "lib/pkgconfig" [
+      lib.makeSearchPath "lib/pkgconfig" [#
         wayland-scanner
         wayland
         libxkbcommon
@@ -67,10 +71,6 @@ stdenv.mkDerivation {
         fcft
       ]
     }:${wayland-protocols}/share/pkgconfig''${PKG_CONFIG_PATH:+:}$PKG_CONFIG_PATH"
-    export ZIG_GLOBAL_CHACHE_DIR=$TMPDIR/zig-cache
-    mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
-    cp -rn ${zigDeps}/* "$ZIG_GLOBAL_CACHE_DIR/"
-    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
 #    export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
 #    mkdir -p $ZIG_GLOBAL_CACHE_DIR/p
 #    cp -r ${zigDeps}/* "$ZIG_GLOBAL_CACHE_DIR/p"
