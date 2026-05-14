@@ -30,4 +30,18 @@
     imports = [ ../../home/river.nix ];
     home.stateVersion = "25.11";
   };
+
+  environment.variables = {
+    http_proxy = "http://192.168.0.101:1082";
+    https_proxy = "http://192.168.0.101:1082";
+    no_proxy = "localhost,127.0.0.1,::1";
+  };
+
+  systemd.services.nix-daemon.serviceConfig = {
+    Environment = [
+      "http_proxy=http://192.168.0.101:1082"
+      "https_proxy=http://192.168.0.101:1082"
+      "no_proxy=localhost,127.0.0.1,::1"
+    ];
+  };
 }

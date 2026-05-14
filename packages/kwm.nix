@@ -9,8 +9,7 @@
   wayland-protocols,
   libxkbcommon,
   pixman,
-  fcft,
-  callPackage
+  fcft
 }:
 
 let
@@ -22,14 +21,12 @@ let
     repo = "kwm";
     rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84"; 
     hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
+  }; 
+
+  zigDeps = zig_0_15.fetchDeps {
+    inherit pname version src;
+    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
   };
-
-  zigDeps = callPackage ./build.zig.zon.nix {}; 
-
-#  zigDeps = zig_0_15.fetchDeps {
-#    inherit pname version src;
-#    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
-#  };
 in
 stdenv.mkDerivation {
   inherit pname version src;
