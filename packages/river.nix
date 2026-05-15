@@ -63,7 +63,7 @@ stdenv.mkDerivation {
     fi
   '';
 
-  zigBuildFlahs = [
+  zigBuildFlags = [
     "-Doptimize=ReleaseSafe"
     "-Dpie=true"
   ];
