@@ -20,25 +20,32 @@ let
   src = fetchFromGitHub {
     owner = "kewuaa";
     repo = "kwm";
-    rev = "d3d6ec2c13c830f312a79c8cb7b908964ecb5c84";
-    hash = "sha256-UIBuOC+kAMQmKBwqmefUvz9PhSDb/TNWcNh5CxItnc8=";
+    rev = "master";  
+    hash = "sha256-NyKFSlIpb2m2kQRBJ/4+koJpIaRjbs5hRPJZ34KGJrc=";
+  };
+
+  patchedSrc = stdenv.mkDerivation {
+    name = "kwm-src-final";
+    inherit src;
+    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
+    patchPhase = ''
+      sed -i "/lazy/d" build.zig.zon
+    '';
+    installPhase = "cp -r . $out"; 
   }; 
 
   zigDeps = zig_0_15.fetchDeps {
-    inherit pname version src;
-#    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; 
-    hash = "sha256-RxaOdKCDduRBGMb1bb5cYgQ6WAfIG9tpuxiVhOmaEvE=";
+    inherit pname version;
+    src = patchedSrc;
+    hash = "sha256-cCe9Fy0snuyHFU5H3qMTK1Cpzl1KJDdO8q1MW+mzu1s=";
   };
 in
 stdenv.mkDerivation {
-  inherit pname version src;
+  inherit pname version;
 
+  src = patchedSrc;
+    
   strictDeps = true;
-
-#  depsBuildBuild = [
-#    pkg-config
-#    wayland-scanner
-#  ];
 
   nativeBuildInputs = [
     zig_0_15.hook
@@ -49,6 +56,8 @@ stdenv.mkDerivation {
 
   buildInputs = [
     wayland
+    wayland-protocols
+    wayland-scanner
     libxkbcommon
     pixman
     fcft
@@ -58,31 +67,18 @@ stdenv.mkDerivation {
   postConfigure = ''
     export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
     mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
-    cp -af ${zigDeps}/. "$ZIG_GLOBAL_CACHE_DIR/"
-    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
 
-    export PKG_CONFIG_PATH="${
-      lib.makeSearchPath "lib/pkgconfig" [#
-        wayland-scanner
-        wayland
-        libxkbcommon
-        libevdev
-        pixman
-        fcft
-      ]
-    }:${wayland-protocols}/share/pkgconfig''${PKG_CONFIG_PATH:+:}$PKG_CONFIG_PATH"
-#    export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
-#    mkdir -p $ZIG_GLOBAL_CACHE_DIR/p
-#    cp -r ${zigDeps}/* "$ZIG_GLOBAL_CACHE_DIR/p"
-#    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
+    if [ -d "${zigDeps}/p" ]; then
+      cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/"
+    else
+      mkdir -p "$ZIG_GLOBAL_CACHE_DIR/p"
+      cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/p/"
+    fi
+
+    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
+    echo "--- Current PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
   '';
   
-#  preBuild = ''
-#    if [ -n "$deps" ]; then
-#      zigBuildFlagsArray+=("--system" "$deps")
-#    fi
-#  '';
-
   zigBuildFlags = [
     "-Doptimize=ReleaseSafe"
   ];

@@ -7,8 +7,7 @@
 }:
 
 let
-  cfg = osConfig.custom.river or {};
-  
+  cfg = osConfig.custom.river or {};  
   kwm-local = pkgs.callPackage ../packages/kwm.nix {};
 in
 {
@@ -23,10 +22,8 @@ in
 
     wayland.windowManager.river = {
       enable = true;
-      systemd = {
-	enable = true;
-      };
-     
+      systemd.enable = true;
+      
       settings = {              
         terminal = "${pkgs.foot}/bin/foot";
        
@@ -35,46 +32,49 @@ in
           "color-unfocused" = "0x444444";
           "width" = 2;
         };
+
+        default-layout = "${cfg.windowManager}";
        
         keybinds = {         
           normal = {
-            "Super Return" = ''spawn "${pkgs.foot}/bin/foot"'';
+            "Super Return" = "spawn ${pkgs.foot}/bin/foot";
             "Super Q" = "close";
             "Super+Shift E" = "exit";
             "Super J" = "focus-view next";
             "Super K" = "focus-view previous";
             "Super+Shift J" = "swap next";
             "Super+Shift K" = "swap previous";
-          }
-          // builtins.foldl' (
-            acc: i:
-            let 
-              tag = toString i;
-            in
-            acc // {
-              "Super ${tag}" = "set-focused-tags ${tag}";
-              "Super+Shift ${tag}" = "set-view-tags ${tag}";
-            }
-          ) {} (lib.range 1 9); 
+            "Super m" = "zoom";
+          } // (builtins.listToAttrs(builtins.concatMap (i:
+          let
+            pow2 = n: if n == 0 then 1 else 2 * (pow2 (n - 1));
+            tag = toString (pow2 (i - 1));
+            index = toString i;
+          in [
+            { name = "Super ${index}}"; value = "set-focused-tag ${tag}"; }
+            { name = "Super+Shift ${index}"; value = "set-view-tag ${tag}"; }
+          ]) (lib.range 1 9))); 
        
-          "pointer" = {
+          pointer = {
             "Super BTN_LEFT" = "move-view";
             "Super BTN_RIGHT" = "resize-view";
           };  
         };
-          
+
         spawn = [
-          ''"${pkgs.swaybg}/bin/swaybg" -c "#1e1e2e"''
-          ''"${pkgs.waybar}/bin/waybar"''
-          ''"${if cfg.windowManager == "kwm"
-               then kwm-local
-               else pkgs.rivertile}/bin/${cfg.windowManager}"''
+          "${pkgs.swaybg}/bin/swaybg -c '#1e1e2e'"
+          "${pkgs.waybar}/bin/waybar"
+          (if cfg.windowManager == "kwm"
+           then "${kwm-local}/bin/kwm"
+           else "${pkgs.rivertile}/bin/rivertile")
         ];
+          
       };
          
       extraConfig = ''
         riverctl spawm-tagmask 0
-        riverctl spawm-tagmask none
+        riverctl focus-follows-cursor always
+        riverctl export XDG_CURRENT_DESKTOP river
       '';
     };    
   };

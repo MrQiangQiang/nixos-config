@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
+  fetchgit,
   pkg-config,
   zig_0_16,
   wayland,
@@ -15,17 +15,24 @@
   mesa
 }:
 
-stdenv.mkDerivation {
+let
   pname = "river";
   version = "0.4.2";
-  
-  src = fetchFromGitHub {
-    domain = "codeberg.org";
-    owner = "river";
-    repo = "river";
+ 
+  src = fetchgit {
+    url = "https://codeberg.org/river/river";
     rev = "v${version}";
-    hash "";
+    hash = "sha256-Nufonz39XphxPW1lERq2acVgE5mGmW+x1yimyS6O4tc=";
+    fetchSubmodules = true;
   };
+  
+  zigDeps = zig_0_16.fetchDeps {
+    inherit pname version src;
+    hash = "sha256-17qCdlDdfnHirNu3kNnQRlvRL/ifPhQiYk1IfR7lVSw=";
+  };
+in
+stdenv.mkDerivation {
+  inherit pname version src;
 
   strictDeps = true;
 
@@ -33,19 +40,32 @@ stdenv.mkDerivation {
     zig_0_16.hook
     scdoc
     wayland
-    wayland-protocols
     pkg-config
-    libinput
   ];
  
   buildInputs = [ 
     wayland
+    wayland-protocols
     wlroots_0_20
     libxkbcommon
     libevdev
     libinput
     pixman
     mesa
+  ];
+
+  postConfigure = ''
+    export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-cache"
+    mkdir -p "$ZIG_GLOBAL_CACHE_DIR/p"
+    if [ -d "${zigDeps}" ]; then
+      cp -pr "${zigDeps}/." "$ZIG_gLOBAL_CACHE_DIR/p"
+      chamod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
+    fi
+  '';
+
+  zigBuildFlahs = [
+    "-Doptimize=ReleaseSafe"
+    "-Dpie=true"
   ];
 
   meta = with lib; {
@@ -55,5 +75,4 @@ stdenv.mkDerivation {
     platforms = platforms.linux;
     mainProgram = "river";
   };
-    
 }
