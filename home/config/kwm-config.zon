@@ -1,4 +1,7 @@
 .{
+    .background = {
+        .color = 0xFF0000FF    
+    },
     .bindings = .{
         .key = .{
             .{ .keysym = "Return", .modifiers = { .mod4 = true }, .event = .{ 

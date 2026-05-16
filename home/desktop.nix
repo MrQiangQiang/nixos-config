@@ -7,7 +7,7 @@
 }:
 
 let
-  cfg = osConfig.custom.desktop or {};
+  cfg = osConfig.custom.river or {};
 in
 {
   home.stateVersion = "25.11";
