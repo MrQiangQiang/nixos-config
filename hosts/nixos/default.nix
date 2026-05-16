@@ -25,6 +25,15 @@
     enable = true;
     windowManager = "kwm";
   };
+
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    distrobox
+  ];
   
   users.users.a = {
     isNormalUser = true;
@@ -35,7 +44,10 @@
       "input"
       "render"
       "seat"
+      "podman"
     ];
+    subUidRanges = [ { startUid = 1000; count = 65536; } ];
+    subGidRanges = [ { startGid = 1000; count = 65536; } ];
   };
   
   home-manager.users.a = {
