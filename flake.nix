@@ -8,13 +8,19 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = inputs@{ flake-parts, ... }: 
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs: 
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux"];
       imports = [ 
-        inputs.home-manager.flakeModules.home-manager
         ./packages
         ./hosts
       ];
+      perSystem = { system, ... }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          overlays = [inputs.self.overlays.default ];
+          config.allowUnfree = true;
+        };
+      };
     };
 }
