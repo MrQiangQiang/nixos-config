@@ -19,4 +19,8 @@ in
     swaybg
     firefox
   ]);
+
+  xdg.configFile = lib.mkIf ( cfg.enable or false) {
+    "kwm/config.zon".source = ./config/kwm-config.zon;
+  };
 }

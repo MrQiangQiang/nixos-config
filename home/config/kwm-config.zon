@@ -1,0 +1,8 @@
+.{
+    .bindings = .{
+        .key = .{
+            .{ .keysym = "Return", .modifiers = { .mod4 = true }, .event = .{ 
+.click = .{ .pressed = .{ .spawn = .{ .argv = .{ "foot" } } } } } } },
+        },
+    },
+}
