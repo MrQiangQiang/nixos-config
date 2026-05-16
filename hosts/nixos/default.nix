@@ -51,7 +51,7 @@
   };
   
   home-manager.users.a = {
-    imports = [ ../../home/desktop.nix ];
+    imports = [ ../../home ];
   };
 
 }
