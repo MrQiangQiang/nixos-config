@@ -46,8 +46,8 @@
       "seat"
       "podman"
     ];
-    subUidRanges = [ { startUid = 1000; count = 65536; } ];
-    subGidRanges = [ { startGid = 1000; count = 65536; } ];
+    subUidRanges = [ { startUid = 100000; count = 65536; } ];
+    subGidRanges = [ { startGid = 100000; count = 65536; } ];
   };
   
   home-manager.users.a = {
