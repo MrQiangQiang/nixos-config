@@ -1,11 +1,13 @@
 .{
     .background = .{
-        .color = 0xFF0000FF,    
+        .color = 0xFF0000FF,   
     },
     .bindings = .{
         .key = .{
-            .{ .keysym = "Return", .modifiers = .{ .mod4 = true }, .event = .{ 
-.click = .{ .pressed = .{ .spawn = .{ .argv = .{ "foot" } } } } } },
+            .{ .keysym = 
+"Return", .modifiers = .{ .mod4 = 
+true }, .event = .{ .click = .{ .pressed = .
+{ .spawn = .{ .argv = .{ "foot" } } } } } },
         },
     },
 }
