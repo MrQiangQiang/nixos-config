@@ -34,6 +34,7 @@
       "video"
       "input"
       "render"
+      "seat"
     ];
   };
   

@@ -11,15 +11,12 @@ let
 in
 {
   home.stateVersion = "25.11";
-
-  config = lib.mkIf (cfg.enable or false) {
-    home.packages = with pkgs; [
-      river
-      kwm
-      foot
-      waybar
-      swaybg
-      firefox
-    ];
-  }  
+  home.packages = lib.mkIf ( cfg.enable or false) (with pkgs; [
+    river
+    kwm
+    foot
+    waybar
+    swaybg
+    firefox
+  ]);
 }
