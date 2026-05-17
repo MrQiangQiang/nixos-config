@@ -40,8 +40,8 @@
           prefix = "docker.io";
           location = "docker.io";
           mirror = [
-            { location = "docker.nju.edu.cn"; }
-            { location = "docker.m.daocloud.io"; }
+            { location = "https://docker.nju.edu.cn"; }
+            { location = "https://docker.m.daocloud.io"; }
           ];
         }    
       ];
