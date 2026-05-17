@@ -6,5 +6,5 @@
 }:
 
 {
-  imports = [ ./distrobox ];
+  imports = [ ./distrobox.nix ];
 }
