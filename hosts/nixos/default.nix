@@ -38,8 +38,8 @@
         {
           location = "docker.io";
           mirror = [
-            { "https://docker.nju.edu.cn"; }
-            { "https://docker.m.daocloud.io"; }
+            { location = "docker.nju.edu.cn"; }
+            { location = "docker.m.daocloud.io"; }
           ];
         }    
       ];
