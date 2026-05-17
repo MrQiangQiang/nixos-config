@@ -16,17 +16,12 @@ in
       default = pkgs.river;
       description = "The river package to use";
     };
-    windowManager = lib.mkOption {
-      type = lib.types.enum [ "kwm" "rivertile" ];
-      default = "kwm";
-    };
   };
       
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
     services.displayManager.sessionPackages = [ cfg.package ];
-    services.seatd.enable = true;    
-    services.dbus.enable = true;
+    security.polkit.enable = true;
 
     xdg.portal = {
       enable = true;
@@ -34,7 +29,10 @@ in
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
       ];
-      config.common.default = "*";
+      config = {
+        common.default = "*";
+        river.default = [ "wlr" "gtk" ];
+      };
     };
   };
 }

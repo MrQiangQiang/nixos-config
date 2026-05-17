@@ -21,10 +21,8 @@
     ];
   };
   
-  custom.river = {
-    enable = true;
-    windowManager = "kwm";
-  };
+  custom.river.enable = true;
+  
 
   virtualisation.podman = {
     enable = true;
@@ -40,10 +38,6 @@
     extraGroups = [ 
       "wheel"
       "networkmanager"
-      "video"
-      "input"
-      "render"
-      "seat"
       "podman"
     ];
     subUidRanges = [ { startUid = 100000; count = 65536; } ];

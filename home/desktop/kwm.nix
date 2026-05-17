@@ -7,9 +7,9 @@
 }:
 
 let
-  cfg = osConfig.custon.river or {};
+  isRiverEnabled = osConfig.config.custom.river.enable or false;
 in
-lib.mkIf ( cfg.enable or false ) {
+lib.mkIf isRiverEnabled {
   home.packages = with pkgs; [ kwm ];
   xdg.configFile."kwm/config.zon".source = ./config/kwm-config.zon;
 }

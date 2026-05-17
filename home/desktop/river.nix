@@ -7,8 +7,21 @@
 }:
 
 let
-  cfg = osConfig.custom.river or {};
+  isRiverEnabled = osConfig.config.custom.river.enable or false;
 in
-lib.mkIf ( cfg.enable or false ) {  
-  home.packages = with pkgs; [ river ];
+lib.mkIf isRiverEnabled { 
+  xdg.configFile."river/init" = {
+    executable = true;
+    text = ''
+      #!/bin/sh
+      
+      export XDG_CURRENT_DESKTOP=river
+      export XDG_SESSION_TYPE=wayland
+   
+      swaybg -m color -c "#1e1e2e" &
+      waybar &
+      
+      exec kwm
+    '';
+  }; 
 }
