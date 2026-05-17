@@ -9,6 +9,6 @@
 let
   isRiverEnabled = osConfig.config.custom.river.enable or false;
 in
-lib.mkIf isRiverEnable {
+lib.mkIf isRiverEnabled {
   home.packages = with pkgs; [ waybar ];
 }
