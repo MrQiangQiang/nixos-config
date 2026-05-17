@@ -5,6 +5,22 @@
   ...
 }:
 
+let
+  mirrorConfigText = ''
+    [[registry]]
+    prefix = "docker.io"
+    location = "docker.io"
+    
+    [[registry.mirror]]
+    location = "https://docker.1ms.run"
+
+    [[registry.mirror]]
+    location = "https://docker.m.daocloud.io"
+
+    [[registru.mirror]]
+    location = "https://docker.xuanyuan.me"
+  '';
+in
 {
   imports = [
     ../../modules/river.nix
@@ -26,27 +42,20 @@
   custom.river.enable = true;
   
 
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
-
-  virtualisation.containers = {
-    enable = true;
-    containersConf.settings = {
-      containers.unqualified-search-registries = [ "docker.io" ];
-      registry = [
-        {
-          prefix = "docker.io";
-          location = "docker.io";
-          mirror = [
-            { location = "https://docker.nju.edu.cn"; }
-            { location = "https://docker.m.daocloud.io"; }
-          ];
-        }    
-      ];
+  virtualisation = {
+    podman = {
+      enable = true;
+      dockerCompat = true;
+    };
+    containers = {
+      enable = true;
+      containersConf.settings = {
+        containers.unqualified-search-registries = [ "docker.io" ];
+      };
     };
   };
+
+  environment.etc."containers/registries.conf".text = mirrorConfigText;
 
   environment.systemPackages = with pkgs; [
     distrobox
