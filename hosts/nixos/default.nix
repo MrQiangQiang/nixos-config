@@ -11,6 +11,8 @@
     ./hardware-configuration.nix
   ];
 
+  system.stateVersion = "25.11";
+
   hardware.graphics = {
     enable = true;
     enable32Bit =true;
@@ -29,6 +31,17 @@
     dockerCompat = true;
   };
 
+  virtualisation.containers = {
+    enable = true;
+    registries = {
+      search = [ "docker.io" ];
+      mirrors."docker.io".location = [
+        "https://docker.nju.edu.cn"
+        "https://docker.m.daocloud.io"
+      ];
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     distrobox
   ];
@@ -40,8 +53,7 @@
       "networkmanager"
       "podman"
     ];
-    subUidRanges = [ { startUid = 100000; count = 65536; } ];
-    subGidRanges = [ { startGid = 100000; count = 65536; } ];
+    autoSubUidGidRange = true;
   };
   
   home-manager.users.a = {

@@ -18,7 +18,7 @@ let
       set -euo pipefail
       
       CONTAINER_NAME="trae-env"
-      IMAGE="ubuntu:24.04"
+      IMAGE="docker.io/library/ubuntu:24.04"
 
       echo "=> [Host] Checking Distrobox container status..."
       if ! distrobox list --no-color | grep -qw "$CONTAINER_NAME"; then

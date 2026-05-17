@@ -25,12 +25,16 @@ inputs.nixpkgs.lib.nixosSystem {
       time.timeZone = "Asia/Shanghai";
       
       boot.loader = {
-      systemd-boot.enable = true;
+        systemd-boot.enable = true;
         efi.canTouchEfiVariables = true;
       };
 
       nix.settings = {
         experimental-features = [ "nix-command" "flakes" ];
+        trusted-users = [
+          "root"
+          "@wheel"
+        ];
         substituters = [
           "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=10"
           "https://mirror.sjtu.edu.cn/nix-channels/store?priority=20"
@@ -44,9 +48,7 @@ inputs.nixpkgs.lib.nixosSystem {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-      };
-      
-      system.stateVersion = "25.11";
+      };      
     }
   ] ++ extraModules;
 }
