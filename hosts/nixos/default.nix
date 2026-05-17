@@ -34,7 +34,7 @@
   virtualisation.containers = {
     enable = true;
     containersConf.settings = {
-      containers.unqualified-search-registries = [ "docker.io" ]
+      containers.unqualified-search-registries = [ "docker.io" ];
       registry = [
         {
           prefix = "docker.io";
