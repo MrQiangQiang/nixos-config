@@ -7,7 +7,7 @@
 }:
 
 let
-  isRiverEnabled = osConfig.config.custom.river.enable or false;
+  isRiverEnabled = osConfig.custom.river.enable or false;
 in
 lib.mkIf isRiverEnabled {
   home.packages = with pkgs; [ kwm ];
