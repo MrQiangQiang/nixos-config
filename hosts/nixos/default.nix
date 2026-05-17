@@ -33,9 +33,11 @@
 
   virtualisation.containers = {
     enable = true;
-    settings = {
+    containersConf.settings = {
+      containers.unqualified-search-registries = [ "docker.io" ]
       registry = [
         {
+          prefix = "docker.io";
           location = "docker.io";
           mirror = [
             { location = "docker.nju.edu.cn"; }
