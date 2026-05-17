@@ -33,11 +33,15 @@
 
   virtualisation.containers = {
     enable = true;
-    registries = {
-      search = [ "docker.io" ];
-      mirrors."docker.io".location = [
-        "https://docker.nju.edu.cn"
-        "https://docker.m.daocloud.io"
+    settings = {
+      registry = [
+        {
+          location = "docker.io";
+          mirror = [
+            { "https://docker.nju.edu.cn"; }
+            { "https://docker.m.daocloud.io"; }
+          ];
+        }    
       ];
     };
   };
