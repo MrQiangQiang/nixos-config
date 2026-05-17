@@ -31,23 +31,7 @@
       enable = true;
       dockerCompat = true;
     };
-    containers = {
-      enable = true;
-      containersConf.settings = {
-        containers.unqualified-search-registries = [ "docker.io" ];
-        registry = [
-          {
-            prefix = "docker.io";
-            location = "docker.io";
-            mirror = [
-              { location = "https://docker.1ms.run"; }
-              { location = "https://docker.m.daocloud.io"; }
-              { location = "https://docker.xuanyuan.me"; }
-            ];
-          }
-        ]; 
-      };
-    };
+    containers.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
