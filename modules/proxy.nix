@@ -14,6 +14,9 @@ let
     log-level: info
     ipv6: false
 
+    external-controller: 127.0.0.1:9090
+    secret: "local_only_secure_token_2026_atuo_generated"
+
     tun:
       enable: true
       stack: gvisor
@@ -33,14 +36,16 @@ let
       my-airport:
         type: http
         url: ${secrets.proxy.subscriptionUrl}
+        lazy: true
         interval: 86400
-        path: ./airport.yaml
+        path: /var/lib/mihomo/airport-cache.yaml
         health-check: { enable: true, interval: 600, url: http://www.gstatic.com/generate_204 }
 
     proxy-groups:
       - { name: "全自动最优节点", type: url-test, use: [my-airport], url: http://www.gstatic.com/generate_204, interval: 300, tolerance: 50 }
 
     rules:
+      - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
       - GEOIP,LAN,DIRECT
       - GEOIP,CN,DIRECT
       - MATCH,全自动最优节点    

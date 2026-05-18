@@ -4,7 +4,7 @@
   programs.git = {
     enable = true;
     userName = "fugui";
-    userEmail = "chenzhiqiang0125@gamil.com"
+    userEmail = "chenzhiqiang0125@gamil.com";
   };
 
   programs.vim = {
