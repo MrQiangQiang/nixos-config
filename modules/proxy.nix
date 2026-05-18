@@ -30,7 +30,7 @@ let
       enhanced-mode: fake-ip
       fake-ip-range: 198.18.0.1/16
       default-nameserver: [223.5.5.5, 119.29.29.29]
-      nameserver: ["https//doh.pub/dns-query"]
+      nameserver: [223.5.5.5, 119.29.29.29, "https//doh.pub/dns-query"]
       
     proxy-providers:
       my-airport:
