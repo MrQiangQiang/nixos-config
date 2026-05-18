@@ -11,6 +11,7 @@
     ../../modules/proxy.nix
     ../../modules/im.nix
     ../../modules/fonts.nix
+    ../../modules/core-utils.nix
     ./hardware-configuration.nix
   ];
 
