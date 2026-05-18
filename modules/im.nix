@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -13,9 +14,9 @@
   };
 
   environment.variables = with pkgs; {
-    GTK_IM_MODULE = "fcitx5";
-    QT_IM_MODULE = "fcitx5";
-    XMODIFIERS = "@im=fcitx5";
+    GTK_IM_MODULE = lib.mkForce "fcitx5";
+    QT_IM_MODULE = lib.mkForce "fcitx5";
+    XMODIFIERS = lib.mkForce "@im=fcitx";
   };
 
   environment.systemPackages = with pkgs; [

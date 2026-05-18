@@ -10,6 +10,7 @@
     ../../modules/river.nix
     ../../modules/proxy.nix
     ../../modules/im.nix
+    ../../modules/fonts.nix
     ./hardware-configuration.nix
   ];
 
