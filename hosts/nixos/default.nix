@@ -8,6 +8,8 @@
 {
   imports = [
     ../../modules/river.nix
+    ../../modules/proxy.nix
+    ../../modules/im.nix
     ./hardware-configuration.nix
   ];
 
