@@ -25,7 +25,7 @@ distrobox enter "$CONTAINER_NAME" -- bash << 'EOF'
 
   if [ "$CURRENT_STATUS" != "install ok installed" ]; then
     echo "=> [Container] Target package not found. Downloading the latest Linux stable release from ByteDance CDN..."
-    wget --no-check-certificate -q "https://cdn.trae.cn/releases/stable/linux/trae-cn-latest.deb" -O /tmp/trae.deb
+    wget --no-check-certificate -q --show-progress -O /tmp/trae.deb "https://cdn.trae.cn/releases/stable/linux/trae-cn-latest.deb"
 
     echo "=> [Container] Unpacking and automatically resolving graphical system dependencies..."
     sudo apt-get install -y -qq /tmp/trae.deb > /dev/null
