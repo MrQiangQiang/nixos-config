@@ -35,9 +35,11 @@ let
         echo "=> [Container] Synchronizing local API repositories..."
         sudo apt-get update -qq
         sudo apt-get install -y -qq wget ca-certificates > /dev/null
-        
-        echo "=> [Container] Verifying Trae IDE installation status via dpkg.."
-        if ! dpkg-query -W -f=''${Status}'' trae 2>/dev/null | grep -q "install ok installed"; then
+
+        CURRENT_STATUS=$(dpkg-query -W -f='${Status}' trae 2>/dev/null || echo "not-installed")
+        echo "=> [Container] Explicit Trae Status: [$CURRENT_STATUS]"
+  
+        if [ "$CURRENT_STATUS" != "install ok installed" ]; then
           echo "=> [Container] Target package not found. Downloading the latest Linux stable release from ByteDance CDN..."
           wget --no-check-certificate -q "https://cdn.trae.cn/releases/stable/linux/trae-cn-latest.deb" -O /tmp/trae.deb
 
