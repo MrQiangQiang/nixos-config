@@ -28,7 +28,7 @@ let
       
       echo "=> [Host] Entering container to inject the automated setup script.."
       # Standard << 'EOF' feeds the internal logic to the container's bash
-      distrobox enter -n "$CONTAINER_NAME" --bash << 'EOF'
+      distrobox enter "$CONTAINER_NAME" -- bash << 'EOF'
         set -euo pipefail
         export DEBIAN_FRONTEND=noninteractive
         
@@ -37,7 +37,7 @@ let
         sudo apt-get install -y -qq wget ca-certificates > /dev/null
         
         echo "=> [Container] Verifying Trae IDE installation status via dpkg.."
-        if ! dpkg-query -W -f=''${Status} trae 2>/dev/null | grep -q "install ok installed"; then
+        if ! dpkg-query -W -f=''${Status}'' trae 2>/dev/null | grep -q "install ok installed"; then
           echo "=> [Container] Target package not found. Downloading the latest Linux stable release from ByteDance CDN..."
           wget --no-check-certificate -q "https://cdn.trae.cn/releases/stable/linux/trae-cn-latest.deb" -O /tmp/trae.deb
 
@@ -55,7 +55,7 @@ let
 
         echo "=> [Container] Exporting graphical desktop entry to the Nixos host..."
         distrobox-export --app trae
-      EOF
+EOF
 
       echo "=============================================================="
       echo "=> [Host] Congratulations! Trae IDE is now ready for your River desktop!"
