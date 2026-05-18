@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+
+echo "=> [Container] Synchronizing local API repositories..."
+sudo apt-get update -qq || echo "[Warning] Slight jitter in package repository synchronization..."
+
+sudo apt-get install -y -qq wget ca-certificates > /dev/null
+if [ $? -ne 0 ]; then
+  echo "[Error] Failed to install core dependency 'wget'!"
+  exit 1
+fi
+
+CURRENT_STATUS=$(dpkg-query -W -f='${Status}' trae 2>/dev/null || echo "not-installed")
+echo "=> [Container] Explicit Trae Status: [$CURRENT_STATUS]"
+
+if [ "$CURRENT_STATUS" != "install ok installed" ]; then
+  echo "=> [Container] Target package not found. Downloading the latest Linux stable release from ByteDance CDN..."
+
+  wget --no-check-certificate -q --show-progress -O /tmp/trae.deb "https://cdn.trae.cn/releases/stable/linux/trae-cn-latest.deb"
+  if [ $? -ne 0 ]; then
+    echo "[Error] Failed to download Trae from ByteDance CDN! please check your Mihomo proxy node."
+    exit 1
+  fi
+
+  echo "=> [Container] Unpacking and automatically resolving graphical system dependencies..."
+  sudo apt-get install -y -qq /tmp/trae.deb > /dev/null
+  rm -f /tmp/trae.deb
+else
+  echo "=> [Container] Trae is already installed via dpkg. Skipping download stage."
+fi
+
+echo "=> [Container] Injecting Wayland optimizations and disabling sandbox constraints..."
+if [ -f /usr/share/applications/trae.desktop ]; then
+  sudo sed -i 's|^Exec=.*trae.*|Exec=/usr/bin/trae --no-sandbox --ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --password-store=basic %U|g' /usr/share/applications/trae.desktop
+fi
+
+echo "=> [Container] Exporting graphical desktop entry to the Nixos host..."
+distrobox-export --app trae
