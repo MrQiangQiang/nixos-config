@@ -32,12 +32,11 @@ echo "=> [Host] Entering container to inject the automated setup script.."
 
 EXIT_CODE=0
 
-distrobox enter "$CONTAINER_NAME" \
-  --env http_proxy="{$http_proxy:-}" \
-  --env https_proxy="{$https_proxy:-}" \
-  --env all_proxy="{$all_proxy:-}" \
-  --env no_proxy="{$no_proxy:-}" \
-  -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
+http_proxy="{$http_proxy:-}" \
+https_proxy="{$https_proxy:-}" \
+all_proxy="{$all_proxy:-}" \
+no_proxy="{$no_proxy:-}" \
+distrobox enter "$CONTAINER_NAME" -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo "================================================================="
