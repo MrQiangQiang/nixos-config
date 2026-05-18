@@ -3,8 +3,12 @@
 {
   programs.git = {
     enable = true;
-    userName = "fugui";
-    userEmail = "chenzhiqiang0125@gamil.com";
+    settings = {
+      user = {
+        name = "fugui";
+        email = "chenzhiqiang0125@gmail.com";
+      };
+    };
   };
 
   programs.vim = {

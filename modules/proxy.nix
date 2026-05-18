@@ -38,7 +38,7 @@ let
         url: ${secrets.proxy.subscriptionUrl}
         lazy: true
         interval: 86400
-        path: /var/lib/mihomo/airport-cache.yaml
+        path: airport-cache.yaml
         health-check: { enable: true, interval: 600, url: http://www.gstatic.com/generate_204 }
 
     proxy-groups:
@@ -58,12 +58,14 @@ in {
   services.mihomo = {
     enable = true;
     tunMode = true;
-    configFile = "${mihomoConfig}";
+    configFile = mihomoConfig;
   };
 
   systemd.services.mihomo.serviceConfig = {
     StateDirectory = "mihomo";
     StateDirectoryMode = "0750";
+    AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
+    CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
   };
 
   systemd.services.nix-daemon.serviceConfig.Environment = [
