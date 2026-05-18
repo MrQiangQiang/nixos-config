@@ -27,6 +27,7 @@ fi
 echo "=> [Host] Entering container to inject the automated setup script.."
 
 EXIT_CODE=0
+# shellcheck disable=SC2154
 distrobox enter "$CONTAINER_NAME" \
   --env http_proxy="{$http_proxy:-}" \
   --env https_proxy="{$https_proxy:-}" \
