@@ -17,6 +17,7 @@ let
     tun:
       enable: true
       stack: gvisor
+      device: tun0
       auto-route: true
       auto-detect-interface: true
       dns-hijack: ["any:53"]
@@ -51,6 +52,7 @@ in {
 
   services.mihomo = {
     enable = true;
+    tunMode = true;
     configFile = "${mihomoConfig}";
   };
 
@@ -59,14 +61,18 @@ in {
     StateDirectoryMode = "0750";
   };
 
+  systemd.services.nix-daemon.serviceConfig.Environment = [
+    "http_proxy=http://127.0.0.1:7890";
+    "https_proxy=http://127.0.0.1:7890";
+  ];
+
   networking.firewall = {
     enable = true;
     trustedInterfaces = [ "tun0" ];
     checkReversePath = false;
   };
 
-  networking.networkmanager.connection.config = {
+  networking.networkmanager.connectionConfig = {
     "connection.mdns" = 2;
   };
 }
-  
