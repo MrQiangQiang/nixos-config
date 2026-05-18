@@ -10,7 +10,8 @@ echo "=> [Host] Checking Distrobox container status..."
 if ! podman container exists "$CONTAINER_NAME" 2>/dev/null && ! docker container exists "$CONTAINER_NAME" 2>/dev/null; then
   if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
     echo "=> [Host] Container not found. Creating a clean Ubuntu environment.."
-    distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes
+    distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes \
+      --additional-flags "--dns 223.5.5.5 --dns 8.8.8.8"
   fi
 fi
 
@@ -26,7 +27,12 @@ fi
 echo "=> [Host] Entering container to inject the automated setup script.."
 
 EXIT_CODE=0
-distrobox enter "$CONTAINER_NAME" -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
+distrobox enter "$CONTAINER_NAME" \
+  --env http_proxy="{$http_proxy:-}" \
+  --env https_proxy="{$https_proxy:-}" \
+  --env all_proxy="{$all_proxy:-}" \
+  --env no_proxy="{$no_proxy:-}" \
+  -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo "================================================================="
