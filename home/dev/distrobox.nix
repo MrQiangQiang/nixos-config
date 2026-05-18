@@ -28,7 +28,7 @@ let
       
       echo "=> [Host] Entering container to inject the automated setup script.."
       # Standard << 'EOF' feeds the internal logic to the container's bash
-      distrobox enter "$CONTAINER_NAME" --bash << 'EOF'
+      distrobox enter -n "$CONTAINER_NAME" --bash << 'EOF'
         set -euo pipefail
         export DEBIAN_FRONTEND=noninteractive
         
