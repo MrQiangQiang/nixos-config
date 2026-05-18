@@ -14,7 +14,7 @@ if ! podman container exists "$CONTAINER_NAME" 2>/dev/null && ! docker container
   fi
 fi
 
-if [ ! -f "$REAL_setUP_SCRIPT" ]; then
+if [ ! -f "$REAL_SETUP_SCRIPT" ]; then
   echo "================================================================="
   echo "=> [Host Error ] Deployment interrupted: Internal setup script not found!"
   echo "=> Expected path: $REAL_SETUP_SCRIPT"
