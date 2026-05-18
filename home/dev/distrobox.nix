@@ -18,7 +18,7 @@ let
       set -euo pipefail
       
       CONTAINER_NAME="trae-env"
-      IMAGE="docker.xuanyuan.me/library/ubuntu:24.04"
+      IMAGE="docker.io/library/ubuntu:24.04"
 
       echo "=> [Host] Checking Distrobox container status..."
       if ! distrobox list --no-color | grep -qw "$CONTAINER_NAME"; then
@@ -50,20 +50,12 @@ let
 
         echo "=> [Container] Injecting Wayland optimizations and disabling sandbox constraints..."
         if [ -f /usr/share/applications/trae.desktop ]; then
-          mkdir -p "$HOME/.local/share/applications"
-          cp /usr/share/applications/trae.desktop "$HOME/.local/share/applications/"
-
-          # Modern Wayland Best Practices for Electron apps:
-          # --no-sandbox: Fixes Electron crashes inside unprivileged user namespaces on newer kernels
-          # --ozone-platform-hint=auto: Enables native Wayland rendering (prevents XWayland blurriness)
-          # --enable-features=WaylandWindowDecorations: Ensures proper window scaling and borders
-          # --password-store=basic: Prevents freezing by avoiding missing Gnome keyring loops in containers
-          sed -i 's|Exec=/usr/bin/trae|Exec=/usr/bin/trae --no-sandbox --ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --password-store=basic|g' "$HOME/.local/share/applications/trae.desktop"
+          sudo sed -i 's|^Exec=.*trae.*|Exec=/usr/bin/trae --no-sandbox --ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --password-store=basic %U|g' "/usr/share/applications/trae.desktop"
         fi
 
         echo "=> [Container] Exporting graphical desktop entry to the Nixos host..."
-EOF
-# CRITICAL: This EOF marker must be completely flush-left (no spaces/tabs) for shellcheck to compile!
+        distrobox-export --app trae
+      EOF
 
       echo "=============================================================="
       echo "=> [Host] Congratulations! Trae IDE is now ready for your River desktop!"
@@ -72,9 +64,7 @@ EOF
     '';
   };
 in
-{
-  programs.distrobox.enable = true;
-  
+{  
   home.packages = [
     init-trae-script
   ];
