@@ -20,7 +20,7 @@ lib.mkIf isRiverEnabled {
   };
   home.packages = with pkgs; [
     ffmpegthumbnailer
-    poppler_utils
+    poppler-utils
     unrar
   ]; 
 }
