@@ -32,7 +32,6 @@ in
       ];
       config = {
         common.default = "*";
-        river.default = [ "wlr" "gtk" ];
       };
     };    
   };

@@ -14,5 +14,6 @@
     ./swaybg.nix
     ./foot.nix
     ./firefox.nix
+    ./filemanager.nix
   ];
 }
