@@ -11,6 +11,9 @@ inputs.nixpkgs.lib.nixosSystem {
   inherit system;
   specialArgs = { inherit inputs; };
   modules = [
+    ../modules/locale.nix
+    ../modules/core-utils.nix
+    ../modules/fonts.nix
     inputs.home-manager.nixosModules.home-manager
     {
       nixpkgs.overlays = [ inputs.self.overlays.default ];
