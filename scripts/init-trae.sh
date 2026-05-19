@@ -30,12 +30,13 @@ if [ ${#storage_debs[@]} -eq 0 ]; then
   DOWNLOAD_DIR=$(xdg-user-dir DOWNLOAD 2>/dev/null || echo "$HOME/Downloads")
 
   shopt -s nullglob
-  downloaded-debs=("$DOWNLOAD_DIR"/*[Tt]rae*.deb)
+  downloaded_debs=("$DOWNLOAD_DIR"/*[Tt]rae*.deb)
   shopt -u nullglob
 
   if [ ${#downloaded_debs[@]} -gt 0 ]; then
     LATEST_DEB="${downloaded_debs[0]}"
     echo "=> [Host] Discovered fresh package in downloads: $(basename "$LATEST_DEB")"
+    echo "=> [Host] Automatically relocating it to configuration storage..."
     mv "$LATEST_DEB" "$DEB_STORAGE"
   else
     echo "==============================================================="
@@ -44,7 +45,7 @@ if [ ${#storage_debs[@]} -eq 0 ]; then
     echo "==============================================================="
     xdg-open "https://www.trae.cn/ide/download" || true
     echo -e "\n Please let your browser download the '.deb' file normally."
-    echo -e "Once download completes, simply re-run this script to continue!"
+    echo "Once download completes, simply re-run this script to continue!"
     exit 0
   fi
 fi
