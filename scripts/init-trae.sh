@@ -10,26 +10,51 @@ CONTAINER_NAME="trae-env"
 IMAGE="docker.io/library/ubuntu:24.04"
 REAL_SETUP_SCRIPT="${HOME}/nixos-config/scripts/trae-container-setup.sh"
 
+DEB_STORAGE="${HOME}/.local/share/trae-ide/pkgs"
+mkdir -p "$DEB_STORAGE"
+
 echo "=> [Host] Checking Distrobox container status..."
 if ! podman container exists "$CONTAINER_NAME" 2>/dev/null && ! docker container exists "$CONTAINER_NAME" 2>/dev/null; then
   if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
     echo "=> [Host] Container not found. Creating a clean Ubuntu environment.."
     distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes \
-      --additional-flags "--dns 223.5.5.5 --dns 8.8.8.8"
+    --additional-flags "--dns 223.5.5.5 --dns 8.8.8.8"
+  fi
+fi
+
+shopt -s nullglob
+storage_debs=("$DEB_STORAGE"/*.deb)
+shopt -u nullglob
+
+if [ ${#storage_debs[@]} -eq 0 ]; then
+  DOWNLOAD_DIR=$(xdg-user-dir DOWNLOAD 2>/dev/null || echo "$HOME/Downloads")
+
+  shopt -s nullglob
+  downloaded-debs=("$DOWNLOAD_DIR"/*[Tt]rae*.deb)
+  shopt -u nullglob
+
+  if [ ${#downloaded_debs[@]} -gt 0 ]; then
+    LATEST_DEB="${downloaded_debs[0]}"
+    echo "=> [Host] Discovered fresh package in downloads: $(basename "$LATEST_DEB")"
+    mv "$LATEST_DEB" "$DEB_STORAGE"
+  else
+    echo "==============================================================="
+    echo "=> [Host] Trae IDE local Package Missing!"
+    echo "=> Bypassing CDN restrictions: Redirecting to official browser gateway."
+    echo "==============================================================="
+    xdg-open "https://www.trae.cn/ide/download" || true
+    echo -e "\n Please let your browser download the '.deb' file normally."
+    echo -e "Once download completes, simply re-run this script to continue!"
+    exit 0
   fi
 fi
 
 if [ ! -f "$REAL_SETUP_SCRIPT" ]; then
-  echo "================================================================="
-  echo "=> [Host Error ] Deployment interrupted: Internal setup script not found!"
-  echo "=> Expected path: $REAL_SETUP_SCRIPT"
-  echo "=> Please ensure your nixos-config repo is under your $HOME directory."
-  echo "================================================================="
+  echo "=> [Host Error] Setup script not found at: $REAL_SETUP_SCRIPT."
   exit 1
 fi
 
 echo "=> [Host] Entering container to inject the automated setup script.."
-
 EXIT_CODE=0
 
 http_proxy="{$http_proxy:-}" \
@@ -45,7 +70,6 @@ if [ $EXIT_CODE -eq 0 ]; then
 else
   echo "================================================================="
   echo "=> [Host] Container setup script exited with error code: $EXIT_CODE"
-  echo "=> Please chech the English log output above to diagnose network/proxy issues"
   echo "================================================================="
   exit "$EXIT_CODE"
 fi
