@@ -27,5 +27,12 @@ lib.mkIf isRiverEnabled {
     ffmpegthumbnailer
     poppler-utils
     unrar
-  ]; 
+  ];
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "inode/directory" = [ "thunar.desktop" ];
+    };
+  }; 
 }

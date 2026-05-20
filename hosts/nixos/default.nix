@@ -48,11 +48,5 @@
   
   home-manager.users.a = {
     imports = [ ../../home ];
-    xdg.mimeApps = {
-      enable = true;
-      defaultApplications = {
-        "inode/directory" = "thunar.desktop";
-      };
-    };
   };
 }
