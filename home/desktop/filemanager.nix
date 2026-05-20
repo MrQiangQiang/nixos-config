@@ -22,6 +22,8 @@ lib.mkIf isRiverEnabled {
 
   home.packages = with pkgs; [
     thunar
+    tumbler
+    gvfs
     ffmpegthumbnailer
     poppler-utils
     unrar
