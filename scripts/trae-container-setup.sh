@@ -7,6 +7,9 @@ DEB_DIR="${HOME}/.local/share/trae-ide/pkgs"
 echo "=> [Container] Synchronizing local API repositories..."
 sudo apt-get update -qq || echo "[Warning] Slight jitter in package repository, ignoring..."
 
+echo "=> [Container] Installing required system utilities..."
+sudo apt-get install -y -qq xdg-utils 2>/dev/null || true
+
 CURRENT_STATUS=$(dpkg-query -W -f='${Status}' trae 2>/dev/null || dpkg-query -W -f='${Status}' trae-cn 2>/dev/null || echo "not-installed")
 INSTALLED_VER=$(dpkg-query -W -f='${Version}' trae 2>/dev/null || dpkg-query -W -f='${Version}' trae-cn 2>/dev/null || echo "0")
 

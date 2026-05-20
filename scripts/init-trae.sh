@@ -8,7 +8,9 @@ no_proxy="${no_proxy:-}"
 
 CONTAINER_NAME="trae-env"
 IMAGE="docker.io/library/ubuntu:24.04"
-REAL_SETUP_SCRIPT="${HOME}/nixos-config/scripts/trae-container-setup.sh"
+SCRIPTS_HOST_DIR="${HOME}/nixos-config/scripts"
+SCRIPTS_CONTAINER_DIR="/opt/init-scripts"
+REAL_SETUP_SCRIPT="${SCRIPTS_HOST_DIR}/trae-container-setup.sh"
 
 DEB_STORAGE="${HOME}/.local/share/trae-ide/pkgs"
 mkdir -p "$DEB_STORAGE"
@@ -17,8 +19,12 @@ echo "=> [Host] Checking Distrobox container status..."
 if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
   echo "=> [Host] Container not found. Creating a clean Ubuntu environment.."
   distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes \
-  --additional-flags "--env WAYLAND_DISPLAY=$WAYLAND_DISPLAY --env 
+    --volume /run/host:/run/host \
+    --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
+    --additional-flags "--env WAYLAND_DISPLAY=$WAYLAND_DISPLAY --env 
 XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+    --init-hooks "bash ${SCRIPTS_CONTAINER_DIR}/init-trae-bashrc-d.sh && bash $
+{SCRIPTS_CONTAINER_DIR}/init-trae-hook-env.sh"
 fi
 
 shopt -s nullglob
@@ -57,14 +63,16 @@ fi
 echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
-http_proxy="{$http_proxy:-}" \
-https_proxy="{$https_proxy:-}" \
-all_proxy="{$all_proxy:-}" \
-no_proxy="{$no_proxy:-}" \
-WAYLAND_DISPLAY="$WAYLAND_DISPLAY" \
-XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
-DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-distrobox enter "$CONTAINER_NAME" -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
+distrobox enter "$CONTAINER_NAME" \
+  --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
+  --env WAYLAND_DISPLAY \
+  --env XDG_RUNTIME_DIR \
+  --env DBUS_SESSION_BUS_ADDRESS \
+  --env http_proxy="{$http_proxy:-}" \
+  --env https_proxy="{$https_proxy:-}" \
+  --env all_proxy="{$all_proxy:-}" \
+  --env no_proxy="{$no_proxy:-}" \
+  -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo "================================================================="
