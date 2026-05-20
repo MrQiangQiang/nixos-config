@@ -10,8 +10,6 @@
     ];
   };
 
-  services.xserver.desktopManager.runXdgAutostartIfNone = true;
-
   environment.systemPackages = with pkgs; [
     qt6Packages.fcitx5-configtool
   ];

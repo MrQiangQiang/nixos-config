@@ -19,6 +19,7 @@ lib.mkIf isRiverEnabled {
 
       swaybg -m color -c "#FF0000" &
       waybar &
+      fcitx5 -d &
 
       systemctl --user import-environment WAYLAND_DISPLAY 
 XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
@@ -27,7 +28,7 @@ XDG_CUREENT_DESKTOP=river XDG_SESSION_TYPE=wayland
 
       systemctl --user restart xdg-desktop-portal.service || true
       systemctl --user restart xdg-desktop-portal-gtk.service || true    
-
+    
       exec kwm
     '';
   }; 
