@@ -19,7 +19,6 @@ echo "=> [Host] Checking Distrobox container status..."
 if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
   echo "=> [Host] Container not found. Creating a clean Ubuntu environment.."
   distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes \
-    --volume /run/host:/run/host \
     --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
     --additional-flags "--env WAYLAND_DISPLAY=$WAYLAND_DISPLAY --env 
 XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" \
