@@ -48,6 +48,7 @@ if dpkg-query -W -f='${Status}' trae-cn | grep -q "install ok installed"; then
 fi
 
 distrobox-export --app "$APP_NAME" \
-  --extra-flags "--no-sandbox --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
+  --extra-flags "--no-sandbox --enable-features=UseOzonePlatform,WaylandWindowDecorations 
+--ozone-platform-hint=auto --enable-wayland-ime"
 
 echo "=> [Container] Setup flow completed successfully!"

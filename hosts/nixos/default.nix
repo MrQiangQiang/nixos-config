@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-{
+{ config, lib, pkgs, ... }: {
   imports = [
     ../../modules/river.nix
     ../../modules/proxy.nix
