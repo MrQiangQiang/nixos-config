@@ -62,14 +62,14 @@ fi
 echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
+http_proxy="{$http_proxy:-}" \
+https_proxy="{$https_proxy:-}" \
+all_proxy="{$all_proxy:-}" \
+no_proxy="{$no_proxy:-}" \
+WAYLAND_DISPLAY="{$WAYLAND_DISPLAY}" \
+XDG_RUNTIME_DIR="{$XDG_RUNTIME_DIR}" \
+DBUS_SESSION_BUS_ADDRESS="{$DBUS_SESSION_BUS_ADDRESS}" \
 distrobox enter "$CONTAINER_NAME" \
-  --env WAYLAND_DISPLAY \
-  --env XDG_RUNTIME_DIR \
-  --env DBUS_SESSION_BUS_ADDRESS \
-  --env http_proxy="{$http_proxy:-}" \
-  --env https_proxy="{$https_proxy:-}" \
-  --env all_proxy="{$all_proxy:-}" \
-  --env no_proxy="{$no_proxy:-}" \
   -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
