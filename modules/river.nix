@@ -29,6 +29,12 @@ in
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
       ];
+      config = {
+        river = {
+          "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+          "default" = [ "gtk" "wlr" ];
+        };
+      };
     };    
   };
 }
