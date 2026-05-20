@@ -63,7 +63,6 @@ echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
 distrobox enter "$CONTAINER_NAME" \
-  --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
   --env WAYLAND_DISPLAY \
   --env XDG_RUNTIME_DIR \
   --env DBUS_SESSION_BUS_ADDRESS \
