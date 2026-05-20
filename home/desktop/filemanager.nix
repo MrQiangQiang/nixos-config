@@ -18,6 +18,17 @@ lib.mkIf isRiverEnabled {
       };
     };
   };
+  
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs.xfce; [
+      thunar-archive-plugin
+    ];
+  };
+
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
+
   home.packages = with pkgs; [
     ffmpegthumbnailer
     poppler-utils
