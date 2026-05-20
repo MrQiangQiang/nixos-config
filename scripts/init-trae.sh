@@ -59,6 +59,11 @@ if [ ! -f "$REAL_SETUP_SCRIPT" ]; then
   exit 1
 fi
 
+if [ ! -f ~/.config/containers/containers.conf ]; then
+  mkdir -p ~/.config/containers
+  touch ~/.config/containers/containers.conf
+fi
+
 echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
