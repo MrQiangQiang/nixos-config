@@ -1,8 +1,8 @@
 { config, pkgs, lib, ...}:
 {
-  service.upower.enable = true;
+  services.upower.enable = true;
   
-  service.pipewire = {
+  services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
