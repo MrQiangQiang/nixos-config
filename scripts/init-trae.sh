@@ -22,7 +22,7 @@ if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
     --volume /run/host:/run/host \
     --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
     --additional-flags "--env WAYLAND_DISPLAY=$WAYLAND_DISPLAY --env 
-XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" \
     --init-hooks "bash ${SCRIPTS_CONTAINER_DIR}/init-trae-bashrc-d.sh && bash $
 {SCRIPTS_CONTAINER_DIR}/init-trae-hook-env.sh"
 fi
