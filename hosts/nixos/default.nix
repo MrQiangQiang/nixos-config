@@ -15,15 +15,10 @@
 
   system.stateVersion = "25.11";
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit =true;
-    extraPackages = with pkgs; [ 
-      mesa
+  hardware.graphics.extraPackages = with pkgs; [
+      intel-media-driver 
       intel-vaapi-driver
-      libvdpau-va-gl
-    ];
-  };
+  ];
   
   custom.river.enable = true;
   

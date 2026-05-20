@@ -14,6 +14,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/locale.nix
     ../modules/core-utils.nix
     ../modules/fonts.nix
+    ../modules/system.nix
     inputs.home-manager.nixosModules.home-manager
     {
       nixpkgs.overlays = [ inputs.self.overlays.default ];
