@@ -61,7 +61,10 @@ fi
 
 if [ ! -f ~/.config/containers/containers.conf ]; then
   mkdir -p ~/.config/containers
-  touch ~/.config/containers/containers.conf
+  cat << 'EOF' > ~/.config/containers/containers.conf
+[containers]
+default_sysctls = []
+EOF
 fi
 
 echo "=> [Host] Entering container to inject the automated setup script.."
