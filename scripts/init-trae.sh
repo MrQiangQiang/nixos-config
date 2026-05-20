@@ -59,14 +59,6 @@ if [ ! -f "$REAL_SETUP_SCRIPT" ]; then
   exit 1
 fi
 
-if [ ! -f ~/.config/containers/containers.conf ]; then
-  mkdir -p ~/.config/containers
-  cat << 'EOF' > ~/.config/containers/containers.conf
-[containers]
-default_sysctls = []
-EOF
-fi
-
 echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
