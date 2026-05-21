@@ -1,4 +1,4 @@
-{ pkgs, lib, stdenv, buildFHSEnv, dpkg, makeDesktopItem }:
+{ pkgs, ... }:
 let
   pname = "trae-cn";
   version = "1.107.1";
@@ -15,7 +15,7 @@ let
   };
 
   # 解包衍生源
-  trae-unwrapped = stdenv.mkDerivation {
+  trae-unwrapped = pkgs.stdenv.mkDerivation {
     inherit pname version src;
     nativeBuildInputs = [ dpkg ];
     unpackPhase = "dpkg-deb -x $src .";
@@ -29,7 +29,7 @@ let
   };
 
   # 声明式桌面图标，采用绝对路径确保渲染无误
-  desktopItem = makeDesktopItem {
+  desktopItem = pkgs.makeDesktopItem {
     name = "trae-cn";
     desktopName = "Trae CN";
     exec = "trae-cn %U";
@@ -40,7 +40,7 @@ let
     terminal = false;
   };
 in
-buildFSHEnv {
+pkgs.buildFSHEnv {
   name = "trae-cn";
   
   targetPkgs = pkgs: with pkgs; [
