@@ -30,7 +30,7 @@ let
 
   # 声明式桌面图标，采用绝对路径确保渲染无误
   desktopItem = makeDesktopItem {
-    name = "trae-cn"
+    name = "trae-cn";
     desktopName = "Trae CN";
     exec = "trae-cn %U";
     icon = "${trae-unwrapped}/share/pixmaps/trae.png";
