@@ -1,7 +1,7 @@
 { pkgs, lib, stdenv, buildFHSEnv, dpkg, makeDesktopItem }:
 let
   pname = "trae-cn";
-  version = "1.107.1"
+  version = "1.107.1";
 
   src = pkgs.requireFile {
     name = "Trae_CN-linux-x64.deb";
