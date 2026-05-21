@@ -17,7 +17,7 @@ let
   # 解包衍生源
   trae-unwrapped = pkgs.stdenv.mkDerivation {
     inherit pname version src;
-    nativeBuildInputs = [ dpkg ];
+    nativeBuildInputs = [ pkgs.dpkg ];
     unpackPhase = "dpkg-deb -x $src .";
     installPhase = ''
       mkdir -p $out/opt/Trae
