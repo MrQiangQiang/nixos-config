@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 ENV_DIR="$HOME/.bashrc.d"
 ENV_FILE="$ENV_DIR/trae-env.sh"

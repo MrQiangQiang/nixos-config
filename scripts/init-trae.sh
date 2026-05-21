@@ -20,7 +20,7 @@ if ! distrobox list --no-color 2>/dev/null | grep -qw "$CONTAINER_NAME"; then
   echo "=> [Host] Container not found. Creating a clean Ubuntu environment.."
   distrobox create --name "$CONTAINER_NAME" --image "$IMAGE" --yes \
     --volume "${SCRIPTS_HOST_DIR}:${SCRIPTS_CONTAINER_DIR}:ro" \
-    --init-hooks "bash ${SCRIPTS_CONTAINER_DIR}/init-trae-bashrc-d.sh && bash ${SCRIPTS_CONTAINER_DIR}/init-trae-hook-env.sh"
+    --init-hooks "bash -x ${SCRIPTS_CONTAINER_DIR}/init-trae-bashrc-d.sh && bash -x ${SCRIPTS_CONTAINER_DIR}/init-trae-hook-env.sh"
 fi
 
 shopt -s nullglob

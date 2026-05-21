@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 BASHRC_SNIPPET='for f in ~/.bashrc.d/*.sh; do [ -r "$f" ] && source "$f"; done'
 
