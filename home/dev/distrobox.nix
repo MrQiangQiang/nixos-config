@@ -17,7 +17,7 @@ in
   
   home.file = {
     ".config/containers/containsers.conf".text = ''
-      [containers]
-    '';
+[containers]
+'';
   };
 }
