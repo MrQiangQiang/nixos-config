@@ -13,11 +13,5 @@ in
 {  
   home.packages = [
     init-trae-script
-  ];
-  
-  home.file = {
-    ".config/containers/containers.conf".text = ''
-      [containers]
-    '';
-  };
+  ];  
 }
