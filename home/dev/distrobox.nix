@@ -1,10 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
+{ config, lib, pkgs, ... }:
 let
   # Pack the setup script into a standard Nix user application
   init-trae-script = pkgs.writeShellApplication {
@@ -20,4 +14,10 @@ in
   home.packages = [
     init-trae-script
   ];
+  
+  home.file = {
+    ".config/containers/containsers.conf".text = ''
+      [containers]
+    '';
+  };
 }
