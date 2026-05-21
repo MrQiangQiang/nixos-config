@@ -62,13 +62,13 @@ fi
 echo "=> [Host] Entering container to inject the automated setup script.."
 EXIT_CODE=0
 
-http_proxy="{$http_proxy:-}" \
-https_proxy="{$https_proxy:-}" \
-all_proxy="{$all_proxy:-}" \
-no_proxy="{$no_proxy:-}" \
-WAYLAND_DISPLAY="{$WAYLAND_DISPLAY}" \
-XDG_RUNTIME_DIR="{$XDG_RUNTIME_DIR}" \
-DBUS_SESSION_BUS_ADDRESS="{$DBUS_SESSION_BUS_ADDRESS}" \
+#http_proxy="{$http_proxy:-}" \
+#https_proxy="{$https_proxy:-}" \
+#all_proxy="{$all_proxy:-}" \
+#no_proxy="{$no_proxy:-}" \
+#WAYLAND_DISPLAY="{$WAYLAND_DISPLAY}" \
+#XDG_RUNTIME_DIR="{$XDG_RUNTIME_DIR}" \
+#DBUS_SESSION_BUS_ADDRESS="{$DBUS_SESSION_BUS_ADDRESS}" \
 distrobox enter "$CONTAINER_NAME" \
   -- bash "$REAL_SETUP_SCRIPT" || EXIT_CODE=$?
 
