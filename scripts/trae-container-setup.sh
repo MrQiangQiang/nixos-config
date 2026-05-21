@@ -8,7 +8,7 @@ echo "=> [Container] Synchronizing local API repositories..."
 sudo apt-get update -qq || echo "[Warning] Slight jitter in package repository, ignoring..."
 
 echo "=> [Container] Installing required system utilities..."
-sudo apt-get install -y -qq xdg-utils locales
+sudo apt-get install -y -qq xdg-utils locales host-spawm
 sudo locale-gen zh_CN.UTF-8
 sudo update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
