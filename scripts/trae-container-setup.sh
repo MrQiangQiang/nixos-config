@@ -8,7 +8,9 @@ echo "=> [Container] Synchronizing local API repositories..."
 sudo apt-get update -qq || echo "[Warning] Slight jitter in package repository, ignoring..."
 
 echo "=> [Container] Installing required system utilities..."
-sudo apt-get install -y -qq xdg-utils 2>/dev/null || true
+sudo apt-get install -y -qq xdg-utils locales
+sudo locale-gen zh_CN.UTF-8
+sudo update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
 CURRENT_STATUS=$(dpkg-query -W -f='${Status}' trae 2>/dev/null || dpkg-query -W -f='${Status}' trae-cn 2>/dev/null || echo "not-installed")
 INSTALLED_VER=$(dpkg-query -W -f='${Version}' trae 2>/dev/null || dpkg-query -W -f='${Version}' trae-cn 2>/dev/null || echo "0")
@@ -51,7 +53,6 @@ if dpkg-query -W -f='${Status}' trae-cn | grep -q "install ok installed"; then
 fi
 
 distrobox-export --app "$APP_NAME" \
-  --extra-flags "--no-sandbox --enable-features=UseOzonePlatform,WaylandWindowDecorations 
---ozone-platform-hint=auto --enable-wayland-ime"
+  --extra-flags "--no-sandbox --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime"
 
 echo "=> [Container] Setup flow completed successfully!"
