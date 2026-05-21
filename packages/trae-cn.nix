@@ -44,7 +44,7 @@ pkgs.buildFHSEnv {
   name = "trae-cn";
   
   targetPkgs = pkgs: with pkgs; [
-    alsa-lib cairo cups dubs expat glib gtk3
+    alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
     xorg.libX11 xorg.libxcb xorg.libXcomposite xorg.libXdamage
     xorg.libXext xorg.libXfixes xorg.libXrandr
