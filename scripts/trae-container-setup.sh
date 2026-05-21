@@ -8,14 +8,17 @@ echo "=> [Container] Synchronizing local API repositories..."
 sudo apt-get update -qq || echo "[Warning] Slight jitter in package repository, ignoring..."
 
 echo "=> [Container] Installing required system utilities..."
-sudo apt-get install -y -qq xdg-utils locales host-spawm
+sudo apt-get install -y -qq xdg-utils locales
 sudo locale-gen zh_CN.UTF-8
 sudo update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
 CURRENT_STATUS=$(dpkg-query -W -f='${Status}' trae 2>/dev/null || dpkg-query -W -f='${Status}' trae-cn 2>/dev/null || echo "not-installed")
 INSTALLED_VER=$(dpkg-query -W -f='${Version}' trae 2>/dev/null || dpkg-query -W -f='${Version}' trae-cn 2>/dev/null || echo "0")
 
-TRAE_DEB=$(ls -t "$DEB_DIR"/*.deb 2>/dev/null | head -n 1)
+TRAE_DEB=$(ls -t "$DEB_DIR"/*.deb 2>/dev/null | head -n 1) || {
+  echo "=> [Fatal Error] Trae IDE installation package not found in $DEB_DIR!"
+  exit 1
+}
 
 NEED_INSTALL=false
 
@@ -38,12 +41,12 @@ if [ "$NEED_INSTALL" = true ]; then
   fi
 
   echo "=> [Container] Unpacking and resolving system graphical dependencies..."
-  sudo apt-get install -y -qq "$TRAE_DEB" > /dev/null
+  sudo apt-get install -y -qq "$TRAE_DEB"
   echo "=> [Container] Cleaning up transient package to keep environment stateless..."
   rm -f "$TRAE_DEB"
 else
   echo "=> [Container] Trae is already up-to-date. Clearing stale transient debs..."
-  rm -f "$DEB_DIR"/*.deb
+  rm -f "$TRAE_DEB"
 fi
 
 echo "=> [Container] Exporting graphical desktop entry with native Wayland flags..."
