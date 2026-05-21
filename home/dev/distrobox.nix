@@ -16,8 +16,8 @@ in
   ];
   
   home.file = {
-    ".config/containers/containsers.conf".text = ''
-[containers]
-'';
+    ".config/containers/containers.conf".text = ''
+      [containers]
+    '';
   };
 }
