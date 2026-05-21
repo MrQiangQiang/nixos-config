@@ -18,7 +18,7 @@ let
   trae-unwrapped = stdenv.mkDerivation {
     inherit pname version src;
     nativeBuildInputs = [ dpkg ];
-    unpackPhase = "dpkg-deb -x $src ."
+    unpackPhase = "dpkg-deb -x $src .";
     installPhase = ''
       mkdir -p $out/opt/Trae
       cp -r opt/Trae/* $out/opt/Trae/
