@@ -40,7 +40,7 @@ let
     terminal = false;
   };
 in
-pkgs.buildFSHEnv {
+pkgs.buildFHSEnv {
   name = "trae-cn";
   
   targetPkgs = pkgs: with pkgs; [
