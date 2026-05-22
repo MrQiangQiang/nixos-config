@@ -115,11 +115,12 @@ pkgs.buildFHSEnv {
   '';
  
 
-  # 网络全权委托给 TUN
-  # 加上 --no-proxy-server，强行阉割 Electron 的代理逻辑
-  # 此时应用只发出纯净的 TCP 流量，由宿主机代理工具 TUN 在底层瞬间接管和精准分流
-  # 原生 Wayland 启动参数，挂载 exec 接管进程
-  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime --password-store=basic";
+  runScript = "env DISABLE_HYPERFETCH=true ${trae-unwrapped}/opt/Trae/trae-cn \
+    --proxy-server=http://127.0.0.1:7890 \
+    --enable-features=UseOzonePlatform,WaylandWindowDecorations \
+    --ozone-platform-hint=auto \
+    --enable-wayland-ime \
+    --password-store=basic";
 
   # 仅安装我们自己声明的纯净 Desktop Item，防止出现两个图标
   extraInstallCommands = ''
