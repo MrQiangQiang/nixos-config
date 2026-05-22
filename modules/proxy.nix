@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}:
-
+{ config, pkgs, ... }:
 let
   secrets = import ../secrets.nix;
 
@@ -17,6 +12,12 @@ let
     external-controller: 127.0.0.1:9090
     secret: "local_only_secure_token_2026_atuo_generated"
 
+    sniffing:
+      enable: true
+      force-dns-mapping: true
+      parse-pure-ip: true
+      override-destination: true
+
     tun:
       enable: true
       stack: gvisor
@@ -24,6 +25,7 @@ let
       auto-route: true
       auto-detect-interface: true
       dns-hijack: ["any:53"]
+      strict-route: true
 
     dns:
       enable: true
@@ -46,9 +48,19 @@ let
 
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
+
+      # 1. 优先进行【域名】匹配（秒级命中，不触发后台 DNS 等待）
+      - GEOSITE,private,DIRECT
+      - GEOSITE,apple,DIRECT
+      - GEOSITE,category-ads-all,REJECT
+      - GEOSITE,cn,DIRECT
+
+      # 2. 其次进行【IP】匹配（作为兜底）
       - GEOIP,LAN,DIRECT
       - GEOIP,CN,DIRECT
-      - MATCH,全自动最优节点    
+
+      # 3. 剩余未命中流量全部走海外代理
+      - MATCH,全自动最优节点
   '';
 in {
   boot.kernel.sysctl = {

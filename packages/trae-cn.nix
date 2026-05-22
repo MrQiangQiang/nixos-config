@@ -76,12 +76,12 @@ pkgs.buildFHSEnv {
     libX11 libxcb libXcomposite libXdamage
     libXext libXfixes libXrandr libxshmfence
     # 网络与安全
-    gnutls libsecret libgcrypt
+    gnutls libsecret libgcrypt cacert openssl
     # 这里补全了 atk 相关库
     at-spi2-atk at-spi2-core atk
     # 字体与环境
     fontconfig freetype
-    stdenv.cc.cc.lib zlib openssl
+    stdenv.cc.cc.lib zlib
     udev
   ];
 
@@ -97,6 +97,10 @@ pkgs.buildFHSEnv {
     export GTK_IM_MODULE=fcitx5
     export QT_IM_MODULE=fcitx5
     export XMODIFIERS=@im=fcitx
+
+    # 强制引导沙箱内的网络库去正确路径寻找证书
+    export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
   '';
 
   # 原生 Wayland 启动参数，挂载 exec 接管进程
