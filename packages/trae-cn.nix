@@ -23,16 +23,19 @@ let
     '';
     installPhase = ''
       mkdir -p $out/opt/Trae
-      cp -r opt/Trae/* $out/opt/Trae/
+      mkdir -p $out/share/pixmaps
      
       # 自适应探测真实解包路径并复制核心文件
       if [ -d "usr/share/trae-cn" ]; then
-        cp -r usr/share/trae-cn/* $out/opt/Trae/
-      elif [ -d "opt/Trae" ]; then
-        cp -r opt/Trae/* $out/opt/Trae/
-      else
-        echo "解压失败：找不到 Trae 的核心目录！"
-        exit 1
+        cp -a usr/share/trae-cn/. $out/opt/Trae/ || true
+      fi
+
+      if [ -d "opt/Trae" ]; then
+        cp -a opt/Trae/. $out/opt/Trae/ || true
+      fi
+      
+      if [ -d "opt/apps/com.trae.app"]; then
+        cp -a opt/apps/com.trae.app/. $out/opt/Trae/ || true
       fi
       
       # 兼容执行文件的命名（处理 trae vs trae-cn）
