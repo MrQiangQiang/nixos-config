@@ -46,8 +46,8 @@ pkgs.buildFHSEnv {
   targetPkgs = pkgs: with pkgs; [
     alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
-    xorg.libx11 xorg.libxcb xorg.libxcomposite xorg.libxdamage
-    xorg.libxext xorg.libxfixes xorg.libxrandr
+    xorg.libX11 xorg.libxcb xorg.libXcomposite xorg.libXdamage
+    xorg.libXext xorg.libXfixes xorg.libXrandr
     fontconfig freetype
     stdenv.cc.cc.lib zlib openssl bash coreutils curl git
   ];
