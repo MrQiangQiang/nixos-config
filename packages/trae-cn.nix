@@ -66,13 +66,20 @@ pkgs.buildFHSEnv {
 
   # 强制引入基础工具，确保 shell 环境完备
   targetPkgs = pkgs: with pkgs; [
+    # 核心依赖
+    bash coreutils curl git
+    # GUI 基础库
     alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
+    # X11 / Wayland 相关库（处理 libatk 问题）
     libX11 libxcb libXcomposite libXdamage
-    libXext libXfixes libXrandr
+    libXext libXfixes libXrandr libxshmfence
+    # 这里补全了 atk 相关库
+    at-spi2-atk at-spi2-core atk
+    # 字体与环境
     fontconfig freetype
-    stdenv.cc.cc.lib zlib openssl bash coreutils curl git
-  ] ++ (trae-unwrapped.targetPkgs or []);
+    stdenv.cc.cc.lib zlib openssl
+  ];
 
   # 关闭隔离，完美融入宿主机网络与进程树
   unshareUser = false;
