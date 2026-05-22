@@ -35,12 +35,15 @@ let
       nameserver: [223.5.5.5, 119.29.29.29, "https://doh.pub/dns-query"]
 
     fake-ip-filter:
-      - '*.trae.cn'
-      - '*.trae.com.cn'
-      - '*.bytedance.com'
-      - '*.bytedance.net'
-      - '*.byted.org'
-      - '*.zijieapi.com'
+      - '+.trae.cn'
+      - '+.trae.com.cn'
+      - '+.bytedance.com'
+      - '+.bytedance.net'
+      - '+.byted.org'
+      - '+.zijieapi.com'
+      - '+.mchost.guru'
+      - '+.bytedanceapi.com'
+      - '+.volcengine.com'
       - 'api.trae.com.cn'
 
     proxy-providers:
@@ -65,6 +68,9 @@ let
       - DOMAIN-SUFFIX,bytedance.net,DIRECT
       - DOMAIN-SUFFIX,byted.org,DIRECT
       - DOMAIN-SUFFIX,zijieapi.com,DIRECT
+      - DOMAIN-SUFFIX,mchost.gurn,DIRECT
+      - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
+      - DOMAIN-SUFFIX,volcengine.com,DIRECT
 
       # 1. 优先进行【域名】匹配（秒级命中，不触发后台 DNS 等待）
       - GEOSITE,private,DIRECT
