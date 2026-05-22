@@ -103,7 +103,12 @@ pkgs.buildFHSEnv {
     export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+
+    # 强制关闭字节跳动私有网络引擎 (Hyperfetch ttnet)
+    # 迫使沙盒内的 Trae 降级到标准的 Node.js Chromium Socket 网络栈, 彻底解决连接挂起超时的问题
+    export DISABLE_HYPERFETCH="true"
   '';
+ 
 
   # 网络全权委托给 TUN
   # 加上 --no-proxy-server，强行阉割 Electron 的代理逻辑
