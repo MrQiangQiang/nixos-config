@@ -34,17 +34,17 @@ let
       default-nameserver: [223.5.5.5, 119.29.29.29]
       nameserver: [223.5.5.5, 119.29.29.29, "https://doh.pub/dns-query"]
 
-    fake-ip-filter:
-      - '+.trae.cn'
-      - '+.trae.com.cn'
-      - '+.bytedance.com'
-      - '+.bytedance.net'
-      - '+.byted.org'
-      - '+.zijieapi.com'
-      - '+.mchost.guru'
-      - '+.bytedanceapi.com'
-      - '+.volcengine.com'
-      - 'api.trae.com.cn'
+      fake-ip-filter:
+        - '+.trae.cn'
+        - '+.trae.com.cn'
+        - '+.bytedance.com'
+        - '+.bytedance.net'
+        - '+.byted.org'
+        - '+.zijieapi.com'
+        - '+.mchost.guru'
+        - '+.bytedanceapi.com'
+        - '+.volcengine.com'
+        - 'api.trae.com.cn'
 
     proxy-providers:
       my-airport:
