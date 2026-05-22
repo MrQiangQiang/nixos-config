@@ -25,8 +25,24 @@ let
       mkdir -p $out/opt/Trae
       cp -r opt/Trae/* $out/opt/Trae/
      
-      mkdir -p $out/share/pixmaps
-      cp usr/share/pixmaps/trae.png $out/share/pixmaps/ || true
+      # 自适应探测真实解包路径并复制核心文件
+      if [ -d "usr/share/trae-cn" ]; then
+        cp -r usr/share/trae-cn/* $out/opt/Trae/
+      elif [ -d "opt/Trae" ]; then
+        cp -r opt/Trae/* $out/opt/Trae/
+      else
+        echo "解压失败：找不到 Trae 的核心目录！"
+        exit 1
+      fi
+      
+      # 兼容执行文件的命名（处理 trae vs trae-cn）
+      # 我们创建一个软链接，保证最后的 runScript 无论如何都能找到 'trae' 这个命令
+      if [ -f "$out/opt/Trae/trae-cn" ] && [ ! -f "$out/opt/Trae/trae" ]; then
+        ln -s $out/opt/Trae/trae-cn $out/opt/Trae/trae
+      fi
+
+      # 智能提出图标（模糊查找，无视图标路径的变化）
+      find usr/share -type f -name "*.png" | grep -i trae | head -n 1 | xargs -I {} cp {} $out/share/pixmaps/trae.png || true
     '';
   };
 
