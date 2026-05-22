@@ -32,8 +32,17 @@ let
       enhanced-mode: fake-ip
       fake-ip-range: 198.18.0.1/16
       default-nameserver: [223.5.5.5, 119.29.29.29]
-      nameserver: [223.5.5.5, 119.29.29.29, "https//doh.pub/dns-query"]
-      
+      nameserver: [223.5.5.5, 119.29.29.29, "https://doh.pub/dns-query"]
+
+    fake-ip-filter:
+      - '*.trae.cn'
+      - '*.trae.com.cn'
+      - '*.bytedance.com'
+      - '*.bytedance.net'
+      - '*.byted.org'
+      - '*.zijieapi.com'
+      - 'api.trae.com.cn'
+
     proxy-providers:
       my-airport:
         type: http
@@ -48,6 +57,14 @@ let
 
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
+
+      # 强制 Trae 与字节跳动相关流量走本地网络直连
+      - DOMAIN-SUFFIX,trae-cn,DIRECT
+      - DOMAIN-SUFFIX,trae.com.cn,DIRECT
+      - DOMAIN-SUFFIX,bytedance.com,DIRECT
+      - DOMAIN-SUFFIX,bytedance.net,DIRECT
+      - DOMAIN-SUFFIX,byted.org,DIRECT
+      - DOMAIN-SUFFIX,zijieapi.com,DIRECT
 
       # 1. 优先进行【域名】匹配（秒级命中，不触发后台 DNS 等待）
       - GEOSITE,private,DIRECT
