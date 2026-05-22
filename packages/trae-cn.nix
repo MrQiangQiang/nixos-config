@@ -91,7 +91,7 @@ pkgs.buildFHSEnv {
   '';
 
   # 原生 Wayland 启动参数，挂载 exec 接管进程
-  runScript = "${trae-unwrapped}/opt/Trae/trae --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime";
+  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime";
 
   # 仅安装我们自己声明的纯净 Desktop Item，防止出现两个图标
   extraInstallCommands = ''
