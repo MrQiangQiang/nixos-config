@@ -104,6 +104,11 @@ pkgs.buildFHSEnv {
     export NIX_SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     export NODE_EXTRA_CA_CERTS="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
 
+    # 强制所有 HTTP/HTTPS流量主动交给mihomo的mixed-port处理
+    export http_proxy="http://127.0.0.1:7890"
+    export https_proxy="http://127.0.0.1:7890"
+    export no_proxy="localhost,127.0.0.1,::1" 
+
     # 强制关闭字节跳动私有网络引擎 (Hyperfetch ttnet)
     # 迫使沙盒内的 Trae 降级到标准的 Node.js Chromium Socket 网络栈, 彻底解决连接挂起超时的问题
     export DISABLE_HYPERFETCH="true"
@@ -114,7 +119,7 @@ pkgs.buildFHSEnv {
   # 加上 --no-proxy-server，强行阉割 Electron 的代理逻辑
   # 此时应用只发出纯净的 TCP 流量，由宿主机代理工具 TUN 在底层瞬间接管和精准分流
   # 原生 Wayland 启动参数，挂载 exec 接管进程
-  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime --no-proxy-server --password-store=basic";
+  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime --password-store=basic";
 
   # 仅安装我们自己声明的纯净 Desktop Item，防止出现两个图标
   extraInstallCommands = ''
