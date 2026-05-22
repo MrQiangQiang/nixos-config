@@ -17,15 +17,14 @@ let
   # 解包衍生源
   trae-unwrapped = pkgs.stdenv.mkDerivation {
     inherit pname version src;
-    nativeBuildInputs = [ pkgs.dpkg ];
-    unpackPhase = "dpkg-deb -x $src .";
+    unpackPhase = ''
+      ar x $src
+      tar xf data.tar.*
+    '';
     installPhase = ''
       mkdir -p $out/opt/Trae
       cp -r opt/Trae/* $out/opt/Trae/
      
-      # 清除所有文件的特殊权限 (suid/sgid)，防止其影响 Nix 构建
-      chmod -R u-s,g-s $out/opt/Trae    
-
       mkdir -p $out/share/pixmaps
       cp usr/share/pixmaps/trae.png $out/share/pixmaps/ || true
     '';
@@ -49,8 +48,8 @@ pkgs.buildFHSEnv {
   targetPkgs = pkgs: with pkgs; [
     alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
-    xorg.libX11 xorg.libxcb xorg.libXcomposite xorg.libXdamage
-    xorg.libXext xorg.libXfixes xorg.libXrandr
+    libX11 libxcb libXcomposite libXdamage
+    libXext libXfixes libXrandr
     fontconfig freetype
     stdenv.cc.cc.lib zlib openssl bash coreutils curl git
   ];
