@@ -98,13 +98,18 @@ pkgs.buildFHSEnv {
     export QT_IM_MODULE=fcitx5
     export XMODIFIERS=@im=fcitx
 
-    # 强制引导沙箱内的网络库去正确路径寻找证书
+    # 彻底规避 Node.js 的目录扫描 Bug
+    # 直接指向 NixOS 预先合并好的单一证书文件，不再让应用去扫描 /etc/ssl/certs/ 目录
     export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+    export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
   '';
 
+  # 网络全权委托给 TUN
+  # 加上 --no-proxy-server，强行阉割 Electron 的代理逻辑
+  # 此时应用只发出纯净的 TCP 流量，由宿主机代理工具 TUN 在底层瞬间接管和精准分流
   # 原生 Wayland 启动参数，挂载 exec 接管进程
-  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime";
+  runScript = "${trae-unwrapped}/opt/Trae/trae-cn --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime --no-proxy-server";
 
   # 仅安装我们自己声明的纯净 Desktop Item，防止出现两个图标
   extraInstallCommands = ''
