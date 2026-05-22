@@ -22,6 +22,9 @@ let
     installPhase = ''
       mkdir -p $out/opt/Trae
       cp -r opt/Trae/* $out/opt/Trae/
+     
+      # 清除所有文件的特殊权限 (suid/sgid)，防止其影响 Nix 构建
+      chmod -R u-s,g-s $out/opt/Trae    
 
       mkdir -p $out/share/pixmaps
       cp usr/share/pixmaps/trae.png $out/share/pixmaps/ || true
