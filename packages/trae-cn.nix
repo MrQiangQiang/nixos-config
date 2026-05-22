@@ -63,7 +63,8 @@ let
 in
 pkgs.buildFHSEnv {
   name = "trae-cn";
-  
+
+  # 强制引入基础工具，确保 shell 环境完备
   targetPkgs = pkgs: with pkgs; [
     alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
@@ -71,7 +72,7 @@ pkgs.buildFHSEnv {
     libXext libXfixes libXrandr
     fontconfig freetype
     stdenv.cc.cc.lib zlib openssl bash coreutils curl git
-  ];
+  ] ++ (trae-unwrapped.targetPkgs or []);
 
   # 关闭隔离，完美融入宿主机网络与进程树
   unshareUser = false;
@@ -90,10 +91,11 @@ pkgs.buildFHSEnv {
   '';
 
   # 原生 Wayland 启动参数，挂载 exec 接管进程
-  runScript = "exec ${trae-unwrapped}/opt/Trae --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime";
+  runScript = "${trae-unwrapped}/opt/Trae/trae --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime";
 
   # 仅安装我们自己声明的纯净 Desktop Item，防止出现两个图标
   extraInstallCommands = ''
+    # 复制 Desktop 文件
     mkdir -p $out/share/applications
     cp ${desktopItem}/share/applications/* $out/share/applications/
   '';
