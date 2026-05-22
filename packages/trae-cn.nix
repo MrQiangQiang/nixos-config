@@ -67,7 +67,7 @@ pkgs.buildFHSEnv {
   # 强制引入基础工具，确保 shell 环境完备
   targetPkgs = pkgs: with pkgs; [
     # 核心工具
-    bash coreutils curl git
+    bash coreutils curl git xdg-utils
     # GUI 基础与渲染库
     alsa-lib cairo cups dbus expat glib gtk3
     libdrm libglvnd libxkbcommon mesa nspr nss pango
@@ -75,6 +75,8 @@ pkgs.buildFHSEnv {
     # X11 / Wayland 相关库（处理 libatk 问题）
     libX11 libxcb libXcomposite libXdamage
     libXext libXfixes libXrandr libxshmfence
+    # 网络与安全
+    gnutls libsecret libgcrypt
     # 这里补全了 atk 相关库
     at-spi2-atk at-spi2-core atk
     # 字体与环境
@@ -91,9 +93,7 @@ pkgs.buildFHSEnv {
 
   # 纯净环境变量: Wayland 护航与输入法标准化
   profile = ''
-    export XDG_SESSION_TYPE=wayland
-    unset DISPLAY
-    
+    export XDG_SESSION_TYPE=wayland    
     export GTK_IM_MODULE=fcitx5
     export QT_IM_MODULE=fcitx5
     export XMODIFIERS=@im=fcitx
