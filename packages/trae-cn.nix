@@ -100,9 +100,9 @@ pkgs.buildFHSEnv {
 
     # 彻底规避 Node.js 的目录扫描 Bug
     # 直接指向 NixOS 预先合并好的单一证书文件，不再让应用去扫描 /etc/ssl/certs/ 目录
-    export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-    export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+    export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+    export NIX_SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+    export NODE_EXTRA_CA_CERTS="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
 
     # 强制关闭字节跳动私有网络引擎 (Hyperfetch ttnet)
     # 迫使沙盒内的 Trae 降级到标准的 Node.js Chromium Socket 网络栈, 彻底解决连接挂起超时的问题
