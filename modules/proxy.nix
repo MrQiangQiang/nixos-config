@@ -65,11 +65,11 @@ let
       - DOMAIN-SUFFIX,zijieapi.com,DIRECT
       - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
       - DOMAIN-SUFFIX,volcengine.com,DIRECT
+      - DOMAIN-SUFFIX,mchost.guru,DIRECT
 
       - DOMAIN-SUFFIX,bytedance.com,全自动最优节点
       - DOMAIN-SUFFIX,bytedance.net,全自动最优节点
       - DOMAIN-SUFFIX,byted.org,全自动最优节点
-      - DOMAIN-SUFFIX,mchost.guru,全自动最优节点
 
       # 国内流量直连 (域名精确匹配+geosite分流)
       - GEOSITE,private,DIRECT
