@@ -61,16 +61,16 @@ let
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
 
-      # 强制 Trae 与字节跳动相关流量走本地网络直连
-      - DOMAIN-SUFFIX,trae-cn,DIRECT
-      - DOMAIN-SUFFIX,trae.com.cn,DIRECT
-      - DOMAIN-SUFFIX,bytedance.com,DIRECT
-      - DOMAIN-SUFFIX,bytedance.net,DIRECT
-      - DOMAIN-SUFFIX,byted.org,DIRECT
-      - DOMAIN-SUFFIX,zijieapi.com,DIRECT
-      - DOMAIN-SUFFIX,mchost.gurn,DIRECT
-      - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
-      - DOMAIN-SUFFIX,volcengine.com,DIRECT
+      # 强制 Trae 与字节跳动相关流量代理
+      - DOMAIN-SUFFIX,trae-cn,全自动最优节点
+      - DOMAIN-SUFFIX,trae.com.cn,全自动最优节点
+      - DOMAIN-SUFFIX,bytedance.com,全自动最优节
+      - DOMAIN-SUFFIX,bytedance.net,全自动最优节
+      - DOMAIN-SUFFIX,byted.org,全自动最优节
+      - DOMAIN-SUFFIX,zijieapi.com,全自动最优节
+      - DOMAIN-SUFFIX,mchost.gurn,全自动最优节
+      - DOMAIN-SUFFIX,bytedanceapi.com,全自动最优节
+      - DOMAIN-SUFFIX,volcengine.com,全自动最优节
 
       # 1. 优先进行【域名】匹配（秒级命中，不触发后台 DNS 等待）
       - GEOSITE,private,DIRECT
