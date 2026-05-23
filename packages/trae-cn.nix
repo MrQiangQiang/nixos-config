@@ -60,6 +60,14 @@ let
     startupWMClass = "trae";
     terminal = false;
   };
+
+  # 通过 pkgs.writeText 将配置固化到 Nix Store，确保可重现性
+  proxychainsConfig = pkgs.writeText "proxychains.conf" ''
+    strict_chain
+    proxy_dns
+    [ProxyList]
+    http 127.0.0.1 7890
+  '';
 in
 pkgs.buildFHSEnv {
   name = "trae-cn";
@@ -77,6 +85,7 @@ pkgs.buildFHSEnv {
     libXext libXfixes libXrandr libxshmfence
     # 网络与安全
     gnutls libsecret libgcrypt cacert openssl
+    proxychains-ng
     # 这里补全了 atk 相关库
     at-spi2-atk at-spi2-core atk
     # 字体与环境
@@ -104,19 +113,11 @@ pkgs.buildFHSEnv {
     export NIX_SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     export NODE_EXTRA_CA_CERTS="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
 
-    # 强制所有 HTTP/HTTPS流量主动交给mihomo的mixed-port处理
-    export http_proxy="http://127.0.0.1:7890"
-    export https_proxy="http://127.0.0.1:7890"
-    export no_proxy="localhost,127.0.0.1,::1" 
-
-    # 强制关闭字节跳动私有网络引擎 (Hyperfetch ttnet)
-    # 迫使沙盒内的 Trae 降级到标准的 Node.js Chromium Socket 网络栈, 彻底解决连接挂起超时的问题
-    export DISABLE_HYPERFETCH="true"
+    # Nix Store 中的 proxychains 配置文件
+    export PROXYCHAINS_CONF_FILE="${proxychainsConfig}"
   '';
  
-
-  runScript = "env DISABLE_HYPERFETCH=true ${trae-unwrapped}/opt/Trae/trae-cn \
-    --proxy-server=http://127.0.0.1:7890 \
+  runScript = "proxychains -q ${trae-unwrapped}/opt/Trae/trae-cn \
     --enable-features=UseOzonePlatform,WaylandWindowDecorations \
     --ozone-platform-hint=auto \
     --enable-wayland-ime \
