@@ -62,13 +62,14 @@ let
 
       # Trae 域名强制直连（国内速度快）
       - DOMAIN-SUFFIX,trae.com.cn,DIRECT
-      - DOMAIN-SUFFIX,bytedance.com,DIRECT
-      - DOMAIN-SUFFIX,bytedance.net,DIRECT
-      - DOMAIN-SUFFIX,byted.org,DIRECT
       - DOMAIN-SUFFIX,zijieapi.com,DIRECT
-      - DOMAIN-SUFFIX,mchost.guru,DIRECT
       - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
       - DOMAIN-SUFFIX,volcengine.com,DIRECT
+
+      - DOMAIN-SUFFIX,bytedance.com,全自动最优节点
+      - DOMAIN-SUFFIX,bytedance.net,全自动最优节点
+      - DOMAIN-SUFFIX,byted.org,全自动最优节点
+      - DOMAIN-SUFFIX,mchost.guru,全自动最优节点
 
       # 国内流量直连 (域名精确匹配+geosite分流)
       - GEOSITE,private,DIRECT
