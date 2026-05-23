@@ -64,7 +64,7 @@ let
   # 通过 pkgs.writeText 将配置固化到 Nix Store，确保可重现性
   proxychainsConfig = pkgs.writeText "proxychains.conf" ''
     strict_chain
-    proxy_dns
+#    proxy_dns
     [ProxyList]
     http 127.0.0.1 7890
   '';
