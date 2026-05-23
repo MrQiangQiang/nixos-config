@@ -117,7 +117,7 @@ pkgs.buildFHSEnv {
     export PROXYCHAINS_CONF_FILE="${proxychainsConfig}"
   '';
 
-  runScript = "${pkgs.proxychains-ng}/bin/proxychains -q ${trae-unwrapped}/opt/Trae/trae-cn \ 
+  runScript = "${pkgs.lib.getExe pkgs.proxychains-ng} -q ${trae-unwrapped}/opt/Trae/trae-cn \
     --enable-features=UseOzonePlatform,WaylandWindowDecorations \
     --ozone-platform-hint=auto \
     --enable-wayland-ime \
