@@ -60,6 +60,16 @@ let
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
 
+      # Trae 域名强制直连（国内速度快）
+      - DOMAIN-SUFFIX,trae.com.cn,DIRECT
+      - DOMAIN-SUFFIX,bytedance.com,DIRECT
+      - DOMAIN-SUFFIX,bytedance.net,DIRECT
+      - DOMAIN-SUFFIX,byted.org,DIRECT
+      - DOMAIN-SUFFIX,zijieapi.com,DIRECT
+      - DOMAIN-SUFFIX,mchost.guru,DIRECT
+      - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
+      - DOMAIN-SUFFIX,volcengine.com,DIRECT
+
       # 国内流量直连 (域名精确匹配+geosite分流)
       - GEOSITE,private,DIRECT
       - GEOSITE,apple,DIRECT
