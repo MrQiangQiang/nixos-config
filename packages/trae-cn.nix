@@ -116,8 +116,8 @@ pkgs.buildFHSEnv {
     # Nix Store 中的 proxychains 配置文件
     export PROXYCHAINS_CONF_FILE="${proxychainsConfig}"
   '';
- 
-  runScript = "proxychains -q ${trae-unwrapped}/opt/Trae/trae-cn \
+
+  runScript = "${pkgs.proxychains-ng}/bin/proxychains -q ${trae-unwrapped}/opt/Trae/trae-cn \ 
     --enable-features=UseOzonePlatform,WaylandWindowDecorations \
     --ozone-platform-hint=auto \
     --enable-wayland-ime \
