@@ -6,5 +6,6 @@
     vim
     curl
     tree
+    wget
   ];
 }

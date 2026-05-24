@@ -22,7 +22,7 @@
       "networkmanager"
     ];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKP1CRJnNW/V6jT190yd1CMjuorkNPJRs/dAgAbGnBx fugui@github.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPlCRJnNW/V6jTl90yd1CMjIuorkNPJRs/dAgAbGnBx fugui@github.com"
     ];
   };
   
