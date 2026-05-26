@@ -24,7 +24,7 @@ lib.mkIf isRiverEnabled {
       systemctl --user import-environment WAYLAND_DISPLAY 
 XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
       dbus-update-activation-environment --systemd WAYLAND_DISPLAY 
-XDG_CUREENT_DESKTOP=river XDG_SESSION_TYPE=wayland
+XDG_CURRENT_DESKTOP=river XDG_SESSION_TYPE=wayland
 
       systemctl --user restart xdg-desktop-portal.service || true
       systemctl --user restart xdg-desktop-portal-gtk.service || true    

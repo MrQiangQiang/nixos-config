@@ -10,64 +10,59 @@ let
     ipv6: false
 
     external-controller: 127.0.0.1:9090
-    secret: "local_only_secure_token_2026_atuo_generated"
+    secret: "local_only_secure_token_2026_auto_generated"
 
     sniffing:
       enable: true
       force-dns-mapping: true
       parse-pure-ip: true
       override-destination: true
+      sniff:
+        HTTP:
+          ports: [80, 8080-8880]
+          override-destination: true
+        TLS:
+          ports: [443, 8443]
+        QUIC:
+          ports: [443, 8443]
 
     tun:
       enable: true
-      stack: gvisor
+      stack: mixed
       device: tun0
       auto-route: true
       auto-detect-interface: true
-      dns-hijack: ["any:53"]
+      dns-hijack: ["any:53", "tcp://any:53"]
       strict-route: true
 
     dns:
       enable: true
-      enhanced-mode: fake-ip
-      fake-ip-range: 198.18.0.1/16
+      enhanced-mode: redir-host
+      redir-host-compatible-mode: true
       default-nameserver: [223.5.5.5, 119.29.29.29]
 
-      # 使用 DoH/DoT 作为主要上游，避免运营商 DNS 污染
       nameserver:
         - 223.5.5.5
         - 119.29.29.29
         - https://doh.pub/dns-query
         - tls://dns.alidns.com
 
-      # 关键：为受污染的域名指定安全的 DNS 服务器
-      # 这里的服务器应该能返回正确的公网 IP
       nameserver-policy:
         "bytedance.net": https://doh.pub/dns-query
         "bytedance.com": https://doh.pub/dns-query
         "byted.org": https://doh.pub/dns-query
+        "trae.com.cn": https://doh.pub/dns-query
+        "mchost.guru": https://doh.pub/dns-query
+        "zijieapi.com": https://doh.pub/dns-query
 
       fallback-filter:
         geoip: false
         geoip-code: CN
 
-      # 如果 nameserver 返回的 IP 不在中国且匹配 fallback-filter，就会使用 fallback-dns 再解析一次
-      fallback-dns:
+      fallback:
         - https://doh.pub/dns-query
         - tls://dns.alidns.com
         - 223.5.5.5
-
-      # 清空 fake-ip-filter，因为这些域名走直连，用 fake-ip 也没关系，规则是根据域名匹配的
-      fake-ip-filter:
-        - '+.trae.cn'
-        - '+.trae.com.cn'
-        - '+.bytedance.com'
-        - '+.bytedance.net'
-        - '+.byted.org'
-        - '+.zijieapi.com'
-        - '+.mchost.guru'
-        - '+.bytedanceapi.com'
-        - '+.volcengine.com'
 
     proxy-providers:
       my-airport:
@@ -84,27 +79,24 @@ let
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
 
-     # Trae 及字节跳动所有域名直连（DNS 已保证解析正确）
       - DOMAIN-SUFFIX,trae.com.cn,DIRECT
-      - DOMAIN-SUFFIX,bytedance.com,DIRECT
-      - DOMAIN-SUFFIX,bytedance.net,DIRECT
-      - DOMAIN-SUFFIX,byted.org,DIRECT
-      - DOMAIN-SUFFIX,zijieapi.com,DIRECT
       - DOMAIN-SUFFIX,mchost.guru,DIRECT
       - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
       - DOMAIN-SUFFIX,volcengine.com,DIRECT
+      - DOMAIN-SUFFIX,zijieapi.com,DIRECT
+      - DOMAIN-SUFFIX,bytedance.net,DIRECT
+      - DOMAIN-SUFFIX,bytedance.com,DIRECT
+      - DOMAIN-SUFFIX,byted.org,DIRECT
+      - DOMAIN-SUFFIX,tiktok-row.net,全自动最优节点
 
-      # 国内流量直连 (域名精确匹配+geosite分流)
       - GEOSITE,private,DIRECT
       - GEOSITE,apple,DIRECT
       - GEOSITE,category-ads-all,REJECT
       - GEOSITE,cn,DIRECT
 
-      # 2. 其次进行【IP】匹配（作为兜底）
       - GEOIP,LAN,DIRECT
       - GEOIP,CN,DIRECT
 
-      # 3. 剩余未命中流量全部走海外代理
       - MATCH,全自动最优节点
   '';
 in {
@@ -129,6 +121,12 @@ in {
     "http_proxy=http://127.0.0.1:7890"
     "https_proxy=http://127.0.0.1:7890"
   ];
+
+  environment.sessionVariables = {
+    http_proxy = "http://127.0.0.1:7890";
+    https_proxy = "http://127.0.0.1:7890";
+    no_proxy = "localhost,127.0.0.1,::1";
+  };
 
   networking.firewall = {
     enable = true;

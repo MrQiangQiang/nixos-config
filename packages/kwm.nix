@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  zig_0_15,
+  zig_0_16,
   pkg-config,
   wayland,
   wayland-scanner,
@@ -15,13 +15,13 @@
 
 let
   pname = "kwm";
-  version = "2026-05-11";
+  version = "0.3.0";
 
   src = fetchFromGitHub {
     owner = "kewuaa";
     repo = "kwm";
-    rev = "master";  
-    hash = "sha256-NyKFSlIpb2m2kQRBJ/4+koJpIaRjbs5hRPJZ34KGJrc=";
+    rev = "v${version}";
+    hash = "sha256-hX76wTHPTgg5RAHILfd3CjRKPlgAwGSK3lG82IFoUUs=";
   };
 
   patchedSrc = stdenv.mkDerivation {
@@ -31,27 +31,27 @@ let
     patchPhase = ''
       sed -i "/lazy/d" build.zig.zon
     '';
-    installPhase = "cp -r . $out"; 
-  }; 
+    installPhase = "cp -r . $out";
+  };
 
-  zigDeps = zig_0_15.fetchDeps {
+  zigDeps = zig_0_16.fetchDeps {
     inherit pname version;
     src = patchedSrc;
-    hash = "sha256-cCe9Fy0snuyHFU5H3qMTK1Cpzl1KJDdO8q1MW+mzu1s=";
+    hash = "sha256-Lz/Wcy40rxN81n/mBj4YJVbyGOolHzSFZMs93T1h0oQ=";
   };
 in
 stdenv.mkDerivation {
   inherit pname version;
 
   src = patchedSrc;
-    
+
   strictDeps = true;
 
   nativeBuildInputs = [
-    zig_0_15.hook
+    zig_0_16.hook
     wayland-protocols
     wayland-scanner
-    pkg-config 
+    pkg-config
   ];
 
   buildInputs = [
@@ -76,18 +76,16 @@ stdenv.mkDerivation {
     fi
 
     chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
-    echo "--- Current PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
   '';
-  
+
   zigBuildFlags = [
     "-Doptimize=ReleaseSafe"
   ];
 
   meta = with lib; {
-    description = "window manager for River Wayland cpmpositor (zig)";
+    description = "Window manager for River Wayland compositor";
     homepage = "https://github.com/kewuaa/kwm";
     license = licenses.gpl3;
     platforms = platforms.linux;
   };
 }
-
