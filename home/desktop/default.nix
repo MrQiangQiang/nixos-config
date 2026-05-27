@@ -1,17 +1,17 @@
 {
-  config,
-  lib,
-  pkgs,
-  osConfig,
-  ...
-}:
-
-{
   imports = [
     ./river.nix
     ./kwm.nix
-    ./waybar.nix
     ./swaybg.nix
+    ./waylock.nix
+    ./mako.nix
+    ./fuzzel.nix
+    ./wob.nix
+    ./swayidle.nix
+    ./kanshi.nix
+    ./screenshot.nix
+    ./clipboard.nix
+    ./gammastep.nix
     ./foot.nix
     ./firefox.nix
     ./filemanager.nix
