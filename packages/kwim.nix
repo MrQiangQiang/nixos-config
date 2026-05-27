@@ -1,34 +1,28 @@
 {
   lib,
   stdenv,
-  fetchgit,
-  pkg-config,
+  fetchFromGitHub,
   zig_0_16,
+  pkg-config,
   wayland,
   wayland-scanner,
   wayland-protocols,
-  wlroots_0_20,
   libxkbcommon,
-  libevdev,
-  libinput,
-  pixman,
-  scdoc,
-  mesa
 }:
 
 let
-  pname = "river";
-  version = "0.4.5";
+  pname = "kwim";
+  version = "0.2.0";
 
-  src = fetchgit {
-    url = "https://codeberg.org/river/river";
+  src = fetchFromGitHub {
+    owner = "kewuaa";
+    repo = "kwim";
     rev = "v${version}";
-    hash = "sha256-q4JAlr9/ex+BEgktBmFwOvZzQEAGvxXPD1QyKqyha4g=";
-    fetchSubmodules = true;
+    hash = "sha256-ewg259zRCMGq75XXMmPqoFwD5NBEFXXsIj1rvMy31uw=";
   };
 
   patchedSrc = stdenv.mkDerivation {
-    name = "${pname}-src-final";
+    name = "kwim-src-final";
     inherit src;
     phases = [ "unpackPhase" "patchPhase" "installPhase" ];
     patchPhase = ''
@@ -40,7 +34,7 @@ let
   zigDeps = zig_0_16.fetchDeps {
     inherit pname version;
     src = patchedSrc;
-    hash = "sha256-Nb0iscPQV8P49vaI7hZQvSEtM/ZpXsWb7w/rpH79lTg=";
+    hash = "sha256-rOZZu/Y/rZ7who3hl1qIBHXZtRP7s4FXo0+LNnM6dYo=";
   };
 in
 stdenv.mkDerivation {
@@ -52,7 +46,6 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     zig_0_16.hook
-    scdoc
     wayland-protocols
     wayland-scanner
     pkg-config
@@ -62,23 +55,20 @@ stdenv.mkDerivation {
     wayland
     wayland-protocols
     wayland-scanner
-    wlroots_0_20
     libxkbcommon
-    libevdev
-    libinput
-    pixman
-    mesa
   ];
 
   postConfigure = ''
-    export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-cache"
+    export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
     mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
+
     if [ -d "${zigDeps}/p" ]; then
       cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/"
     else
       mkdir -p "$ZIG_GLOBAL_CACHE_DIR/p"
       cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/p/"
     fi
+
     chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
   '';
 
@@ -87,10 +77,10 @@ stdenv.mkDerivation {
   ];
 
   meta = with lib; {
-    description = "A dynamic tiling Wayland compositor";
-    homepage = "https://codeberg.org/river/river";
-    license = licenses.gpl3Only;
+    description = "Input device manager for River Wayland compositor";
+    homepage = "https://github.com/kewuaa/kwim";
+    license = licenses.gpl3;
     platforms = platforms.linux;
-    mainProgram = "river";
+    mainProgram = "kwim";
   };
 }
