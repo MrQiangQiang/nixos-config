@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }: {
   imports = [
-    ../../modules/river.nix
+    ../../modules/desktop.nix
     ../../modules/proxy.nix
     ../../modules/im.nix
     ./hardware-configuration.nix
@@ -9,15 +9,15 @@
   system.stateVersion = "25.11";
 
   hardware.graphics.extraPackages = with pkgs; [
-      intel-media-driver 
+      intel-media-driver
       intel-vaapi-driver
   ];
-  
-  custom.river.enable = true;
+
+  custom.desktop.enable = true;
 
   users.users.a = {
     isNormalUser = true;
-    extraGroups = [ 
+    extraGroups = [
       "wheel"
       "networkmanager"
     ];
@@ -25,7 +25,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPlCRJnNW/V6jTl90yd1CMjIuorkNPJRs/dAgAbGnBx fugui@github.com"
     ];
   };
-  
+
   home-manager.users.a = {
     imports = [ ../../home ];
   };

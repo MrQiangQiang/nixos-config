@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }:
+
+let
+  isDesktopEnabled = config.custom.desktop.enable or false;
+in
+lib.mkIf isDesktopEnabled {
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
