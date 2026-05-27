@@ -1,8 +1,8 @@
 { config, lib, pkgs, osConfig, ... }:
 let
-  isRiverEnabled = osConfig.custom.river.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable or false;
 in
-lib.mkIf isRiverEnabled {
+lib.mkIf isDesktopEnabled {
   programs.yazi = {
     enable = true;
     settings = {
