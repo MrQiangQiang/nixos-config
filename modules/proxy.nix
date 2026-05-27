@@ -110,11 +110,15 @@ in {
     configFile = mihomoConfig;
   };
 
-  systemd.services.mihomo.serviceConfig = {
-    StateDirectory = "mihomo";
-    StateDirectoryMode = "0750";
-    AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
-    CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
+  systemd.services.mihomo = {
+    after = [ "time-sync.target" ];
+    wants = [ "time-sync.target" ];
+    serviceConfig = {
+      StateDirectory = "mihomo";
+      StateDirectoryMode = "0750";
+      AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
+      CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
+    };
   };
 
   systemd.services.nix-daemon.serviceConfig.Environment = [
