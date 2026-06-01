@@ -1,7 +1,8 @@
-{ config, lib, pkgs, osConfig, ... }:
+{ config, lib, pkgs, osConfig, palette, ... }:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  p = palette.dark;
 in
 lib.mkIf isDesktopEnabled {
   programs.fuzzel = {
@@ -13,11 +14,11 @@ lib.mkIf isDesktopEnabled {
         dpi-aware = "auto";
       };
       colors = {
-        background = "000000ff";
-        text = "bbbbbbff";
-        match = "427b58ff";
-        selection = "427b58ff";
-        selection-text = "eeeeeeff";
+        background = "${p.base}ff";
+        text = "${p.text}ff";
+        match = "${p.pine}ff";
+        selection = "${p.pine}ff";
+        selection-text = "${p.text}ff";
       };
     };
   };

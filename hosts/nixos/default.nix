@@ -20,6 +20,7 @@
     extraGroups = [
       "wheel"
       "networkmanager"
+      "ydotool"
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPlCRJnNW/V6jTl90yd1CMjIuorkNPJRs/dAgAbGnBx fugui@github.com"

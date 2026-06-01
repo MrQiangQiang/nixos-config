@@ -1,8 +1,13 @@
+{ config, lib, pkgs, osConfig, ... }:
+
+let
+  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  palette = import ./palette.nix { inherit osConfig; };
+in
 {
   imports = [
     ./river.nix
     ./kwm.nix
-    ./swaybg.nix
     ./waylock.nix
     ./mako.nix
     ./fuzzel.nix
@@ -15,5 +20,9 @@
     ./foot.nix
     ./firefox.nix
     ./filemanager.nix
+    ./gtk.nix
+    ./darkman.nix
   ];
+
+  _module.args.palette = palette;
 }

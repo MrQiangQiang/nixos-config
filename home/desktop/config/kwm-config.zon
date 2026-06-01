@@ -1,22 +1,21 @@
 .{
     .startup_cmds = .{
-        .{ "swaybg", "-m", "color", "-c", "#000000" },
         .{ "mako" },
         .{ "wl-paste", "--watch", "cliphist", "store" },
         .{ "polkit-gnome-authentication-agent-1" },
     },
 
-    .background = null,
+    .background = 0x@base@ff,
 
     .bar = .{
         .scheme = .{
             .normal = .{
-                .fg = 0xbbbbbbff,
-                .bg = 0x111111d0,
+                .fg = 0x@text@ff,
+                .bg = 0x@base@d0,
             },
             .select = .{
-                .fg = 0x427b58ff,
-                .bg = 0x222222d0,
+                .fg = 0x@pine@ff,
+                .bg = 0x@surface@d0,
             },
         },
 
@@ -29,8 +28,8 @@
                 .area = .{ .mode = null },
                 .scheme = .{
                     .normal = .{
-                        .fg = 0x427b58ff,
-                        .bg = 0x222222d0,
+                        .fg = 0x@pine@ff,
+                        .bg = 0x@surface@d0,
                     }
                 }
             },
@@ -40,8 +39,8 @@
     .border = .{
         .width = 2,
         .color = .{
-            .focus = 0x427b58ff,
-            .unfocus = 0x333333ff,
+            .focus = 0x@pine@ff,
+            .unfocus = 0x@muted@ff,
         },
     },
 
@@ -824,7 +823,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .spawn_shell = .{ .cmd = "waylock -init-color 0x000000 -input-color 0x427b58 -fail-color 0xcc3333" },
+                            .spawn_shell = .{ .cmd = "waylock -init-color 0x@base@ -input-color 0x@pine@ -fail-color 0x@love@" },
                         },
                     },
                 },

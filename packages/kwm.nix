@@ -80,6 +80,7 @@ stdenv.mkDerivation {
 
   zigBuildFlags = [
     "-Doptimize=ReleaseSafe"
+    "-Dbackground=true"
   ];
 
   meta = with lib; {

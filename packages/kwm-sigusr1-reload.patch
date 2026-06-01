@@ -1,0 +1,39 @@
+diff --git a/src/kwm.zig b/src/kwm.zig
+--- a/src/kwm.zig
++++ b/src/kwm.zig
+@@ -45,6 +45,7 @@
+     posix.sigaddset(&mask, posix.SIG.TERM);
+     posix.sigaddset(&mask, posix.SIG.QUIT);
+     posix.sigaddset(&mask, posix.SIG.CHLD);
++    posix.sigaddset(&mask, posix.SIG.USR1);
+     posix.sigprocmask(posix.SIG.BLOCK, &mask, null);
+     const signal_fd = try posix.signalfd(-1, &mask, 1 << @bitOffsetOf(posix.O, "NONBLOCK"));
+     defer posix.close(signal_fd);
+
+diff --git a/src/kwm/context.zig b/src/kwm/context.zig
+--- a/src/kwm/context.zig
++++ b/src/kwm/context.zig
+@@ -311,6 +311,7 @@
+     if (comptime build_options.bar_enabled) {
+         if (mask.bar) {
+             self.stop_listening_status();
++            self.start_listening_status();
+
+             var it = self.outputs.safeIterator(.forward);
+             while (it.next()) |output| {
+@@ -321,6 +322,7 @@
+             }
+         }
+     }
++    self.rwm.manageDirty();
+ }
+
+
+@@ -419,6 +421,7 @@
+     switch (sig) {
+         .INT, .TERM, .QUIT => self.quit(false),
+         .KILL => self.quit(true),
++        .USR1 => self.reload_config(),
+         .CHLD => {
+             while (true) {
+                 const res = posix.waitpid(-1, posix.W.NOHANG) catch |err| {
