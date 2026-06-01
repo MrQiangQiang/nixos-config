@@ -463,7 +463,9 @@
                 .modifiers = .{ .mod4 = true },
                 .event = .{
                     .click = .{
-                        .pressed = .toggle_floating,
+                        .pressed = .{
+                            .toggle_fullscreen = .{ .in_window = false },
+                        },
                     },
                 },
             },
@@ -486,7 +488,16 @@
                 },
             },
             .{
-                .keysym = "f",
+                .keysym = "v",
+                .modifiers = .{ .mod4 = true },
+                .event = .{
+                    .click = .{
+                        .pressed = .toggle_floating,
+                    },
+                },
+            },
+            .{
+                .keysym = "v",
                 .modifiers = .{ .mod4 = true, .mod1 = true },
                 .event = .{
                     .click = .{
