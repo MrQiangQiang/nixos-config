@@ -15,7 +15,7 @@ in
     ./kanshi.nix
     ./screenshot.nix
     ./clipboard.nix
-    ./gammastep.nix
+    ./wlsunset.nix
     ./foot.nix
     ./firefox.nix
     ./filemanager.nix

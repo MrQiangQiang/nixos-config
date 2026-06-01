@@ -4,9 +4,8 @@ let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
 in
 lib.mkIf isDesktopEnabled {
-  services.gammastep = {
+  services.wlsunset = {
     enable = true;
-    provider = "manual";
     latitude = osConfig.custom.desktop.latitude;
     longitude = osConfig.custom.desktop.longitude;
     temperature = {
