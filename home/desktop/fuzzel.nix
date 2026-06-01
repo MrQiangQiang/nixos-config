@@ -9,6 +9,7 @@ let
       font = "monospace:size=12";
       prompt = "> ";
       dpi-aware = "auto";
+      icon-theme = config.gtk.iconTheme.name;
     };
     colors = {
       background = "${colors.overlay}ff";
