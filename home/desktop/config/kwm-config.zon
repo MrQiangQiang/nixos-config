@@ -276,7 +276,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .zoom = .{ .swap = true },
+                            .spawn = .{ .argv = .{ "foot" } },
                         },
                     },
                 },
@@ -813,7 +813,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .spawn = .{ .argv = .{ "foot" } },
+                            .zoom = .{ .swap = true },
                         },
                     },
                 },
