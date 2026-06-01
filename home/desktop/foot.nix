@@ -2,33 +2,51 @@
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
-  p = palette.dark;
+  d = palette.dark;
+  l = palette.dawn;
+
+  mkFootColors = c: {
+    foreground = c.text;
+    background = c.base;
+    regular0 = c.overlay;
+    regular1 = c.love;
+    regular2 = c.pine;
+    regular3 = c.gold;
+    regular4 = c.foam;
+    regular5 = c.iris;
+    regular6 = c.rose;
+    regular7 = c.text;
+    bright0 = c.muted;
+    bright1 = c.love;
+    bright2 = c.pine;
+    bright3 = c.gold;
+    bright4 = c.foam;
+    bright5 = c.iris;
+    bright6 = c.rose;
+    bright7 = c.text;
+  };
+
+  footSettings = {
+    main = {
+      font = "monospace:size=16";
+      initial-color-theme = "dark";
+    };
+    colors-dark = mkFootColors d;
+    colors-light = mkFootColors l;
+  };
+
+  footDarkIni = pkgs.writeText "foot-dark.ini" (
+    lib.generators.toINI {} footSettings
+  );
+  footLightIni = pkgs.writeText "foot-light.ini" (
+    lib.generators.toINI {} (footSettings // {
+      main = footSettings.main // { initial-color-theme = "light"; };
+    })
+  );
 in
 lib.mkIf isDesktopEnabled {
-  programs.foot = {
-    enable = true;
-    settings = {
-      main.font = "monospace:size=16";
-      colors = {
-        foreground = "${p.text}ff";
-        background = "${p.base}ff";
-        regular0 = "${p.overlay}ff";
-        regular1 = "${p.love}ff";
-        regular2 = "${p.pine}ff";
-        regular3 = "${p.gold}ff";
-        regular4 = "${p.foam}ff";
-        regular5 = "${p.iris}ff";
-        regular6 = "${p.rose}ff";
-        regular7 = "${p.text}ff";
-        bright0 = "${p.muted}ff";
-        bright1 = "${p.love}ff";
-        bright2 = "${p.pine}ff";
-        bright3 = "${p.gold}ff";
-        bright4 = "${p.foam}ff";
-        bright5 = "${p.iris}ff";
-        bright6 = "${p.rose}ff";
-        bright7 = "${p.text}ff";
-      };
-    };
-  };
+  home.packages = [ pkgs.foot ];
+
+  xdg.configFile."theme/foot-dark.ini".source = footDarkIni;
+  xdg.configFile."theme/foot-light.ini".source = footLightIni;
 }

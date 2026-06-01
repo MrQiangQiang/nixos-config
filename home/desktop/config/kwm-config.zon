@@ -11,11 +11,11 @@
         .scheme = .{
             .normal = .{
                 .fg = 0x@text@ff,
-                .bg = 0x@base@d0,
+                .bg = 0x@surface@ff,
             },
             .select = .{
-                .fg = 0x@pine@ff,
-                .bg = 0x@surface@d0,
+                .fg = 0x@rose@ff,
+                .bg = 0x@highlight_med@ff,
             },
         },
 
@@ -28,8 +28,8 @@
                 .area = .{ .mode = null },
                 .scheme = .{
                     .normal = .{
-                        .fg = 0x@pine@ff,
-                        .bg = 0x@surface@d0,
+                        .fg = 0x@text@ff,
+                        .bg = 0x@highlight_med@ff,
                     }
                 }
             },
@@ -39,8 +39,9 @@
     .border = .{
         .width = 2,
         .color = .{
-            .focus = 0x@pine@ff,
-            .unfocus = 0x@muted@ff,
+            .focus = 0x@rose@ff,
+            .unfocus = 0x@highlight_high@ff,
+            .swallowing = 0x@foam@ff,
         },
     },
 
@@ -823,7 +824,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .spawn_shell = .{ .cmd = "waylock -init-color 0x@base@ -input-color 0x@pine@ -fail-color 0x@love@" },
+                            .spawn = .{ .argv = .{ "waylock-theme" } },
                         },
                     },
                 },
