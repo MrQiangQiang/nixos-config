@@ -1,8 +1,7 @@
 { config, pkgs, ... }:
-let
-  secrets = import ../secrets.nix;
 
-  mihomoConfig = pkgs.writeText "mihomo-config.yaml" ''
+let
+  mihomoConfigTemplate = pkgs.writeText "mihomo-config-template.yaml" ''
     mixed-port: 7890
     allow-lan: true
     mode: rule
@@ -67,7 +66,7 @@ let
     proxy-providers:
       my-airport:
         type: http
-        url: ${secrets.proxy.subscriptionUrl}
+        url: __PROXY_SUBSCRIPTION_URL__
         lazy: true
         interval: 86400
         path: airport-cache.yaml
@@ -99,32 +98,40 @@ let
 
       - MATCH,全自动最优节点
   '';
+
+  mihomoPrestart = pkgs.writeShellScript "mihomo-prestart" ''
+    mkdir -p /run/mihomo
+    ${pkgs.gnused}/bin/sed "s|__PROXY_SUBSCRIPTION_URL__|$(cat ${config.age.secrets.proxy-subscription-url.path})|" \
+      ${mihomoConfigTemplate} > /run/mihomo/config.yaml
+    chmod 644 /run/mihomo/config.yaml
+  '';
 in {
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
   };
 
+  age.secrets.proxy-subscription-url = {
+    file = ../secrets/proxy-subscription-url.age;
+  };
+
   services.mihomo = {
     enable = true;
     tunMode = true;
-    configFile = mihomoConfig;
+    configFile = mihomoConfigTemplate;
   };
 
   systemd.services.mihomo = {
-    after = [ "time-sync.target" ];
+    after = [ "time-sync.target" "agenix.service" ];
     wants = [ "time-sync.target" ];
+    restartTriggers = [ config.age.secrets.proxy-subscription-url.file ];
     serviceConfig = {
+      ExecStartPre = [ "+${mihomoPrestart}" ];
       StateDirectory = "mihomo";
       StateDirectoryMode = "0750";
       AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
       CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
     };
   };
-
-  systemd.services.nix-daemon.serviceConfig.Environment = [
-    "http_proxy=http://127.0.0.1:7890"
-    "https_proxy=http://127.0.0.1:7890"
-  ];
 
   environment.sessionVariables = {
     http_proxy = "http://127.0.0.1:7890";

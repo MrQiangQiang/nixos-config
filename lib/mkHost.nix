@@ -17,6 +17,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/system.nix
     ../modules/ssh.nix
     inputs.home-manager.nixosModules.home-manager
+    inputs.agenix.nixosModules.default
     {
       nixpkgs.overlays = [
         inputs.self.overlays.default
