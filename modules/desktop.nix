@@ -24,12 +24,12 @@ in
     latitude = lib.mkOption {
       type = lib.types.float;
       default = 31.2;
-      description = "Latitude for darkman and gammastep";
+      description = "Latitude for darkman and wlsunset";
     };
     longitude = lib.mkOption {
       type = lib.types.float;
       default = 121.5;
-      description = "Longitude for darkman and gammastep";
+      description = "Longitude for darkman and wlsunset";
     };
     schemaDir = lib.mkOption {
       type = lib.types.str;
