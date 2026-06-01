@@ -29,11 +29,22 @@ diff --git a/src/kwm/context.zig b/src/kwm/context.zig
  }
 
 
-@@ -419,6 +421,7 @@
+@@ -419,6 +421,18 @@
      switch (sig) {
          .INT, .TERM, .QUIT => self.quit(false),
          .KILL => self.quit(true),
-+        .USR1 => self.reload_config(),
++        .USR1 => {
++            log.info("SIGUSR1 received, reloading config", .{});
++            self.reload_config();
++            if (comptime build_options.bar_enabled) {
++                var it = self.outputs.safeIterator(.forward);
++                while (it.next()) |output| {
++                    output.bar.damage(.all);
++                }
++            }
++            self.rwm.manageDirty();
++            log.info("SIGUSR1 reload complete", .{});
++        },
          .CHLD => {
              while (true) {
                  const res = posix.waitpid(-1, posix.W.NOHANG) catch |err| {

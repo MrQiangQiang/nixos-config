@@ -30,6 +30,7 @@ let
     phases = [ "unpackPhase" "patchPhase" "installPhase" ];
     patchPhase = ''
       sed -i "/lazy/d" build.zig.zon
+      patch -p1 < ${./kwm-sigusr1-reload.patch}
     '';
     installPhase = "cp -r . $out";
   };
