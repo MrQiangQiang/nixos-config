@@ -33,15 +33,13 @@ in
 
   programs.git = {
     enable = true;
+    userName = "fugui";
+    userEmail = "chenzhiqiang0125@gmail.com";
     signing = {
       key = nixosSshPublicKey;
       signByDefault = true;
     };
-    settings = {
-      user = {
-        name = "fugui";
-        email = "chenzhiqiang0125@gmail.com";
-      };
+    extraConfig = {
       gpg = {
         format = "ssh";
       };
