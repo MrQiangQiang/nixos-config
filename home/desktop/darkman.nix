@@ -49,4 +49,16 @@ lib.mkIf isDesktopEnabled {
     darkModeScripts.dark-theme = applyTheme "dark";
     lightModeScripts.light-theme = applyTheme "light";
   };
+
+  xdg.desktopEntries.darkman = {
+    name = "Toggle darkman";
+    genericName = "Toggle dark mode";
+    comment = "Toggle dark mode via darkman";
+    exec = "darkman toggle";
+    icon = "darkman";
+    terminal = false;
+    categories = [ "Settings" ];
+  };
+
+  xdg.dataFile."icons/hicolor/scalable/apps/darkman.svg".source = ./icons/darkman.svg;
 }

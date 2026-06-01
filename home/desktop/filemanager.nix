@@ -34,5 +34,7 @@ lib.mkIf isDesktopEnabled {
     defaultApplications = {
       "inode/directory" = [ "thunar.desktop" ];
     };
-  }; 
+  };
+
+  xdg.dataFile."icons/hicolor/scalable/apps/yazi.svg".source = ./icons/yazi.svg;
 }
