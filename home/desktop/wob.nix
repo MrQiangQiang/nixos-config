@@ -19,7 +19,11 @@ let
   };
 in
 lib.mkIf isDesktopEnabled {
-  home.packages = [ pkgs.wob ];
+  home.packages = [ pkgs.brightnessctl ];
+
+  services.wob = {
+    enable = true;
+  };
 
   xdg.configFile."theme/wob-config-dark.ini" = {
     source = pkgs.writeText "wob-config-dark.ini" (
