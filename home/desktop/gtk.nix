@@ -23,8 +23,8 @@ lib.mkIf isDesktopEnabled {
     };
     gtk4.theme = null;
     iconTheme = {
-      name = "rose-pine-icons";
-      package = pkgs.rose-pine-gtk-theme;
+      name = "Papirus";
+      package = pkgs.papirus-icon-theme;
     };
   };
 
