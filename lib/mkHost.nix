@@ -18,7 +18,10 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/ssh.nix
     inputs.home-manager.nixosModules.home-manager
     {
-      nixpkgs.overlays = [ inputs.self.overlays.default ];
+      nixpkgs.overlays = [
+        inputs.self.overlays.default
+        inputs.nix-vscode-extensions.overlays.default
+      ];
       nixpkgs.config.allowUnfree = true;
 
       networking.hostName = hostName;

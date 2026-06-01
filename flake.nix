@@ -6,6 +6,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
   outputs = inputs:
@@ -18,7 +19,10 @@
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
-          overlays = [inputs.self.overlays.default ];
+          overlays = [
+            inputs.self.overlays.default
+            inputs.nix-vscode-extensions.overlays.default
+          ];
           config.allowUnfree = true;
         };
       };

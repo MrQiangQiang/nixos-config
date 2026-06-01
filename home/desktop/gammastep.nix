@@ -7,11 +7,11 @@ lib.mkIf isDesktopEnabled {
   services.gammastep = {
     enable = true;
     provider = "manual";
-    latitude = 31.2;
-    longitude = 121.5;
+    latitude = osConfig.custom.desktop.latitude;
+    longitude = osConfig.custom.desktop.longitude;
     temperature = {
-      day = 5500;
-      night = 3500;
+      day = 6500;
+      night = 4500;
     };
   };
 }

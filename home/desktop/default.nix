@@ -2,7 +2,6 @@
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
-  palette = import ./palette.nix { inherit osConfig; };
 in
 {
   imports = [
@@ -22,7 +21,6 @@ in
     ./filemanager.nix
     ./gtk.nix
     ./darkman.nix
+    ./polkit.nix
   ];
-
-  _module.args.palette = palette;
 }
