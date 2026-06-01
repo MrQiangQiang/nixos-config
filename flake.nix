@@ -7,7 +7,10 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
-    agenix.url = "github:ryantm/agenix";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs:
