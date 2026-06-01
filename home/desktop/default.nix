@@ -22,5 +22,6 @@ in
     ./gtk.nix
     ./darkman.nix
     ./polkit.nix
+    ./keybind-help.nix
   ];
 }

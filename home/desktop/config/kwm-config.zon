@@ -430,17 +430,6 @@
                 },
             },
             .{
-                .keysym = "f",
-                .modifiers = .{ .mod4 = true, .shift = true },
-                .event = .{
-                    .click = .{
-                        .pressed = .{
-                            .toggle_fullscreen = .{ .in_window = false },
-                        },
-                    },
-                },
-            },
-            .{
                 .keysym = "e",
                 .modifiers = .{ .mod4 = true, .shift = true },
                 .event = .{
@@ -847,6 +836,17 @@
                     .click = .{
                         .pressed = .{
                             .spawn = .{ .argv = .{ "screenshot-region" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "slash",
+                .modifiers = .{ .mod4 = true },
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "keybind-cheatsheet" } },
                         },
                     },
                 },
