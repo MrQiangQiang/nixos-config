@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, vscodeDarkTheme ? "Rosé Pine", vscodeLightTheme ? "Rosé Pine Dawn", ... }:
 let
   pname = "trae-cn";
   version = "2.3.30127";
@@ -20,6 +20,10 @@ let
     pango stdenv.cc.cc.lib udev xz zeromq zlib
   ];
 
+  traeBootstrap = pkgs.replaceVars ./trae-bootstrap.cjs {
+    inherit vscodeDarkTheme vscodeLightTheme;
+  };
+
   trae-unwrapped = pkgs.stdenv.mkDerivation {
     inherit pname version src;
 
@@ -40,11 +44,7 @@ let
       sed -i 's/should_use_ttnet:!0/should_use_ttnet:!1/g' $out/opt/Trae/resources/app/out/main.js
       sed -i 's/domain_white_list:{[^}]*\["\*"\][^}]*}/domain_white_list:{}/g' $out/opt/Trae/resources/app/out/main.js
 
-      cat > $out/opt/Trae/resources/app/out/trae-bootstrap.cjs << 'BOOTSTRAP_EOF'
-const {app} = require("electron");
-try { app.commandLine.appendSwitch("no-proxy-server"); } catch(e) {}
-module.exports = require("./main.js");
-BOOTSTRAP_EOF
+      install -Dm644 ${traeBootstrap} $out/opt/Trae/resources/app/out/trae-bootstrap.cjs
 
       chmod u+w $out/opt/Trae/resources/app/package.json
       sed -i 's|"main": "./out/main.js"|"main": "./out/trae-bootstrap.cjs"|' $out/opt/Trae/resources/app/package.json
@@ -79,27 +79,28 @@ pkgs.buildFHSEnv {
   dieWithParent = false;
 
   profile = ''
-    export XDG_SESSION_TYPE="''${XDG_SESSION_TYPE:-wayland}"
-    export GTK_IM_MODULE=fcitx5
-    export QT_IM_MODULE=fcitx5
+    if [ -n "''${WAYLAND_DISPLAY:-}" ]; then
+      export XDG_SESSION_TYPE=wayland
+    fi
+    export XDG_CURRENT_DESKTOP="''${XDG_CURRENT_DESKTOP:-river}"
+    export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+    export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+    export GTK_IM_MODULE=fcitx
+    export QT_IM_MODULE=fcitx
     export XMODIFIERS=@im=fcitx
     export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     export NIX_SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     export NODE_EXTRA_CA_CERTS="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     export NIX_ETC_PROTOCOLS="${pkgs.iana-etc}/etc/protocols"
     export NIX_ETC_SERVICES="${pkgs.iana-etc}/etc/services"
+    export GSETTINGS_SCHEMA_DIR="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/gsettings-desktop-schemas-${pkgs.gsettings-desktop-schemas.version}/glib-2.0/schemas"
     unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY no_proxy NO_PROXY
   '';
 
   runScript = pkgs.writeScript "trae-cn-runner" ''
     #!${pkgs.bash}/bin/bash
-    printf 'nameserver 223.5.5.5\nnameserver 119.29.29.29\noptions edns0\n' > /etc/resolv.conf 2>/dev/null || true
-    exec ${trae-unwrapped}/opt/Trae/bin/trae-cn \
-      --enable-features=UseOzonePlatform,WaylandWindowDecorations \
-      --ozone-platform-hint=auto \
-      --enable-wayland-ime \
-      --password-store=basic \
-      "$@"
+    ( printf 'nameserver 223.5.5.5\nnameserver 119.29.29.29\noptions edns0\n' > /etc/resolv.conf ) 2>/dev/null || true
+    exec ${trae-unwrapped}/opt/Trae/bin/trae-cn "$@"
   '';
 
   extraInstallCommands = ''
