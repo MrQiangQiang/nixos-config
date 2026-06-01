@@ -15,6 +15,8 @@ lib.mkIf isDesktopEnabled {
     ];
   };
 
+  environment.variables.QT_IM_MODULE = "fcitx";
+
   environment.systemPackages = with pkgs; [
     qt6Packages.fcitx5-configtool
   ];
