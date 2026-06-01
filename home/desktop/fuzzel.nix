@@ -23,6 +23,9 @@ in
 lib.mkIf isDesktopEnabled {
   home.packages = [ pkgs.fuzzel ];
 
+  xdg.dataFile."icons/hicolor/scalable/apps/input-keyboard.svg".source =
+    "${pkgs.papirus-icon-theme}/share/icons/Papirus/48x48/devices/input-keyboard.svg";
+
   xdg.configFile."theme/fuzzel-config-dark.ini" = {
     source = pkgs.writeText "fuzzel-config-dark.ini" (
       lib.generators.toINI {} (mkFuzzelConfig d)
