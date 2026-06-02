@@ -6,7 +6,7 @@ let
 
   getVolume = ''
     vol=$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)
-    pct=$(${pkgs.coreutils}/bin/echo "$vol" | ${pkgs.gnused}/bin/sed 's/Volume: \([0-9.]*\).*/\1/' | ${pkgs.coreutils}/bin/awk '{printf "%.0f", $1 * 100}')
+    pct=$(${pkgs.coreutils}/bin/echo "$vol" | ${pkgs.gnused}/bin/sed 's/Volume: //;s/\.//' | ${pkgs.gnused}/bin/sed 's/^0*//'); pct=''${pct:-0}
     if ${pkgs.coreutils}/bin/echo "$vol" | ${pkgs.gnugrep}/bin/grep -q MUTED; then
       ${pkgs.coreutils}/bin/echo "$pct muted" > ${wobSock}
     else
