@@ -22,6 +22,7 @@ in
     ./gtk.nix
     ./darkman.nix
     ./polkit.nix
+    ./media-keys.nix
     ./keybind-help.nix
   ];
 }
