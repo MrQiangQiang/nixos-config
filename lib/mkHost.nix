@@ -16,6 +16,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/fonts.nix
     ../modules/system.nix
     ../modules/ssh.nix
+    inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     inputs.agenix.nixosModules.default
     {
