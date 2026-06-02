@@ -52,7 +52,8 @@ in
     desc = "kwm 默认 — dwm 风格，F=Floating 全家桶，Super+字母=基础 Super+Shift=破坏性";
     bindings = [
       { desc = "重载配置"; key = "r"; mods = [ "Super" "Shift" ]; category = "会话"; }
-      { desc = "切换键盘直通模式"; key = "Escape"; mods = [ "Super" "Shift" ]; category = "会话"; }
+      { desc = "进入键盘直通模式"; key = "Escape"; mods = [ "Super" "Shift" ]; category = "会话"; mode = "default"; }
+      { desc = "退出键盘直通模式"; key = "Escape"; mods = [ "Super" "Shift" ]; category = "会话"; mode = "passthrough"; }
       { desc = "退出会话"; key = "q"; mods = [ "Super" "Shift" ]; category = "会话"; }
       { desc = "关闭当前窗口"; key = "c"; mods = [ "Super" "Shift" ]; category = "会话"; }
 
@@ -99,10 +100,10 @@ in
       { desc = "主区域位置→顶部"; key = "k"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
       { desc = "主区域位置→右侧"; key = "l"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
       { desc = "主区域位置→左侧"; key = "h"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
-      { desc = "增加主窗口数"; key = "="; mods = [ "Super" ]; category = "布局参数"; }
-      { desc = "减少主窗口数"; key = "-"; mods = [ "Super" ]; category = "布局参数"; }
-      { desc = "增大间距"; key = "="; mods = [ "Super" "Alt" ]; category = "布局参数"; }
-      { desc = "减小间距"; key = "-"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
+      { desc = "增加主窗口数"; key = "equal"; mods = [ "Super" ]; category = "布局参数"; }
+      { desc = "减少主窗口数"; key = "minus"; mods = [ "Super" ]; category = "布局参数"; }
+      { desc = "增大间距"; key = "equal"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
+      { desc = "减小间距"; key = "minus"; mods = [ "Super" "Alt" ]; category = "布局参数"; }
 
       { desc = "切换到上一个 Tag"; key = "Tab"; mods = [ "Super" ]; category = "工作区"; }
       { desc = "切换到下一个已占用 Tag"; key = "apostrophe"; mods = [ "Super" ]; category = "工作区"; }
@@ -127,7 +128,7 @@ in
       { desc = "终端 (foot)"; key = "Return"; mods = [ "Super" "Shift" ]; category = "应用"; }
       { desc = "锁屏 (waylock)"; key = "l"; mods = [ "Super" "Shift" ]; category = "应用"; }
       { desc = "区域截图"; key = "Print"; mods = []; category = "应用"; }
-      { desc = "快捷键速查"; key = "/"; mods = [ "Super" ]; category = "应用"; }
+      { desc = "快捷键速查"; key = "slash"; mods = [ "Super" ]; category = "应用"; }
 
       { desc = "移动窗口(鼠标)"; key = "左键"; mods = [ "Super" ]; category = "鼠标"; }
       { desc = "调整窗口大小(鼠标)"; key = "右键"; mods = [ "Super" ]; category = "鼠标"; }
