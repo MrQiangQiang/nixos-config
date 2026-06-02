@@ -18,6 +18,7 @@ lib.mkIf isDesktopEnabled {
     enable = true;
     timeouts = [
       { timeout = 300; command = "${waylock-theme}/bin/waylock-theme"; }
+      { timeout = 600; command = "${pkgs.wlopm}/bin/wlopm --off '*'"; resumeCommand = "${pkgs.wlopm}/bin/wlopm --on '*'"; }
     ];
     events = {
       "before-sleep" = "${waylock-theme}/bin/waylock-theme";
