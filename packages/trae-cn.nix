@@ -38,7 +38,7 @@ let
       runHook preInstall
       rm -f $out/opt/Trae/resources/app/modules/ckg/binary/libstdc++.so.6
 
-      find $out/opt/Trae -type f \( -iname "*trae*.png" -o -iname "*trae*.svg" \) | head -n 1 | xargs -I {} install -Dm644 {} $out/share/pixmaps/trae.png 2>/dev/null || true
+      install -Dm644 $out/opt/Trae/resources/app/resources/linux/code.png $out/share/pixmaps/trae.png
 
       chmod u+w $out/opt/Trae/resources/app/out/main.js
       sed -i 's/should_use_ttnet:!0/should_use_ttnet:!1/g' $out/opt/Trae/resources/app/out/main.js
