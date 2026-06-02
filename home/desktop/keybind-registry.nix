@@ -33,7 +33,6 @@ in
       { desc = "下一个标签页"; key = "Tab"; mods = [ "Ctrl" ]; category = "标签页"; }
       { desc = "上一个标签页"; key = "Tab"; mods = [ "Ctrl" "Shift" ]; category = "标签页"; }
 
-      { desc = "锁屏"; key = "l"; mods = [ "Super" ]; category = "系统"; }
       { desc = "截图"; key = "Print"; mods = []; category = "系统"; }
       { desc = "全屏切换"; key = "F11"; mods = []; category = "系统"; }
 
@@ -50,18 +49,18 @@ in
 
   kwm = {
     tier = "managed";
-    desc = "Tiling WM 共识 — Super+主行 hjkl 导航，修饰键分层语义";
+    desc = "kwm 默认 — dwm 风格，F=Floating 全家桶，Super+字母=基础 Super+Shift=破坏性";
     bindings = [
       { desc = "重载配置"; key = "r"; mods = [ "Super" "Shift" ]; category = "会话"; }
       { desc = "切换键盘直通模式"; key = "Escape"; mods = [ "Super" "Shift" ]; category = "会话"; }
       { desc = "退出会话"; key = "q"; mods = [ "Super" "Shift" ]; category = "会话"; }
       { desc = "关闭当前窗口"; key = "c"; mods = [ "Super" "Shift" ]; category = "会话"; }
 
+      { desc = "与主窗口交换(Zoom)"; key = "Return"; mods = [ "Super" ]; category = "焦点"; }
       { desc = "聚焦下一个窗口"; key = "j"; mods = [ "Super" ]; category = "焦点"; }
       { desc = "聚焦上一个窗口"; key = "k"; mods = [ "Super" ]; category = "焦点"; }
       { desc = "聚焦下一个(跳过浮动)"; key = "j"; mods = [ "Super" "Ctrl" ]; category = "焦点"; }
       { desc = "聚焦上一个(跳过浮动)"; key = "k"; mods = [ "Super" "Ctrl" ]; category = "焦点"; }
-      { desc = "与主窗口交换(Zoom)"; key = "Return"; mods = [ "Super" "Shift" ]; category = "焦点"; }
       { desc = "焦点回到主窗口"; key = "h"; mods = [ "Super" "Ctrl" ]; category = "焦点"; }
       { desc = "焦点回到主窗口"; key = "l"; mods = [ "Super" "Ctrl" ]; category = "焦点"; }
 
@@ -80,13 +79,12 @@ in
       { desc = "Monocle 布局"; key = "m"; mods = [ "Super" ]; category = "布局"; }
       { desc = "Scroller 布局"; key = "s"; mods = [ "Super" ]; category = "布局"; }
       { desc = "Centered Master 布局"; key = "u"; mods = [ "Super" ]; category = "布局"; }
-      { desc = "Float 布局"; key = "v"; mods = [ "Super" "Alt" ]; category = "布局"; }
+      { desc = "Float 布局"; key = "f"; mods = [ "Super" "Alt" ]; category = "布局"; }
 
-      { desc = "全屏(无边框)"; key = "f"; mods = [ "Super" ]; category = "窗口"; }
-      { desc = "切换浮动/平铺"; key = "v"; mods = [ "Super" ]; category = "窗口"; }
+      { desc = "切换浮动/平铺"; key = "f"; mods = [ "Super" ]; category = "窗口"; }
       { desc = "临时浮动模式"; key = "f"; mods = [ "Super" "Ctrl" ]; category = "窗口"; }
       { desc = "全屏(保留边框)"; key = "m"; mods = [ "Super" "Shift" ]; category = "窗口"; }
-      { desc = "全屏(无边框)备选"; key = "f"; mods = [ "Super" "Shift" ]; category = "窗口"; }
+      { desc = "全屏(无边框)"; key = "f"; mods = [ "Super" "Shift" ]; category = "窗口"; }
       { desc = "最大化"; key = "e"; mods = [ "Super" "Shift" ]; category = "窗口"; }
       { desc = "切换 Sticky"; key = "s"; mods = [ "Super" "Ctrl" ]; category = "窗口"; }
       { desc = "切换 Swallow"; key = "a"; mods = [ "Super" ]; category = "窗口"; }
@@ -126,7 +124,7 @@ in
       { desc = "吸附到上边"; key = "k"; mods = [ "Super" "Shift" ]; category = "浮动"; mode = "floating"; }
 
       { desc = "应用启动器 (fuzzel)"; key = "p"; mods = [ "Super" ]; category = "应用"; }
-      { desc = "终端 (foot)"; key = "Return"; mods = [ "Super" ]; category = "应用"; }
+      { desc = "终端 (foot)"; key = "Return"; mods = [ "Super" "Shift" ]; category = "应用"; }
       { desc = "锁屏 (waylock)"; key = "l"; mods = [ "Super" "Shift" ]; category = "应用"; }
       { desc = "区域截图"; key = "Print"; mods = []; category = "应用"; }
       { desc = "快捷键速查"; key = "/"; mods = [ "Super" ]; category = "应用"; }
