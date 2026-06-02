@@ -19,5 +19,10 @@ lib.mkIf isDesktopEnabled {
 
   environment.systemPackages = with pkgs; [
     qt6Packages.fcitx5-configtool
+    (runCommand "fcitx5-configtool-icon" {} ''
+      mkdir -p $out/share/icons/hicolor/scalable/apps
+      ln -s ${papirus-icon-theme}/share/icons/Papirus/48x48/devices/input-keyboard.svg \
+        $out/share/icons/hicolor/scalable/apps/input-keyboard.svg
+    '')
   ];
 }
