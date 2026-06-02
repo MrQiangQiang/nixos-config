@@ -276,7 +276,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .spawn = .{ .argv = .{ "foot" } },
+                            .zoom = .{ .swap = true },
                         },
                     },
                 },
@@ -449,12 +449,21 @@
             },
             .{
                 .keysym = "f",
-                .modifiers = .{ .mod4 = true },
+                .modifiers = .{ .mod4 = true, .shift = true },
                 .event = .{
                     .click = .{
                         .pressed = .{
                             .toggle_fullscreen = .{ .in_window = false },
                         },
+                    },
+                },
+            },
+            .{
+                .keysym = "f",
+                .modifiers = .{ .mod4 = true },
+                .event = .{
+                    .click = .{
+                        .pressed = .toggle_floating,
                     },
                 },
             },
@@ -477,16 +486,7 @@
                 },
             },
             .{
-                .keysym = "v",
-                .modifiers = .{ .mod4 = true },
-                .event = .{
-                    .click = .{
-                        .pressed = .toggle_floating,
-                    },
-                },
-            },
-            .{
-                .keysym = "v",
+                .keysym = "f",
                 .modifiers = .{ .mod4 = true, .mod1 = true },
                 .event = .{
                     .click = .{
@@ -813,7 +813,7 @@
                 .event = .{
                     .click = .{
                         .pressed = .{
-                            .zoom = .{ .swap = true },
+                            .spawn = .{ .argv = .{ "foot" } },
                         },
                     },
                 },
@@ -847,6 +847,61 @@
                     .click = .{
                         .pressed = .{
                             .spawn = .{ .argv = .{ "keybind-cheatsheet" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "XF86_AudioRaiseVolume",
+                .modifiers = .{},
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "volume-up" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "XF86_AudioLowerVolume",
+                .modifiers = .{},
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "volume-down" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "XF86_AudioMute",
+                .modifiers = .{},
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "volume-mute" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "XF86_MonBrightnessUp",
+                .modifiers = .{},
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "brightness-up" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "XF86_MonBrightnessDown",
+                .modifiers = .{},
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "brightness-down" } },
                         },
                     },
                 },
