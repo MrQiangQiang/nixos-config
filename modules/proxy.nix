@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   mihomoConfigTemplate = pkgs.writeText "mihomo-config-template.yaml" ''
@@ -106,12 +106,12 @@ let
     chmod 644 /run/mihomo/config.yaml
   '';
 in {
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-  };
-
   age.secrets.proxy-subscription-url = {
     file = ../secrets/proxy-subscription-url.age;
+  };
+
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
   };
 
   services.mihomo = {
@@ -121,7 +121,7 @@ in {
   };
 
   systemd.services.mihomo = {
-    after = [ "time-sync.target" "agenix.service" ];
+    after = [ "agenix.service" "time-sync.target" ];
     wants = [ "time-sync.target" ];
     restartTriggers = [ config.age.secrets.proxy-subscription-url.file ];
     serviceConfig = {
