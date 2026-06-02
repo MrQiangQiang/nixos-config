@@ -4,10 +4,9 @@ let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   cfgHome = config.xdg.configHome;
 
-  cp = source: target: ''
+  link = source: target: ''
     mkdir -p $(${pkgs.coreutils}/bin/dirname ${target})
-    rm -f ${target}
-    ${pkgs.coreutils}/bin/cp ${source} ${target}
+    ln -sf ${source} ${target}
   '';
 
   signal = sig: cmd: ''
@@ -21,15 +20,18 @@ let
     src = { dark ? null, light ? null }: if isDark then config.xdg.configFile.${dark}.source
                                           else config.xdg.configFile.${light}.source;
   in ''
-    ${cp (src { dark = "theme/kwm-config-dark.zon"; light = "theme/kwm-config-light.zon"; }) "${cfgHome}/kwm/config.zon"}
+    ${link (src { dark = "theme/kwm-config-dark.zon"; light = "theme/kwm-config-light.zon"; }) "${cfgHome}/kwm/config.zon"}
     ${signal "SIGUSR1" "kwm"}
 
-    ${cp (src { dark = "theme/mako-config-dark"; light = "theme/mako-config-light"; }) "${cfgHome}/mako/config"}
+    ${link (src { dark = "theme/mako-config-dark"; light = "theme/mako-config-light"; }) "${cfgHome}/mako/config"}
     ${pkgs.mako}/bin/makoctl reload 2>/dev/null || true
 
-    ${cp (src { dark = "theme/fuzzel-config-dark.ini"; light = "theme/fuzzel-config-light.ini"; }) "${cfgHome}/fuzzel/fuzzel.ini"}
+    ${link (src { dark = "theme/fuzzel-config-dark.ini"; light = "theme/fuzzel-config-light.ini"; }) "${cfgHome}/fuzzel/fuzzel.ini"}
 
-    ${cp (src { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
+    ${link (src { dark = "theme/wob-config-dark.ini"; light = "theme/wob-config-light.ini"; }) "${cfgHome}/wob/wob.ini"}
+    systemctl --user restart wob 2>/dev/null || true
+
+    ${link (src { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
     ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
     ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${if isDark then palette.gtk.dark_name else palette.gtk.light_name}'"
