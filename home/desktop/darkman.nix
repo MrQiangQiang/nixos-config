@@ -29,9 +29,6 @@ let
 
     ${cp (src { dark = "theme/fuzzel-config-dark.ini"; light = "theme/fuzzel-config-light.ini"; }) "${cfgHome}/fuzzel/fuzzel.ini"}
 
-    ${cp (src { dark = "theme/wob-config-dark.ini"; light = "theme/wob-config-light.ini"; }) "${cfgHome}/wob/wob.ini"}
-    systemctl --user restart wob 2>/dev/null || true
-
     ${cp (src { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
     ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
