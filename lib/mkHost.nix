@@ -18,7 +18,6 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/ssh.nix
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
-    inputs.agenix.nixosModules.default
     {
       nixpkgs.overlays = [
         inputs.self.overlays.default
@@ -27,7 +26,7 @@ inputs.nixpkgs.lib.nixosSystem {
       nixpkgs.config.allowUnfree = true;
 
       networking.hostName = hostName;
-      networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
+      networking.nameservers = [ "223.5.5.5" "119.29.29.29" ];
       networking.networkmanager.enable = true;
 
       hardware.enableRedistributableFirmware = true;

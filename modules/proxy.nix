@@ -100,10 +100,8 @@ let
   '';
 
   mihomoPrestart = pkgs.writeShellScript "mihomo-prestart" ''
-    mkdir -p /run/mihomo
-    ${pkgs.gnused}/bin/sed "s|__PROXY_SUBSCRIPTION_URL__|$(cat ${config.age.secrets.proxy-subscription-url.path})|" \
-      ${mihomoConfigTemplate} > /run/mihomo/config.yaml
-    chmod 644 /run/mihomo/config.yaml
+    ${pkgs.gnused}/bin/sed "s|__PROXY_SUBSCRIPTION_URL__|$(cat $CREDENTIALS_DIRECTORY/proxy-url)|" \
+      ${mihomoConfigTemplate} > /tmp/mihomo-config.yaml
   '';
 in {
   age.secrets.proxy-subscription-url = {
@@ -125,11 +123,11 @@ in {
     wants = [ "time-sync.target" ];
     restartTriggers = [ config.age.secrets.proxy-subscription-url.file ];
     serviceConfig = {
-      ExecStartPre = [ "+${mihomoPrestart}" ];
-      StateDirectory = "mihomo";
-      StateDirectoryMode = "0750";
-      AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
-      CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" ];
+      ExecStartPre = [ mihomoPrestart ];
+      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f /tmp/mihomo-config.yaml";
+      LoadCredential = lib.mkForce [ "proxy-url:${config.age.secrets.proxy-subscription-url.path}" ];
+      AmbientCapabilities = lib.mkForce [ "CAP_NET_ADMIN" ];
+      CapabilityBoundingSet = lib.mkForce [ "CAP_NET_ADMIN" ];
     };
   };
 
