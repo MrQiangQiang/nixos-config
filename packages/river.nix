@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   stdenv,
   fetchgit,
   pkg-config,
@@ -27,14 +28,13 @@ let
     fetchSubmodules = true;
   };
 
-  patchedSrc = stdenv.mkDerivation {
-    name = "${pname}-src-final";
+  patchedSrc = pkgs.applyPatches {
     inherit src;
-    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
-    patchPhase = ''
+    name = "${pname}-src-patched";
+    patches = [];
+    postPatch = ''
       sed -i "/lazy/d" build.zig.zon
     '';
-    installPhase = "cp -r . $out";
   };
 
   zigDeps = zig_0_16.fetchDeps {
