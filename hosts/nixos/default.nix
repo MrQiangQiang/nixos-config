@@ -31,4 +31,6 @@
   home-manager.users.a = {
     imports = [ ../../home ];
   };
+
+  home-manager.backupFileExtension = "hm-bak";
 }
