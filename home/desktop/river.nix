@@ -4,6 +4,7 @@ let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   schemaDir = osConfig.custom.desktop.schemaDir or "";
   dataHome = config.xdg.dataHome;
+  sessionVars = config.home.sessionVariablesPackage;
 in
 lib.mkIf isDesktopEnabled {
   systemd.user.targets.graphical-session = {
@@ -15,6 +16,7 @@ lib.mkIf isDesktopEnabled {
     text = ''
       #!/bin/sh
       . /etc/set-environment
+      . ${sessionVars}/etc/profile.d/hm-session-vars.sh
 
       export XDG_CURRENT_DESKTOP=river
       export XDG_SESSION_TYPE=wayland
@@ -24,6 +26,9 @@ lib.mkIf isDesktopEnabled {
 
       dbus-update-activation-environment --systemd XDG_CURRENT_DESKTOP XDG_SESSION_TYPE WAYLAND_DISPLAY GSETTINGS_SCHEMA_DIR XDG_DATA_DIRS QT_IM_MODULE XMODIFIERS
 
+      # import-environment sets WAYLAND_DISPLAY in the systemd manager environment,
+      # which is the single source of truth for all user services — always current,
+      # survives reexec. No need for a separate env file.
       systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE GSETTINGS_SCHEMA_DIR XDG_DATA_DIRS QT_IM_MODULE XMODIFIERS
       systemctl --user start graphical-session.target
 
