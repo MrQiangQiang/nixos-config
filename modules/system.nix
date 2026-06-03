@@ -1,5 +1,19 @@
 { config, pkgs, lib, ...}:
 {
+  services.logind = {
+    suspendKey = "suspend";
+    lidSwitch = "suspend";
+    lidSwitchDocked = "ignore";
+  };
+
+  # Compressed swap in RAM — no disk IO, no SSD wear
+  # Recommended by NixOS Wiki for systems with enough RAM
+  zramSwap.enable = true;
+
+  # OOM killer — required by NixOS Wiki when using zram swap
+  # Prevents system lockup when zram capacity is exhausted
+  systemd.oomd.enable = true;
+
   services.upower.enable = true;
 
   services.pipewire = {
