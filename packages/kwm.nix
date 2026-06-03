@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   stdenv,
   fetchFromGitHub,
   zig_0_16,
@@ -24,15 +25,13 @@ let
     hash = "sha256-hX76wTHPTgg5RAHILfd3CjRKPlgAwGSK3lG82IFoUUs=";
   };
 
-  patchedSrc = stdenv.mkDerivation {
-    name = "kwm-src-final";
+  patchedSrc = pkgs.applyPatches {
     inherit src;
-    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
-    patchPhase = ''
+    name = "${pname}-src-patched";
+    patches = [ ./kwm-sigusr1-reload.patch ];
+    postPatch = ''
       sed -i "/lazy/d" build.zig.zon
-      patch -p1 < ${./kwm-sigusr1-reload.patch}
     '';
-    installPhase = "cp -r . $out";
   };
 
   zigDeps = zig_0_16.fetchDeps {
