@@ -1,0 +1,167 @@
+/* Rose Pine Firefox Content Theme */
+/* Source: palette.nix → pkgs.replaceVars */
+/* Dark/light auto-switch via prefers-color-scheme */
+/* Controls: about:newtab, about:home, about:preferences, about: pages */
+
+/* ===== Color Variables ===== */
+
+:root {
+  --rp-base: @dark_base@;
+  --rp-surface: @dark_surface@;
+  --rp-overlay: @dark_overlay@;
+  --rp-muted: @dark_muted@;
+  --rp-subtle: @dark_subtle@;
+  --rp-text: @dark_text@;
+  --rp-love: @dark_love@;
+  --rp-gold: @dark_gold@;
+  --rp-rose: @dark_rose@;
+  --rp-pine: @dark_pine@;
+  --rp-foam: @dark_foam@;
+  --rp-iris: @dark_iris@;
+  --rp-highlight-low: @dark_highlight_low@;
+  --rp-highlight-med: @dark_highlight_med@;
+  --rp-highlight-high: @dark_highlight_high@;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --rp-base: @dawn_base@;
+    --rp-surface: @dawn_surface@;
+    --rp-overlay: @dawn_overlay@;
+    --rp-muted: @dawn_muted@;
+    --rp-subtle: @dawn_subtle@;
+    --rp-text: @dawn_text@;
+    --rp-love: @dawn_love@;
+    --rp-gold: @dawn_gold@;
+    --rp-rose: @dawn_rose@;
+    --rp-pine: @dawn_pine@;
+    --rp-foam: @dawn_foam@;
+    --rp-iris: @dawn_iris@;
+    --rp-highlight-low: @dawn_highlight_low@;
+    --rp-highlight-med: @dawn_highlight_med@;
+    --rp-highlight-high: @dawn_highlight_high@;
+  }
+}
+
+/* ===== New Tab Page ===== */
+
+@-moz-document url("about:newtab"), url("about:home") {
+  body {
+    --newtab-background-color: var(--rp-base) !important;
+    --newtab-background-color-secondary: var(--rp-surface) !important;
+    --newtab-text-primary-color: var(--rp-text) !important;
+    --newtab-text-secondary-color: var(--rp-subtle) !important;
+    --newtab-element-hover-color: var(--rp-highlight-low) !important;
+    --newtab-element-active-color: var(--rp-highlight-med) !important;
+    --newtab-card-background: var(--rp-surface) !important;
+    --newtab-card-shadow: 0 0 0 1px var(--rp-highlight-low) !important;
+    --newtab-search-border-color: var(--rp-highlight-med) !important;
+    --newtab-search-dropdown-background: var(--rp-overlay) !important;
+    --newtab-search-dropdown-header-color: var(--rp-highlight-med) !important;
+    --newtab-search-icon-color: var(--rp-subtle) !important;
+    --newtab-topsites-outer-card-hover: var(--rp-highlight-low) !important;
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  .search-wrapper .search-handoff-button {
+    background-color: var(--rp-overlay) !important;
+    border: 1px solid var(--rp-highlight-med) !important;
+    color: var(--rp-subtle) !important;
+  }
+
+  .top-site-outer .top-site-icon {
+    color: var(--rp-text) !important;
+  }
+
+  .top-site-outer .title {
+    color: var(--rp-subtle) !important;
+  }
+
+  .top-site-outer:hover .title {
+    color: var(--rp-text) !important;
+  }
+
+  .collapsible-section .section-top-bar .context-menu-button {
+    fill: var(--rp-subtle) !important;
+  }
+}
+
+/* ===== About:Preferences ===== */
+
+@-moz-document url("about:preferences") {
+  body {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  .main-content {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  .pane-container {
+    background-color: var(--rp-base) !important;
+  }
+
+  groupbox {
+    background-color: var(--rp-surface) !important;
+    border: 1px solid var(--rp-highlight-low) !important;
+  }
+
+  .category-item {
+    color: var(--rp-subtle) !important;
+  }
+
+  .category-item[selected],
+  .category-item:hover {
+    background-color: var(--rp-highlight-low) !important;
+    color: var(--rp-text) !important;
+  }
+
+  .sidebar-footer-list .sidebar-footer-icon {
+    fill: var(--rp-subtle) !important;
+  }
+
+  .sidebar-footer-link:hover .sidebar-footer-icon {
+    fill: var(--rp-rose) !important;
+  }
+}
+
+/* ===== About:Addons ===== */
+
+@-moz-document url("about:addons") {
+  body {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  .main-content {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+}
+
+/* ===== About:Pages (generic) ===== */
+
+@-moz-document url-prefix("about:") {
+  :root {
+    --in-content-background: var(--rp-base) !important;
+    --in-content-text-color: var(--rp-text) !important;
+    --in-content-deemphasized-text: var(--rp-subtle) !important;
+    --in-content-box-background: var(--rp-surface) !important;
+    --in-content-box-border-color: var(--rp-highlight-med) !important;
+    --in-content-button-background: var(--rp-overlay) !important;
+    --in-content-button-text-color: var(--rp-text) !important;
+    --in-content-button-background-hover: var(--rp-highlight-low) !important;
+    --in-content-button-background-active: var(--rp-highlight-med) !important;
+    --in-content-primary-button-background: var(--rp-rose) !important;
+    --in-content-primary-button-text-color: var(--rp-base) !important;
+    --in-content-item-hover: var(--rp-highlight-low) !important;
+    --in-content-item-selected: var(--rp-highlight-med) !important;
+    --in-content-border-color: var(--rp-highlight-med) !important;
+    --in-content-focus-outline-color: var(--rp-rose) !important;
+    --in-content-table-background: var(--rp-surface) !important;
+    --in-content-accent-color: var(--rp-rose) !important;
+  }
+}

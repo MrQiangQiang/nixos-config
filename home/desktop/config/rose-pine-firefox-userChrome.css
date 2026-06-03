@@ -1,0 +1,237 @@
+/* Rose Pine Firefox Theme */
+/* Source: palette.nix → pkgs.replaceVars */
+/* Dark/light auto-switch via prefers-color-scheme */
+
+/* ===== Color Variables ===== */
+
+:root {
+  --rp-base: @dark_base@;
+  --rp-surface: @dark_surface@;
+  --rp-overlay: @dark_overlay@;
+  --rp-muted: @dark_muted@;
+  --rp-subtle: @dark_subtle@;
+  --rp-text: @dark_text@;
+  --rp-love: @dark_love@;
+  --rp-gold: @dark_gold@;
+  --rp-rose: @dark_rose@;
+  --rp-pine: @dark_pine@;
+  --rp-foam: @dark_foam@;
+  --rp-iris: @dark_iris@;
+  --rp-highlight-low: @dark_highlight_low@;
+  --rp-highlight-med: @dark_highlight_med@;
+  --rp-highlight-high: @dark_highlight_high@;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --rp-base: @dawn_base@;
+    --rp-surface: @dawn_surface@;
+    --rp-overlay: @dawn_overlay@;
+    --rp-muted: @dawn_muted@;
+    --rp-subtle: @dawn_subtle@;
+    --rp-text: @dawn_text@;
+    --rp-love: @dawn_love@;
+    --rp-gold: @dawn_gold@;
+    --rp-rose: @dawn_rose@;
+    --rp-pine: @dawn_pine@;
+    --rp-foam: @dawn_foam@;
+    --rp-iris: @dawn_iris@;
+    --rp-highlight-low: @dawn_highlight_low@;
+    --rp-highlight-med: @dawn_highlight_med@;
+    --rp-highlight-high: @dawn_highlight_high@;
+  }
+}
+
+/* ===== Firefox Internal Variable Overrides ===== */
+
+:root {
+  --toolbar-bgcolor: var(--rp-surface) !important;
+  --toolbar-color: var(--rp-text) !important;
+  --lwt-toolbar-background: var(--rp-surface) !important;
+  --toolbar-field-background-color: var(--rp-overlay) !important;
+  --toolbar-field-color: var(--rp-text) !important;
+  --toolbar-field-border-color: var(--rp-highlight-med) !important;
+  --toolbar-field-focus-border-color: var(--rp-rose) !important;
+  --arrowpanel-background: var(--rp-overlay) !important;
+  --arrowpanel-color: var(--rp-text) !important;
+  --arrowpanel-border-color: var(--rp-highlight-med) !important;
+  --sidebar-background-color: var(--rp-surface) !important;
+  --sidebar-text-color: var(--rp-text) !important;
+  --sidebar-border-color: var(--rp-highlight-low) !important;
+  --tab-selected-bgcolor: var(--rp-surface) !important;
+  --tab-selected-textcolor: var(--rp-text) !important;
+  --tab-icon-overlay-stroke: var(--rp-base) !important;
+  --tab-icon-overlay-fill: var(--rp-text) !important;
+  --tab-min-height: 36px !important;
+  --lwt-frame: var(--rp-base) !important;
+}
+
+/* ===== Frame & Tab Bar ===== */
+
+#navigator-toolbox {
+  background-color: var(--rp-base) !important;
+  border-bottom: none !important;
+}
+
+#TabsToolbar {
+  background-color: var(--rp-base) !important;
+  color: var(--rp-subtle) !important;
+}
+
+/* ===== Tabs ===== */
+
+.tabbrowser-tab .tab-background {
+  background-color: transparent !important;
+}
+
+.tabbrowser-tab[selected] .tab-background {
+  background-color: var(--rp-surface) !important;
+  box-shadow: none !important;
+}
+
+.tabbrowser-tab:not([selected]):hover .tab-background {
+  background-color: var(--rp-highlight-low) !important;
+}
+
+.tabbrowser-tab .tab-label {
+  color: var(--rp-subtle) !important;
+}
+
+.tabbrowser-tab[selected] .tab-label {
+  color: var(--rp-text) !important;
+}
+
+.tabbrowser-tab[selected] .tab-line {
+  background-color: var(--rp-rose) !important;
+}
+
+.tabbrowser-tab .tab-loading-burst {
+  background-color: var(--rp-foam) !important;
+}
+
+/* Tab separators */
+.tabbrowser-tab::after,
+.tabbrowser-tab::before {
+  border-color: var(--rp-highlight-med) !important;
+}
+
+/* New tab button */
+#tabs-newtab-button .toolbarbutton-icon {
+  fill: var(--rp-subtle) !important;
+}
+
+#tabs-newtab-button:hover .toolbarbutton-icon {
+  fill: var(--rp-rose) !important;
+  background-color: var(--rp-highlight-low) !important;
+}
+
+/* ===== Navigation Toolbar ===== */
+
+#nav-bar {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+  border-top: none !important;
+}
+
+/* ===== URL Bar ===== */
+
+#urlbar,
+#searchbar {
+  background-color: var(--rp-overlay) !important;
+  color: var(--rp-text) !important;
+}
+
+#urlbar[focused],
+#searchbar[focused] {
+  border-color: var(--rp-rose) !important;
+}
+
+#urlbar-input,
+#searchbar-input {
+  color: var(--rp-text) !important;
+}
+
+/* URL bar highlight (selection) */
+#urlbar-input::selection {
+  background-color: var(--rp-rose) !important;
+  color: var(--rp-base) !important;
+}
+
+/* ===== Bookmarks Toolbar ===== */
+
+#PersonalToolbar {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+}
+
+/* ===== Sidebar ===== */
+
+#sidebar-box {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+}
+
+#sidebar {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+}
+
+#sidebar-header {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+  border-bottom: 1px solid var(--rp-highlight-low) !important;
+}
+
+/* ===== Popups & Panels ===== */
+
+panel {
+  --panel-background: var(--rp-overlay) !important;
+  --panel-color: var(--rp-text) !important;
+  --panel-border-color: var(--rp-highlight-med) !important;
+}
+
+menupopup {
+  --panel-background: var(--rp-overlay) !important;
+  --panel-color: var(--rp-text) !important;
+  --panel-border-color: var(--rp-highlight-med) !important;
+}
+
+/* Menu item highlight */
+menuitem:hover,
+menu:hover,
+.autocomplete-richlistitem:hover {
+  background-color: var(--rp-highlight-med) !important;
+  color: var(--rp-text) !important;
+}
+
+/* ===== Buttons ===== */
+
+toolbarbutton:hover {
+  background-color: var(--rp-highlight-low) !important;
+}
+
+toolbarbutton:active {
+  background-color: var(--rp-highlight-med) !important;
+}
+
+/* ===== Icons ===== */
+
+.toolbarbutton-icon {
+  fill: var(--rp-subtle) !important;
+}
+
+toolbarbutton:hover .toolbarbutton-icon {
+  fill: var(--rp-rose) !important;
+}
+
+/* ===== CSD: Hide title bar buttons (kwm handles window management) ===== */
+
+.titlebar-buttonbox-container {
+  display: none !important;
+}
+
+/* ===== Content area background (visible during load) ===== */
+
+#browser {
+  background-color: var(--rp-base) !important;
+}
