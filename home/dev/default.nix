@@ -18,6 +18,7 @@ let
     "window.autoDetectColorScheme"
     "workbench.preferredDarkColorTheme"
     "workbench.preferredLightColorTheme"
+    "terminal.integrated.fontFamily"
   ];
 
   traeSettingsJson = (pkgs.formats.json { }).generate "trae-settings" traeSettings;
