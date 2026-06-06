@@ -90,12 +90,11 @@ lib.mkIf isDesktopEnabled {
       settings = {
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "extensions.activeThemeID" = "default-theme@mozilla.org";
+        # 1 = tabs replace titlebar (no separate titlebar above tabs)
+        # With River's org_kde_kwin_server_decoration patch, GTK3 does not
+        # create CSD widgets, so Firefox renders tabs at the top edge.
+        "browser.tabs.inTitlebar" = 1;
       };
     };
   };
-
-  # Disable Firefox CSD (Client-Side Decorations) so kwm draws the border.
-  # home.sessionVariables alone doesn't work: River doesn't source hm-session-vars.sh.
-  # The River init script sources this via /etc/set-environment which reads sessionVariables.
-  home.sessionVariables.MOZ_GTK_TITLEBAR_DECORATION = "none";
 }
