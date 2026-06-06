@@ -1,0 +1,251 @@
+diff --git a/build.zig b/build.zig
+index 39e179a..af91291 100644
+--- a/build.zig
++++ b/build.zig
+@@ -97,6 +97,7 @@ pub fn build(b: *Build) !void {
+     scanner.addCustomProtocol(b.path("protocol/upstream/wlr-layer-shell-unstable-v1.xml"));
+     scanner.addCustomProtocol(b.path("protocol/upstream/wlr-output-power-management-unstable-v1.xml"));
+     scanner.addCustomProtocol(b.path("protocol/upstream/virtual-keyboard-unstable-v1.xml"));
++    scanner.addCustomProtocol(b.path("protocol/upstream/server-decoration.xml"));
+ 
+     // Some of these versions may be out of date with what wlroots implements.
+     // This is not a problem in practice though as long as river successfully compiles.
+@@ -115,6 +116,7 @@ pub fn build(b: *Build) !void {
+     scanner.generate("zwp_pointer_constraints_v1", 1);
+     scanner.generate("zwp_tablet_manager_v2", 1);
+     scanner.generate("zxdg_decoration_manager_v1", 1);
++    scanner.generate("org_kde_kwin_server_decoration_manager", 1);
+     scanner.generate("zxdg_importer_v2", 1);
+     scanner.generate("zxdg_exporter_v2", 1);
+     scanner.generate("ext_session_lock_manager_v1", 1);
+diff --git a/protocol/upstream/server-decoration.xml b/protocol/upstream/server-decoration.xml
+new file mode 100644
+index 0000000..26bff42
+--- /dev/null
++++ b/protocol/upstream/server-decoration.xml
+@@ -0,0 +1,52 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="server_decoration">
++  <copyright><![CDATA[
++    SPDX-FileCopyrightText: 2015 Martin Gräßlin
++    SPDX-License-Identifier: LGPL-2.1-or-later
++  ]]></copyright>
++
++  <interface name="org_kde_kwin_server_decoration_manager" version="1">
++    <description summary="Server side window decoration manager">
++      This interface allows to coordinate whether the server should create
++      a server-side window decoration around a wl_surface representing a
++      shell surface.
++      Use in conjunction with zxdg_decoration_manager_v1 is undefined.
++    </description>
++    <request name="create">
++      <description summary="Create a server-side decoration object for a given surface">
++        When a client creates a server-side decoration object it indicates
++        that it supports the protocol. The client is supposed to tell the
++        server whether it wants server-side decorations or will provide
++        client-side decorations.
++      </description>
++      <arg name="id" type="new_id" interface="org_kde_kwin_server_decoration"/>
++      <arg name="surface" type="object" interface="wl_surface"/>
++    </request>
++    <enum name="mode">
++      <entry name="None" value="0" summary="Undecorated"/>
++      <entry name="Client" value="1" summary="Client-side decoration"/>
++      <entry name="Server" value="2" summary="Server-side decoration"/>
++    </enum>
++    <event name="default_mode">
++      <description summary="The default mode used on the server"/>
++      <arg name="mode" type="uint" enum="mode"/>
++    </event>
++  </interface>
++
++  <interface name="org_kde_kwin_server_decoration" version="1">
++    <request name="release" type="destructor"/>
++    <enum name="mode">
++      <entry name="None" value="0"/>
++      <entry name="Client" value="1"/>
++      <entry name="Server" value="2"/>
++    </enum>
++    <request name="request_mode">
++      <description summary="The decoration mode the surface wants to use."/>
++      <arg name="mode" type="uint" enum="mode"/>
++    </request>
++    <event name="mode">
++      <description summary="The new decoration mode applied by the server"/>
++      <arg name="mode" type="uint" enum="mode"/>
++    </event>
++  </interface>
++</protocol>
+diff --git a/river/Server.zig b/river/Server.zig
+index 7f4ccb0..321d4a0 100644
+--- a/river/Server.zig
++++ b/river/Server.zig
+@@ -31,6 +31,7 @@ const LayerShell = @import("LayerShell.zig");
+ const LibinputConfig = @import("LibinputConfig.zig");
+ const XkbConfig = @import("XkbConfig.zig");
+ const XdgDecoration = @import("XdgDecoration.zig");
++const ServerDecoration = @import("ServerDecoration.zig");
+ const XdgToplevel = @import("XdgToplevel.zig");
+ const XwaylandOverrideRedirect = @import("XwaylandOverrideRedirect.zig");
+ const XwaylandWindow = @import("XwaylandWindow.zig");
+@@ -70,6 +71,7 @@ cursor_shape_manager: *wlr.CursorShapeManagerV1,
+ 
+ xdg_shell: *wlr.XdgShell,
+ xdg_decoration_manager: *wlr.XdgDecorationManagerV1,
++kde_server_decoration: ServerDecoration,
+ xdg_activation: *wlr.XdgActivationV1,
+ xdg_foreign_registry: *wlr.XdgForeignRegistry,
+ xdg_foreign_v2: *wlr.XdgForeignV2,
+@@ -157,6 +159,7 @@ pub fn init(server: *Server, runtime_xwayland: bool) !void {
+ 
+         .xdg_shell = try wlr.XdgShell.create(wl_server, 5),
+         .xdg_decoration_manager = try wlr.XdgDecorationManagerV1.create(wl_server),
++        .kde_server_decoration = undefined,
+         .xdg_activation = try wlr.XdgActivationV1.create(wl_server),
+         .xdg_foreign_registry = xdg_foreign_registry,
+         .xdg_foreign_v2 = try wlr.XdgForeignV2.create(wl_server, xdg_foreign_registry),
+@@ -232,6 +235,7 @@ pub fn init(server: *Server, runtime_xwayland: bool) !void {
+     try server.xkb_config.init();
+     try server.idle_inhibit_manager.init();
+     try server.lock_manager.init();
++    try server.kde_server_decoration.init(wl_server);
+ 
+     server.renderer.events.lost.add(&server.renderer_lost);
+     server.xdg_shell.events.new_toplevel.add(&server.new_xdg_toplevel);
+@@ -348,6 +352,7 @@ fn allowlist(server: *Server, global: *const wl.Global) bool {
+         global == server.cursor_shape_manager.global or
+         global == server.xdg_shell.global or
+         global == server.xdg_decoration_manager.global or
++        global == server.kde_server_decoration.global or
+         global == server.xdg_activation.global or
+         global == server.xdg_foreign_v2.exporter.global or
+         global == server.xdg_foreign_v2.importer.global or
+diff --git a/river/ServerDecoration.zig b/river/ServerDecoration.zig
+new file mode 100644
+index 0000000..1d1347d
+--- /dev/null
++++ b/river/ServerDecoration.zig
+@@ -0,0 +1,111 @@
++// SPDX-FileCopyrightText: © 2025 The River Developers
++// SPDX-License-Identifier: GPL-3.0-only
++
++const ServerDecoration = @This();
++
++const std = @import("std");
++const wl = @import("wayland").server.wl;
++const org = @import("wayland").server.org;
++
++const server = &@import("main.zig").server;
++
++const log = std.log.scoped(.server_decoration);
++
++global: *wl.Global,
++server_destroy: wl.Listener(*wl.Server) = .init(handleServerDestroy),
++
++manager_objects: wl.list.Head(org.KdeKwinServerDecorationManager, null),
++decoration_objects: wl.list.Head(org.KdeKwinServerDecoration, null),
++
++pub fn init(kde_sd: *ServerDecoration, wl_server: *wl.Server) !void {
++    kde_sd.* = .{
++        .global = try wl.Global.create(
++            wl_server,
++            org.KdeKwinServerDecorationManager,
++            1,
++            *ServerDecoration,
++            kde_sd,
++            bindManager,
++        ),
++        .manager_objects = undefined,
++        .decoration_objects = undefined,
++    };
++    kde_sd.manager_objects.init();
++    kde_sd.decoration_objects.init();
++
++    wl_server.addDestroyListener(&kde_sd.server_destroy);
++}
++
++fn handleServerDestroy(listener: *wl.Listener(*wl.Server), _: *wl.Server) void {
++    const kde_sd: *ServerDecoration = @fieldParentPtr("server_destroy", listener);
++
++    kde_sd.global.destroy();
++
++    while (kde_sd.manager_objects.first()) |object| object.destroy();
++    while (kde_sd.decoration_objects.first()) |object| object.destroy();
++}
++
++fn bindManager(client: *wl.Client, kde_sd: *ServerDecoration, version: u32, id: u32) void {
++    const manager = org.KdeKwinServerDecorationManager.create(client, version, id) catch {
++        client.postNoMemory();
++        log.err("out of memory", .{});
++        return;
++    };
++    manager.setHandler(*ServerDecoration, handleManagerRequest, handleManagerDestroy, kde_sd);
++    kde_sd.manager_objects.append(manager);
++
++    // Always advertise Server as the default mode.
++    // This causes GTK3's gdk_wayland_display_prefers_ssd() to return TRUE,
++    // preventing GTK3 from creating CSD decoration widgets.
++    manager.sendDefaultMode(.Server);
++}
++
++fn handleManagerRequest(
++    manager: *org.KdeKwinServerDecorationManager,
++    request: org.KdeKwinServerDecorationManager.Request,
++    kde_sd: *ServerDecoration,
++) void {
++    switch (request) {
++        .create => |args| {
++            const decoration = org.KdeKwinServerDecoration.create(
++                manager.getClient(),
++                manager.getVersion(),
++                args.id,
++            ) catch {
++                manager.getClient().postNoMemory();
++                log.err("out of memory", .{});
++                return;
++            };
++            decoration.setHandler(*ServerDecoration, handleDecorationRequest, handleDecorationDestroy, kde_sd);
++            kde_sd.decoration_objects.append(decoration);
++
++            // Always respond with Server mode.
++            // Ignore the client's requested mode since River always uses SSD.
++            decoration.sendMode(.Server);
++        },
++    }
++}
++
++fn handleManagerDestroy(manager: *org.KdeKwinServerDecorationManager, _: *ServerDecoration) void {
++    manager.getLink().remove();
++}
++
++fn handleDecorationRequest(
++    decoration: *org.KdeKwinServerDecoration,
++    request: org.KdeKwinServerDecoration.Request,
++    _: *ServerDecoration,
++) void {
++    switch (request) {
++        .request_mode => {
++            // Ignore the client's requested mode. Always respond with Server.
++            decoration.sendMode(.Server);
++        },
++        .release => {
++            decoration.destroy();
++        },
++    }
++}
++
++fn handleDecorationDestroy(decoration: *org.KdeKwinServerDecoration, _: *ServerDecoration) void {
++    decoration.getLink().remove();
++}
+diff --git a/river/main.zig b/river/main.zig
+index 210e2dc..5e57af6 100644
+--- a/river/main.zig
++++ b/river/main.zig
+@@ -296,6 +296,7 @@ const LogScope = enum {
+     wm,
+     xdg,
+     xwayland,
++    server_decoration,
+ };
+ 
+ var log_scopes: std.EnumSet(LogScope) = std.EnumSet(LogScope).initFull();
