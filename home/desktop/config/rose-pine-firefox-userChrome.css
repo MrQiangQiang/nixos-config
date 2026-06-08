@@ -1,69 +1,178 @@
 /* Rose Pine Firefox Theme */
 /* Source: palette.nix → pkgs.replaceVars */
-/* Dark/light auto-switch via prefers-color-scheme */
+/* Dark/light auto-switch via CSS light-dark() function.
+   Variables are defined on both :root (main document) and popup elements
+   (Shadow DOM boundaries) because RecascadeSubtree does not propagate
+   inherited custom properties across popup Shadow DOM after runtime
+   prefers-color-scheme changes. */
 
 /* ===== Color Variables ===== */
 
-:root {
-  --rp-base: @dark_base@;
-  --rp-surface: @dark_surface@;
-  --rp-overlay: @dark_overlay@;
-  --rp-muted: @dark_muted@;
-  --rp-subtle: @dark_subtle@;
-  --rp-text: @dark_text@;
-  --rp-love: @dark_love@;
-  --rp-gold: @dark_gold@;
-  --rp-rose: @dark_rose@;
-  --rp-pine: @dark_pine@;
-  --rp-foam: @dark_foam@;
-  --rp-iris: @dark_iris@;
-  --rp-highlight-low: @dark_highlight_low@;
-  --rp-highlight-med: @dark_highlight_med@;
-  --rp-highlight-high: @dark_highlight_high@;
+:root,
+panel,
+menupopup,
+tooltip,
+#tab-preview-panel,
+#tab-note-preview-panel {
+  --rp-base: light-dark(@dawn_base@, @dark_base@);
+  --rp-surface: light-dark(@dawn_surface@, @dark_surface@);
+  --rp-overlay: light-dark(@dawn_overlay@, @dark_overlay@);
+  --rp-muted: light-dark(@dawn_muted@, @dark_muted@);
+  --rp-subtle: light-dark(@dawn_subtle@, @dark_subtle@);
+  --rp-text: light-dark(@dawn_text@, @dark_text@);
+  --rp-love: light-dark(@dawn_love@, @dark_love@);
+  --rp-gold: light-dark(@dawn_gold@, @dark_gold@);
+  --rp-rose: light-dark(@dawn_rose@, @dark_rose@);
+  --rp-pine: light-dark(@dawn_pine@, @dark_pine@);
+  --rp-foam: light-dark(@dawn_foam@, @dark_foam@);
+  --rp-iris: light-dark(@dawn_iris@, @dark_iris@);
+  --rp-highlight-low: light-dark(@dawn_highlight_low@, @dark_highlight_low@);
+  --rp-highlight-med: light-dark(@dawn_highlight_med@, @dark_highlight_med@);
+  --rp-highlight-high: light-dark(@dawn_highlight_high@, @dark_highlight_high@);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --rp-base: @dawn_base@;
-    --rp-surface: @dawn_surface@;
-    --rp-overlay: @dawn_overlay@;
-    --rp-muted: @dawn_muted@;
-    --rp-subtle: @dawn_subtle@;
-    --rp-text: @dawn_text@;
-    --rp-love: @dawn_love@;
-    --rp-gold: @dawn_gold@;
-    --rp-rose: @dawn_rose@;
-    --rp-pine: @dawn_pine@;
-    --rp-foam: @dawn_foam@;
-    --rp-iris: @dawn_iris@;
-    --rp-highlight-low: @dawn_highlight_low@;
-    --rp-highlight-med: @dawn_highlight_med@;
-    --rp-highlight-high: @dawn_highlight_high@;
-  }
-}
-
-/* ===== Firefox Internal Variable Overrides ===== */
+/* ===== Firefox Design Token Overrides (:root layer) ===== */
+/* These cover variables that Firefox internal CSS consumes from :root.
+   For popup/panel elements that are separate DOM subtrees,
+   additional element-level overrides are needed below. */
 
 :root {
-  --toolbar-bgcolor: var(--rp-surface) !important;
-  --toolbar-color: var(--rp-text) !important;
-  --lwt-toolbar-background: var(--rp-surface) !important;
+  /* Canvas / Box backgrounds (tokens-shared.css — consumed by tabs, panels, toolbars) */
+  --background-color-canvas: var(--rp-base) !important;
+  --background-color-box: var(--rp-surface) !important;
+  --background-color-dimmed: var(--rp-highlight-low) !important;
+  --background-color-dimmed-further: var(--rp-highlight-med) !important;
+
+  /* Text colors (tokens-shared.css — consumed by tab-preview, panels, etc.) */
+  --text-color: var(--rp-text) !important;
+  --text-color-deemphasized: var(--rp-subtle) !important;
+
+  /* Border colors (tokens-shared.css — consumed by tab-preview thumbnail, cards) */
+  --border-color: var(--rp-highlight-med) !important;
+  --border-color-deemphasized: var(--rp-highlight-low) !important;
+  --card-border-color: var(--rp-highlight-med) !important;
+  --card-background-color: var(--rp-surface) !important;
+
+  /* Toolbox / Frame (tokens-shared.css + browser-colors.css) */
+  --toolbox-background-color: var(--rp-base) !important;
+  --toolbox-text-color: var(--rp-text) !important;
+  --toolbox-background-color-inactive: var(--rp-surface) !important;
+  --toolbox-text-color-inactive: var(--rp-subtle) !important;
+
+  /* Toolbar (tokens-shared.css + toolbar.css) */
+  --toolbar-background-color: var(--rp-surface) !important;
+  --toolbar-text-color: var(--rp-text) !important;
+
+  /* Toolbar buttons (tokens-shared.css) */
+  --toolbarbutton-icon-fill: var(--rp-subtle) !important;
+  --toolbarbutton-icon-fill-attention: var(--rp-rose) !important;
+  --toolbarbutton-icon-fill-attention-text: var(--rp-base) !important;
+  --toolbarbutton-background-color-hover: var(--rp-highlight-low) !important;
+  --toolbarbutton-background-color-active: var(--rp-highlight-med) !important;
+  --toolbarseparator-color: var(--rp-highlight-med) !important;
+
+  /* URL bar (tokens-shared.css + urlbar.tokens.css) */
   --toolbar-field-background-color: var(--rp-overlay) !important;
-  --toolbar-field-color: var(--rp-text) !important;
+  --toolbar-field-background-color-focus: var(--rp-overlay) !important;
+  --toolbar-field-text-color: var(--rp-text) !important;
+  --toolbar-field-text-color-focus: var(--rp-text) !important;
   --toolbar-field-border-color: var(--rp-highlight-med) !important;
-  --toolbar-field-focus-border-color: var(--rp-rose) !important;
-  --arrowpanel-background: var(--rp-overlay) !important;
-  --arrowpanel-color: var(--rp-text) !important;
-  --arrowpanel-border-color: var(--rp-highlight-med) !important;
+  --toolbar-field-border-color-focus: var(--rp-rose) !important;
+
+  /* URL bar box (urlbar.tokens.css) */
+  --urlbar-box-background-color: var(--rp-highlight-low) !important;
+  --urlbar-box-background-color-focus: var(--rp-highlight-low) !important;
+  --urlbar-box-background-color-hover: var(--rp-highlight-med) !important;
+  --urlbar-box-background-color-active: var(--rp-highlight-med) !important;
+  --urlbar-box-text-color: var(--rp-text) !important;
+  --urlbar-box-text-color-hover: var(--rp-text) !important;
+
+  /* URL bar view (urlbarview.tokens.css + view-proton.css) */
+  --urlbarview-background-color-hover: var(--rp-highlight-low) !important;
+  --urlbarview-background-color-selected: var(--rp-highlight-med) !important;
+  --urlbarview-text-color-selected: var(--rp-text) !important;
+  --urlbarview-text-color-action: var(--rp-iris) !important;
+  --urlbarview-separator-color: var(--rp-highlight-low) !important;
+  --urlbarView-secondary-text-color: var(--rp-subtle) !important;
+
+  /* Tabs (tab.tokens.css) */
+  --tab-background-color-selected: var(--rp-surface) !important;
+  --tab-background-color-hover: var(--rp-highlight-low) !important;
+  --tab-selected-textcolor: var(--rp-text) !important;
+  --tab-loading-fill: var(--rp-foam) !important;
+  --tab-attention-dot-color: var(--rp-foam) !important;
+  --tab-min-height: 36px !important;
+  --tab-border-color-accent: var(--rp-rose) !important;
+  --tab-border-color-selected-leading: var(--rp-rose) !important;
+  --tab-border-color-selected-trailing: var(--rp-iris) !important;
+  --tab-selected-shadow: none !important;
+
+  /* Panel (tokens-shared.css — replaces legacy --arrowpanel-*) */
+  --panel-background-color: var(--rp-base) !important;
+  --panel-background-color-dimmed: var(--rp-highlight-low) !important;
+  --panel-background-color-dimmed-further: var(--rp-highlight-med) !important;
+  --panel-text-color: var(--rp-text) !important;
+  --panel-border-color: var(--rp-highlight-med) !important;
+
+  /* Sidebar */
   --sidebar-background-color: var(--rp-surface) !important;
   --sidebar-text-color: var(--rp-text) !important;
   --sidebar-border-color: var(--rp-highlight-low) !important;
-  --tab-selected-bgcolor: var(--rp-surface) !important;
-  --tab-selected-textcolor: var(--rp-text) !important;
-  --tab-icon-overlay-stroke: var(--rp-base) !important;
-  --tab-icon-overlay-fill: var(--rp-text) !important;
-  --tab-min-height: 36px !important;
-  --lwt-frame: var(--rp-base) !important;
+
+  /* Buttons (tokens-shared.css) */
+  --button-background-color: var(--rp-overlay) !important;
+  --button-background-color-hover: var(--rp-highlight-low) !important;
+  --button-background-color-active: var(--rp-highlight-med) !important;
+  --button-text-color: var(--rp-text) !important;
+  --button-text-color-primary: var(--rp-base) !important;
+  --button-background-color-primary: var(--rp-rose) !important;
+  --color-accent-primary: var(--rp-rose) !important;
+  --color-accent-primary-hover: var(--rp-rose) !important;
+  --color-accent-primary-active: var(--rp-rose) !important;
+
+  /* Ghost buttons (panel items) */
+  --button-background-color-ghost: transparent !important;
+  --button-background-color-ghost-hover: var(--rp-highlight-low) !important;
+  --button-background-color-ghost-active: var(--rp-highlight-med) !important;
+  --button-text-color-ghost: var(--rp-subtle) !important;
+  --button-text-color-ghost-hover: var(--rp-text) !important;
+  --button-text-color-ghost-active: var(--rp-text) !important;
+
+  /* Focus / Links */
+  --focus-outline-color: var(--rp-rose) !important;
+  --link-color: var(--rp-iris) !important;
+  --link-color-hover: var(--rp-iris) !important;
+  --link-color-active: var(--rp-iris) !important;
+  --color-accent-attention: var(--rp-foam) !important;
+  --color-accent-primary-selected: var(--rp-rose) !important;
+
+  /* Icons */
+  --icon-color: var(--rp-subtle) !important;
+
+  /* Input fields (browser-colors.css + global-shared.css) */
+  --input-color: var(--rp-text) !important;
+  --input-bgcolor: var(--rp-overlay) !important;
+  --input-border-color: var(--rp-highlight-med) !important;
+
+  /* Input fields — new design tokens (consumed by moz-input-search/moz-input-text)
+     Root cause: --input-text-background-color defaults to "Field" (CSS system color)
+     which resolves to white in light mode. moz-input-search uses these, NOT --input-bgcolor. */
+  --input-text-background-color: var(--rp-overlay) !important;
+  --input-text-color: var(--rp-text) !important;
+  --input-text-border-color: var(--rp-highlight-med) !important;
+  --input-text-border: var(--border-width) solid var(--rp-highlight-med) !important;
+  --input-text-background-color-disabled: var(--rp-surface) !important;
+  --input-text-color-disabled: var(--rp-muted) !important;
+  --input-text-border-color-disabled: var(--rp-highlight-low) !important;
+
+  /* Separators */
+  --tabs-navbar-separator-color: var(--rp-highlight-low) !important;
+  --chrome-content-separator-color: var(--rp-highlight-low) !important;
+
+  /* Notification badges (browser-colors.css) */
+  --short-notification-background: var(--rp-rose) !important;
+  --short-notification-gradient: var(--rp-iris) !important;
+  --warning-icon-bgcolor: var(--rp-gold) !important;
 }
 
 /* ===== Frame & Tab Bar ===== */
@@ -78,6 +187,14 @@
   color: var(--rp-subtle) !important;
 }
 
+/* ===== Navigation Toolbar ===== */
+
+#nav-bar {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+  border-top: none !important;
+}
+
 /* ===== Tabs ===== */
 
 .tabbrowser-tab .tab-background {
@@ -87,6 +204,7 @@
 .tabbrowser-tab[selected] .tab-background {
   background-color: var(--rp-surface) !important;
   box-shadow: none !important;
+  border-bottom: 2px solid var(--rp-rose) !important;
 }
 
 .tabbrowser-tab:not([selected]):hover .tab-background {
@@ -101,18 +219,15 @@
   color: var(--rp-text) !important;
 }
 
-.tabbrowser-tab[selected] .tab-line {
-  background-color: var(--rp-rose) !important;
-}
-
-.tabbrowser-tab .tab-loading-burst {
-  background-color: var(--rp-foam) !important;
-}
-
 /* Tab separators */
 .tabbrowser-tab::after,
 .tabbrowser-tab::before {
   border-color: var(--rp-highlight-med) !important;
+}
+
+/* Tab loading burst */
+.tabbrowser-tab .tab-loading-burst {
+  background-color: var(--rp-foam) !important;
 }
 
 /* New tab button */
@@ -125,14 +240,6 @@
   background-color: var(--rp-highlight-low) !important;
 }
 
-/* ===== Navigation Toolbar ===== */
-
-#nav-bar {
-  background-color: var(--rp-surface) !important;
-  color: var(--rp-text) !important;
-  border-top: none !important;
-}
-
 /* ===== URL Bar ===== */
 
 #urlbar,
@@ -141,9 +248,29 @@
   color: var(--rp-text) !important;
 }
 
+/* Firefox 151+: .urlbar-background replaces #urlbar-background */
+.urlbar-background {
+  background-color: var(--rp-overlay) !important;
+}
+
+/* Firefox 151+: .urlbar-input-box controls focused URL bar background */
+.urlbar-input-box {
+  background-color: var(--rp-overlay) !important;
+}
+
+/* Firefox 151+: .urlbar-input controls the text input background */
+.urlbar-input {
+  background-color: var(--rp-overlay) !important;
+}
+
 #urlbar[focused],
 #searchbar[focused] {
   border-color: var(--rp-rose) !important;
+}
+
+/* Focused URL bar background stays overlay (not white) */
+#urlbar[breakout][breakout-extend] .urlbar-background {
+  background-color: var(--rp-overlay) !important;
 }
 
 #urlbar-input,
@@ -183,23 +310,112 @@
 }
 
 /* ===== Popups & Panels ===== */
+/* CRITICAL: panel/panelview/menupopup are separate DOM subtrees that
+   do NOT inherit :root variable overrides. Must override directly. */
 
 panel {
-  --panel-background: var(--rp-overlay) !important;
-  --panel-color: var(--rp-text) !important;
+  --panel-background-color: var(--rp-base) !important;
+  --panel-text-color: var(--rp-text) !important;
   --panel-border-color: var(--rp-highlight-med) !important;
+}
+
+panelview {
+  --panel-background-color: var(--rp-base) !important;
+  background-color: var(--rp-base) !important;
+  color: var(--rp-text) !important;
 }
 
 menupopup {
-  --panel-background: var(--rp-overlay) !important;
-  --panel-color: var(--rp-text) !important;
+  --panel-background-color: var(--rp-base) !important;
+  --panel-text-color: var(--rp-text) !important;
   --panel-border-color: var(--rp-highlight-med) !important;
+  background-color: var(--rp-base) !important;
+  color: var(--rp-text) !important;
 }
 
-/* Menu item highlight */
-menuitem:hover,
-menu:hover,
+/* ===== URL Bar Dropdown Panel ===== */
+
+/* Outer popup frame */
+#urlbar-results,
+#PopupSearchAutoComplete {
+  --panel-background-color: var(--rp-base) !important;
+  background-color: var(--rp-base) !important;
+}
+
+/* URL bar results view */
+.urlbarView {
+  background-color: var(--rp-base) !important;
+  color: var(--rp-text) !important;
+}
+
+.urlbarView-body-inner {
+  background-color: var(--rp-base) !important;
+}
+
+/* URL bar result rows */
+.urlbarView-row {
+  background-color: var(--rp-base) !important;
+  color: var(--rp-text) !important;
+}
+
+.urlbarView-row .urlbarView-title {
+  color: var(--rp-text) !important;
+}
+
+.urlbarView-row .urlbarView-url {
+  color: var(--rp-subtle) !important;
+}
+
+/* URL bar result row: hover (not selected) */
+.urlbarView-row:not([selected]):hover {
+  background-color: var(--rp-highlight-low) !important;
+}
+
+/* URL bar result row: selected */
+.urlbarView-row[selected] {
+  background-color: var(--rp-highlight-low) !important;
+  color: var(--rp-text) !important;
+}
+
+.urlbarView-row[selected] .urlbarView-title {
+  color: var(--rp-text) !important;
+}
+
+.urlbarView-row[selected] .urlbarView-url {
+  color: var(--rp-subtle) !important;
+}
+
+/* Search engine one-off buttons at bottom of urlbar dropdown */
+.search-one-offs {
+  background-color: var(--rp-base) !important;
+  border-top: 1px solid var(--rp-highlight-low) !important;
+}
+
+.searchbar-engine-one-off-item:hover {
+  background-color: var(--rp-highlight-med) !important;
+}
+
+/* ===== Search Bar / Form Autocomplete Dropdown (non-URL-bar contexts) ===== */
+
+.autocomplete-richlistitem {
+  background-color: var(--rp-base) !important;
+}
+
+.autocomplete-richlistitem[selected] {
+  background-color: var(--rp-highlight-low) !important;
+  color: var(--rp-text) !important;
+}
+
 .autocomplete-richlistitem:hover {
+  background-color: var(--rp-highlight-med) !important;
+  color: var(--rp-text) !important;
+}
+
+/* ===== Menu Items ===== */
+
+menubar > menu[_moz-menuactive="true"],
+menupopup > menu[_moz-menuactive="true"],
+menuitem[_moz-menuactive="true"] {
   background-color: var(--rp-highlight-med) !important;
   color: var(--rp-text) !important;
 }
@@ -208,10 +424,12 @@ menu:hover,
 
 toolbarbutton:hover {
   background-color: var(--rp-highlight-low) !important;
+  color: var(--rp-text) !important;
 }
 
 toolbarbutton:active {
   background-color: var(--rp-highlight-med) !important;
+  color: var(--rp-text) !important;
 }
 
 /* ===== Icons ===== */
@@ -230,8 +448,135 @@ toolbarbutton:hover .toolbarbutton-icon {
   display: none !important;
 }
 
+/* ===== Unfocused window state ===== */
+
+:root:-moz-window-inactive #navigator-toolbox {
+  background-color: var(--rp-surface) !important;
+}
+
+:root:-moz-window-inactive #TabsToolbar {
+  background-color: var(--rp-surface) !important;
+}
+
+:root:-moz-window-inactive .tabbrowser-tab .tab-label {
+  color: var(--rp-muted) !important;
+}
+
+:root:-moz-window-inactive .tabbrowser-tab[selected] .tab-label {
+  color: var(--rp-subtle) !important;
+}
+
 /* ===== Content area background (visible during load) ===== */
 
 #browser {
   background-color: var(--rp-base) !important;
+}
+
+/* ===== Find Bar ===== */
+
+findbar {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-text) !important;
+  border-top: 1px solid var(--rp-highlight-low) !important;
+}
+
+findbar .findbar-textbox {
+  background-color: var(--rp-overlay) !important;
+  color: var(--rp-text) !important;
+  border: 1px solid var(--rp-highlight-med) !important;
+}
+
+findbar .findbar-textbox[focused] {
+  border-color: var(--rp-rose) !important;
+}
+
+/* Find bar buttons (Previous/Next/Highlight All) */
+findbar toolbarbutton {
+  color: var(--rp-subtle) !important;
+}
+
+findbar toolbarbutton:hover {
+  color: var(--rp-text) !important;
+}
+
+/* ===== URL Bar Breakout (remove shadow on expand) ===== */
+
+#urlbar[breakout][breakout-extend] {
+  box-shadow: none !important;
+}
+
+/* ===== Status Panel (link hover preview at bottom) ===== */
+
+#statuspanel {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-subtle) !important;
+}
+
+#statuspanel-label {
+  background-color: var(--rp-surface) !important;
+  color: var(--rp-subtle) !important;
+}
+
+/* ===== Tooltips ===== */
+/* -moz-appearance: none disables platform-native tooltip appearance,
+   ensuring our CSS background/color overrides take effect. */
+
+tooltip {
+  -moz-appearance: none !important;
+  -moz-default-appearance: none !important;
+  appearance: none !important;
+  color-scheme: light dark;
+  background-color: var(--rp-overlay) !important;
+  color: var(--rp-text) !important;
+  border: 1px solid var(--rp-highlight-med) !important;
+  padding: 6px 10px !important;
+}
+
+/* Tab hover preview panel (#tab-preview-panel is a <panel type="arrow">) */
+#tab-preview-panel {
+  --panel-background-color: var(--rp-overlay) !important;
+  --panel-border-color: var(--rp-highlight-med) !important;
+  --text-color-deemphasized: var(--rp-subtle) !important;
+  --border-color-deemphasized: var(--rp-highlight-low) !important;
+  background-color: var(--rp-overlay) !important;
+  color: var(--rp-text) !important;
+}
+
+#tab-preview-panel .tab-preview-title {
+  color: var(--rp-text) !important;
+}
+
+#tab-preview-panel .tab-preview-uri,
+#tab-preview-panel .tab-preview-pid-activeness {
+  color: var(--rp-subtle) !important;
+}
+
+#tab-preview-panel .tab-preview-thumbnail-container > canvas {
+  border-color: var(--rp-highlight-low) !important;
+}
+
+/* Tab note preview panel */
+#tab-note-preview-panel {
+  --tab-note-text-background: var(--rp-highlight-low) !important;
+  --tab-note-text-border-color: var(--rp-highlight-med) !important;
+}
+
+/* Legacy tab tooltip (Firefox 132 and earlier) */
+#tabbrowser-tab-tooltip {
+  -moz-appearance: none !important;
+  -moz-default-appearance: none !important;
+  appearance: none !important;
+  color-scheme: light dark;
+  background-color: var(--rp-overlay) !important;
+  color: var(--rp-text) !important;
+}
+
+/* ===== Firefox View / Synced Tabs Panel ===== */
+/* #PanelUI-fxa is a <panelview>, already covered by the panelview rule above.
+   Synced tabs are in #PanelUI-remotetabs (also a panelview). */
+
+/* ===== Sidebar Scrollbar ===== */
+
+#sidebar-box scrollbar {
+  scrollbar-color: var(--rp-highlight-med) var(--rp-surface) !important;
 }

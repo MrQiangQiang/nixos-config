@@ -1,0 +1,11 @@
+/* Rose Pine Moon (Dark) — GTK tooltip CSS override for Firefox NAC tooltips.
+   NAC tooltips use CSS system colors (InfoBackground/InfoText) from GTK,
+   which userChrome.css cannot style. This file overrides GTK's tooltip
+   widget colors so InfoBackground/InfoText resolve to Rose Pine Moon values.
+   Runtime switching does NOT work on Wayland (no GtkSettings bridge),
+   but startup is correct: Firefox reads gtk.css when it starts. */
+tooltip {
+  background-color: @dark_overlay@;
+  color: @dark_text@;
+  border-color: @dark_highlight_med@;
+}

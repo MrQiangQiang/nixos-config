@@ -33,8 +33,17 @@ let
     ${link (theme { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
     ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
-    ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${if isDark then palette.gtk.dark_name else palette.gtk.light_name}'"
-    ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'${if isDark then "prefer-dark" else "prefer-light"}'"
+    # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
+    # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.
+    # This symlink ensures gtk.css is correct at Firefox startup. Runtime switching
+    # does NOT work on Wayland (no GtkSettings bridge from gsettings to GTK).
+    ${link (theme { dark = "theme/gtk-tooltip-dark.css"; light = "theme/gtk-tooltip-light.css"; }) "${cfgHome}/gtk-3.0/gtk.css"}
+
+    # System color-scheme. GTK applications (and Firefox content processes
+    # via xdg-desktop-portal-gtk) read this to determine prefers-color-scheme.
+    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface color-scheme "${if isDark then "prefer-dark" else "prefer-light"}"
+    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme "${if isDark then palette.gtk.dark_name else palette.gtk.light_name}"
+    ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-application-prefer-dark-theme "${if isDark then "true" else "false"}"
   '';
 in
 lib.mkIf isDesktopEnabled {

@@ -1,65 +1,79 @@
 /* Rose Pine Firefox Content Theme */
 /* Source: palette.nix → pkgs.replaceVars */
-/* Dark/light auto-switch via prefers-color-scheme */
-/* Controls: about:newtab, about:home, about:preferences, about: pages */
+/* Dark/light auto-switch via CSS light-dark() function. */
+/* Controls: about:newtab, about:preferences, about:addons, about:firefoxview, all about: pages */
 
 /* ===== Color Variables ===== */
 
 :root {
-  --rp-base: @dark_base@;
-  --rp-surface: @dark_surface@;
-  --rp-overlay: @dark_overlay@;
-  --rp-muted: @dark_muted@;
-  --rp-subtle: @dark_subtle@;
-  --rp-text: @dark_text@;
-  --rp-love: @dark_love@;
-  --rp-gold: @dark_gold@;
-  --rp-rose: @dark_rose@;
-  --rp-pine: @dark_pine@;
-  --rp-foam: @dark_foam@;
-  --rp-iris: @dark_iris@;
-  --rp-highlight-low: @dark_highlight_low@;
-  --rp-highlight-med: @dark_highlight_med@;
-  --rp-highlight-high: @dark_highlight_high@;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --rp-base: @dawn_base@;
-    --rp-surface: @dawn_surface@;
-    --rp-overlay: @dawn_overlay@;
-    --rp-muted: @dawn_muted@;
-    --rp-subtle: @dawn_subtle@;
-    --rp-text: @dawn_text@;
-    --rp-love: @dawn_love@;
-    --rp-gold: @dawn_gold@;
-    --rp-rose: @dawn_rose@;
-    --rp-pine: @dawn_pine@;
-    --rp-foam: @dawn_foam@;
-    --rp-iris: @dawn_iris@;
-    --rp-highlight-low: @dawn_highlight_low@;
-    --rp-highlight-med: @dawn_highlight_med@;
-    --rp-highlight-high: @dawn_highlight_high@;
-  }
+  --rp-base: light-dark(@dawn_base@, @dark_base@);
+  --rp-surface: light-dark(@dawn_surface@, @dark_surface@);
+  --rp-overlay: light-dark(@dawn_overlay@, @dark_overlay@);
+  --rp-muted: light-dark(@dawn_muted@, @dark_muted@);
+  --rp-subtle: light-dark(@dawn_subtle@, @dark_subtle@);
+  --rp-text: light-dark(@dawn_text@, @dark_text@);
+  --rp-love: light-dark(@dawn_love@, @dark_love@);
+  --rp-gold: light-dark(@dawn_gold@, @dark_gold@);
+  --rp-rose: light-dark(@dawn_rose@, @dark_rose@);
+  --rp-pine: light-dark(@dawn_pine@, @dark_pine@);
+  --rp-foam: light-dark(@dawn_foam@, @dark_foam@);
+  --rp-iris: light-dark(@dawn_iris@, @dark_iris@);
+  --rp-highlight-low: light-dark(@dawn_highlight_low@, @dark_highlight_low@);
+  --rp-highlight-med: light-dark(@dawn_highlight_med@, @dark_highlight_med@);
+  --rp-highlight-high: light-dark(@dawn_highlight_high@, @dark_highlight_high@);
 }
 
 /* ===== New Tab Page ===== */
 
 @-moz-document url("about:newtab"), url("about:home") {
   body {
+    /* Page backgrounds (_theme.scss) */
     --newtab-background-color: var(--rp-base) !important;
     --newtab-background-color-secondary: var(--rp-surface) !important;
+    --newtab-background-card: var(--rp-surface) !important;
+
+    /* Text colors (_theme.scss) */
     --newtab-text-primary-color: var(--rp-text) !important;
     --newtab-text-secondary-color: var(--rp-subtle) !important;
+    --newtab-text-secondary-text: var(--rp-subtle) !important;
+    --newtab-contextual-text-primary-color: var(--rp-text) !important;
+    --newtab-contextual-text-secondary-color: var(--rp-subtle) !important;
+
+    /* Interactive elements (_theme.scss) */
     --newtab-element-hover-color: var(--rp-highlight-low) !important;
     --newtab-element-active-color: var(--rp-highlight-med) !important;
-    --newtab-card-background: var(--rp-surface) !important;
-    --newtab-card-shadow: 0 0 0 1px var(--rp-highlight-low) !important;
-    --newtab-search-border-color: var(--rp-highlight-med) !important;
-    --newtab-search-dropdown-background: var(--rp-overlay) !important;
-    --newtab-search-dropdown-header-color: var(--rp-highlight-med) !important;
-    --newtab-search-icon-color: var(--rp-subtle) !important;
-    --newtab-topsites-outer-card-hover: var(--rp-highlight-low) !important;
+    --newtab-element-secondary-color: var(--rp-highlight-low) !important;
+    --newtab-element-secondary-hover-color: var(--rp-highlight-med) !important;
+    --newtab-element-secondary-active-color: var(--rp-highlight-high) !important;
+
+    /* Buttons (_theme.scss — these fallback to design tokens) */
+    --newtab-button-background: var(--rp-overlay) !important;
+    --newtab-button-hover-background: var(--rp-highlight-low) !important;
+    --newtab-button-active-background: var(--rp-highlight-med) !important;
+    --newtab-button-text: var(--rp-text) !important;
+
+    /* Primary action (_theme.scss) */
+    --newtab-primary-action-background: var(--rp-rose) !important;
+    --newtab-primary-action-background-dimmed: var(--rp-highlight-med) !important;
+    --newtab-primary-element-hover-color: var(--rp-rose) !important;
+    --newtab-primary-element-active-color: var(--rp-rose) !important;
+    --newtab-primary-element-text-color: var(--rp-base) !important;
+
+    /* Cards & shadows (_theme.scss) */
+    --newtab-card-placeholder-background-color: var(--rp-highlight-low) !important;
+    --newtab-section-card-box-shadow-color: var(--rp-highlight-low) !important;
+    --newtab-inner-box-shadow-color: var(--rp-highlight-low) !important;
+
+    /* Status colors (_theme.scss) */
+    --newtab-status-success: var(--rp-foam) !important;
+    --newtab-status-error: var(--rp-love) !important;
+
+    /* Overlay (_theme.scss) */
+    --newtab-overlay-color: var(--rp-overlay) !important;
+
+    /* Wordmark (_theme.scss) */
+    --newtab-wordmark-color: var(--rp-subtle) !important;
+
     background-color: var(--rp-base) !important;
     color: var(--rp-text) !important;
   }
@@ -84,6 +98,161 @@
 
   .collapsible-section .section-top-bar .context-menu-button {
     fill: var(--rp-subtle) !important;
+  }
+}
+
+/* ===== About:Pages — Design Token Overrides ===== */
+/* Firefox 150+ migrated from --in-content-* to a new design token system.
+   All --in-content-* variables have been removed from Firefox 151 source code.
+   Only the new design token system is needed. */
+
+@-moz-document url-prefix("about:") {
+  :root {
+    /* === New Design Tokens (tokens-brand.css / tokens-shared.css) === */
+
+    /* Canvas / Page background */
+    --background-color-canvas: var(--rp-base) !important;
+
+    /* Box / Card background */
+    --background-color-box: var(--rp-surface) !important;
+
+    /* Status backgrounds */
+    --background-color-information: var(--rp-highlight-low) !important;
+    --background-color-success: var(--rp-highlight-low) !important;
+    --background-color-warning: var(--rp-highlight-low) !important;
+    --background-color-critical: var(--rp-overlay) !important;
+
+    /* Borders */
+    --border-color: var(--rp-highlight-med) !important;
+    --border-color-deemphasized: var(--rp-highlight-low) !important;
+    --border-color-interactive: var(--rp-highlight-med) !important;
+
+    /* Accent / Primary */
+    --color-accent-primary: var(--rp-rose) !important;
+    --color-accent-primary-hover: var(--rp-rose) !important;
+    --color-accent-primary-active: var(--rp-rose) !important;
+    --color-accent-primary-selected: var(--rp-rose) !important;
+
+    /* Buttons */
+    --button-background-color: var(--rp-overlay) !important;
+    --button-background-color-hover: var(--rp-highlight-low) !important;
+    --button-background-color-active: var(--rp-highlight-med) !important;
+    --button-text-color: var(--rp-text) !important;
+    --button-text-color-primary: var(--rp-base) !important;
+
+    /* Primary buttons */
+    --button-background-color-primary: var(--rp-rose) !important;
+    --button-background-color-primary-hover: var(--rp-rose) !important;
+    --button-background-color-primary-active: var(--rp-rose) !important;
+
+    /* Destructive buttons */
+    --button-background-color-destructive: var(--rp-love) !important;
+    --button-background-color-destructive-hover: var(--rp-love) !important;
+    --button-background-color-destructive-active: var(--rp-love) !important;
+    --button-text-color-destructive: var(--rp-base) !important;
+
+    /* Focus */
+    --focus-outline-color: var(--rp-rose) !important;
+
+    /* Icons */
+    --icon-color: var(--rp-subtle) !important;
+
+    /* Links */
+    --link-color: var(--rp-iris) !important;
+    --link-color-hover: var(--rp-iris) !important;
+    --link-color-active: var(--rp-iris) !important;
+    --link-color-visited: var(--rp-iris) !important;
+
+    /* Text */
+    --text-color: var(--rp-text) !important;
+    --text-color-deemphasized: var(--rp-subtle) !important;
+    --text-color-disabled: var(--rp-muted) !important;
+    --text-color-error: var(--rp-love) !important;
+
+    /* Toggle switches */
+    --toggle-background-color: var(--rp-overlay) !important;
+    --toggle-background-color-hover: var(--rp-highlight-low) !important;
+    --toggle-background-color-active: var(--rp-highlight-med) !important;
+    --toggle-background-color-pressed: var(--rp-rose) !important;
+    --toggle-background-color-pressed-hover: var(--rp-rose) !important;
+    --toggle-background-color-pressed-active: var(--rp-rose) !important;
+    --toggle-border-color: var(--rp-highlight-med) !important;
+    --toggle-border-color-hover: var(--rp-highlight-med) !important;
+    --toggle-border-color-active: var(--rp-highlight-med) !important;
+    --toggle-dot-background-color: var(--rp-highlight-med) !important;
+    --toggle-dot-background-color-on-pressed: var(--rp-base) !important;
+
+    /* Table */
+    --table-row-background-color-alternate: var(--rp-surface) !important;
+
+    /* Input fields — legacy design tokens (consumed by global-shared.css input/textarea) */
+    --input-color: var(--rp-text) !important;
+    --input-bgcolor: var(--rp-overlay) !important;
+    --input-border-color: var(--rp-highlight-med) !important;
+
+    /* Input fields — new design tokens (consumed by moz-input-search/moz-input-text #input)
+       Root cause: --input-text-background-color defaults to CSS system color "Field"
+       which resolves to white in light mode regardless of our --input-bgcolor override.
+       moz-input-search uses --input-text-* variables, NOT --input-bgcolor. */
+    --input-text-background-color: var(--rp-overlay) !important;
+    --input-text-color: var(--rp-text) !important;
+    --input-text-border-color: var(--rp-highlight-med) !important;
+    --input-text-border: var(--border-width) solid var(--rp-highlight-med) !important;
+    --input-text-background-color-disabled: var(--rp-surface) !important;
+    --input-text-color-disabled: var(--rp-muted) !important;
+    --input-text-border-color-disabled: var(--rp-highlight-low) !important;
+  }
+}
+
+/* ===== Search Input Defense in Depth ===== */
+/* Root cause: moz-input-search uses --input-text-background-color (defaults to CSS
+   system color "Field" = white in light mode), NOT --input-bgcolor.
+   :root variable overrides should penetrate Shadow DOM via CSS custom property inheritance.
+   Direct selector overrides below provide defense in depth for edge cases. */
+
+@-moz-document url-prefix("about:") {
+  /* moz-input-search (used in about:preferences, about:addons, about:firefoxview) */
+  moz-input-search {
+    --input-text-background-color: var(--rp-overlay) !important;
+    --input-text-color: var(--rp-text) !important;
+    --input-text-border-color: var(--rp-highlight-med) !important;
+    --input-text-border: var(--border-width) solid var(--rp-highlight-med) !important;
+    background-color: var(--rp-overlay) !important;
+    color: var(--rp-text) !important;
+    border-color: var(--rp-highlight-med) !important;
+  }
+
+  moz-input-search:focus-within {
+    border-color: var(--rp-rose) !important;
+    outline-color: var(--rp-rose) !important;
+  }
+
+  /* Regular input elements in about: pages (consumed via --input-bgcolor) */
+  input[type="text"],
+  input[type="search"],
+  input[type="password"],
+  input[type="number"],
+  input:not([type]),
+  textarea {
+    background-color: var(--rp-overlay) !important;
+    color: var(--rp-text) !important;
+    border-color: var(--rp-highlight-med) !important;
+  }
+
+  input[type="text"]:focus,
+  input[type="search"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input:not([type]):focus,
+  textarea:focus {
+    background-color: var(--rp-overlay) !important;
+    border-color: var(--rp-rose) !important;
+    outline-color: var(--rp-rose) !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--rp-muted) !important;
   }
 }
 
@@ -126,6 +295,47 @@
   .sidebar-footer-link:hover .sidebar-footer-icon {
     fill: var(--rp-rose) !important;
   }
+
+  /* Spotlight / info boxes */
+  .info-box-container {
+    background-color: var(--rp-surface) !important;
+  }
+
+  /* Search tooltip */
+  .search-tooltip {
+    background-color: var(--rp-overlay) !important;
+    color: var(--rp-text) !important;
+    border: 1px solid var(--rp-highlight-med) !important;
+  }
+
+  .search-tooltip::before {
+    border-top-color: var(--rp-highlight-med) !important;
+  }
+
+  .search-tooltip::after {
+    border-top-color: var(--rp-overlay) !important;
+  }
+
+  /* Dialog backdrop */
+  .dialogOverlay[topmost] {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Dialog box */
+  .dialogBox {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  /* Privacy detailed options */
+  .privacy-detailedoption {
+    background-color: var(--rp-surface) !important;
+    border-color: var(--rp-highlight-med) !important;
+  }
+
+  .privacy-detailedoption.selected {
+    border-color: var(--rp-rose) !important;
+  }
 }
 
 /* ===== About:Addons ===== */
@@ -140,28 +350,70 @@
     background-color: var(--rp-base) !important;
     color: var(--rp-text) !important;
   }
+
+  /* Sidebar categories */
+  .category {
+    color: var(--rp-subtle) !important;
+  }
+
+  .category[selected],
+  .category:hover {
+    background-color: var(--rp-highlight-low) !important;
+    color: var(--rp-text) !important;
+  }
+
+  /* Addon cards */
+  .card {
+    background-color: var(--rp-surface) !important;
+    color: var(--rp-text) !important;
+  }
+
+  /* Discovery pane */
+  .disco-pane {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
+  }
+
+  /* Theme enable button border */
+  .theme-enable-button {
+    border-color: var(--rp-highlight-med) !important;
+  }
+
+  /* Recommended badges */
+  .addon-badge-recommended {
+    background-color: var(--rp-gold) !important;
+  }
 }
 
-/* ===== About:Pages (generic) ===== */
+/* ===== Firefox View (about:firefoxview) ===== */
+/* Uses Shadow DOM + --fxview-* variables that fallback to --newtab-* variables.
+   Override --fxview-* directly since Shadow DOM inherits document-level custom properties. */
 
-@-moz-document url-prefix("about:") {
+@-moz-document url("about:firefoxview") {
   :root {
-    --in-content-background: var(--rp-base) !important;
-    --in-content-text-color: var(--rp-text) !important;
-    --in-content-deemphasized-text: var(--rp-subtle) !important;
-    --in-content-box-background: var(--rp-surface) !important;
-    --in-content-box-border-color: var(--rp-highlight-med) !important;
-    --in-content-button-background: var(--rp-overlay) !important;
-    --in-content-button-text-color: var(--rp-text) !important;
-    --in-content-button-background-hover: var(--rp-highlight-low) !important;
-    --in-content-button-background-active: var(--rp-highlight-med) !important;
-    --in-content-primary-button-background: var(--rp-rose) !important;
-    --in-content-primary-button-text-color: var(--rp-base) !important;
-    --in-content-item-hover: var(--rp-highlight-low) !important;
-    --in-content-item-selected: var(--rp-highlight-med) !important;
-    --in-content-border-color: var(--rp-highlight-med) !important;
-    --in-content-focus-outline-color: var(--rp-rose) !important;
-    --in-content-table-background: var(--rp-surface) !important;
-    --in-content-accent-color: var(--rp-rose) !important;
+    /* Page */
+    --fxview-background-color: var(--rp-base) !important;
+    --fxview-background-color-secondary: var(--rp-surface) !important;
+    --fxview-border: var(--rp-highlight-low) !important;
+
+    /* Text */
+    --fxview-text-primary-color: var(--rp-text) !important;
+    --fxview-text-secondary-color: var(--rp-subtle) !important;
+    --fxview-text-color-hover: var(--rp-text) !important;
+
+    /* Interactive elements */
+    --fxview-element-background-hover: var(--rp-highlight-low) !important;
+    --fxview-element-background-active: var(--rp-highlight-med) !important;
+
+    /* Primary action */
+    --fxview-primary-action-background: var(--rp-iris) !important;
+
+    /* Indicators */
+    --fxview-indicator-stroke-color-hover: var(--rp-highlight-med) !important;
+  }
+
+  body {
+    background-color: var(--rp-base) !important;
+    color: var(--rp-text) !important;
   }
 }
