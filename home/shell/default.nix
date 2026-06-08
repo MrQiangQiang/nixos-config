@@ -4,6 +4,11 @@ let
   nixosSshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@nixos";
 in
 {
+  imports = [
+    ./bash.nix
+    ./starship.nix
+    ./fish.nix
+  ];
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -33,13 +38,15 @@ in
 
   programs.git = {
     enable = true;
-    userName = "fugui";
-    userEmail = "chenzhiqiang0125@gmail.com";
     signing = {
       key = nixosSshPublicKey;
       signByDefault = true;
     };
-    extraConfig = {
+    settings = {
+      user = {
+        name = "fugui";
+        email = "chenzhiqiang0125@gmail.com";
+      };
       gpg = {
         format = "ssh";
       };

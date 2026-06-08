@@ -8,22 +8,26 @@ let
   mkFootColors = c: {
     foreground = c.text;
     background = c.base;
-    regular0 = c.overlay;
-    regular1 = c.love;
-    regular2 = c.pine;
-    regular3 = c.gold;
-    regular4 = c.foam;
-    regular5 = c.iris;
-    regular6 = c.rose;
-    regular7 = c.text;
-    bright0 = c.muted;
-    bright1 = c.love;
-    bright2 = c.pine;
-    bright3 = c.gold;
-    bright4 = c.foam;
-    bright5 = c.iris;
-    bright6 = c.rose;
-    bright7 = c.text;
+    # regular colors — strictly match official rose-pine/foot
+    regular0 = c.overlay;   # black (Overlay)
+    regular1 = c.love;      # red (Love)
+    regular2 = c.foam;      # green (Foam)
+    regular3 = c.gold;      # yellow (Gold)
+    regular4 = c.pine;      # blue (Pine)
+    regular5 = c.iris;      # magenta (Iris)
+    regular6 = c.rose;      # cyan (Rose)
+    regular7 = c.text;      # white (Text)
+    # bright colors — official lighter variants
+    bright0 = c.bright_overlay;
+    bright1 = c.bright_love;
+    bright2 = c.bright_foam;
+    bright3 = c.bright_gold;
+    bright4 = c.bright_pine;
+    bright5 = c.bright_iris;
+    bright6 = c.bright_rose;
+    bright7 = c.bright_text;
+    flash = c.gold;
+    cursor = "${c.base} ${c.text}";
   };
 
   footSettings = {

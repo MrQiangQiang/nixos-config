@@ -12,11 +12,17 @@ let
       icon-theme = config.gtk.iconTheme.name;
     };
     colors = {
-      background = "${colors.overlay}ff";
+      background = "${colors.base}ff";
       text = "${colors.text}ff";
+      prompt = "${colors.text}ff";
+      placeholder = "${colors.muted}ff";
+      input = "${colors.text}ff";
       match = "${colors.rose}ff";
       selection = "${colors.highlight_med}ff";
       selection-text = "${colors.text}ff";
+      selection-match = "${colors.rose}ff";
+      counter = "${colors.gold}ff";
+      border = "${colors.rose}ff";
     };
   };
 in

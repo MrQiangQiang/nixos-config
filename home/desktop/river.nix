@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, ... }:
+{ config, lib, pkgs, osConfig, palette, ... }:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -44,7 +44,24 @@ lib.mkIf isDesktopEnabled {
 
       fcitx5 -d --replace 2>/dev/null &
 
-      exec kwm
+      # Restore TTY palette after compositor exits. DRM fb helper resets the
+      # hardware cmap to kernel defaults on drm_lastclose(), overwriting our
+      # custom palette. Re-apply from mode.txt so the TTY is correct immediately.
+      # NOTE: Cannot use `exec kwm` here — we need the shell to survive so the
+      # restore function runs after kwm exits.
+      restore_tty_palette() {
+          if [ "$TERM" = "linux" ]; then
+              _mode=$(cat ~/.cache/darkman/mode.txt 2>/dev/null || echo dark)
+              if [ "$_mode" = "light" ]; then
+                  printf '${palette.tty.light}'
+              else
+                  printf '${palette.tty.dark}'
+              fi
+              clear
+          fi
+      }
+      kwm
+      restore_tty_palette
     '';
   };
 }

@@ -1,9 +1,11 @@
 { config, pkgs, lib, ...}:
 {
   services.logind = {
-    suspendKey = "suspend";
-    lidSwitch = "suspend";
-    lidSwitchDocked = "ignore";
+    settings.Login = {
+      HandleSuspendKey = "suspend";
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchDocked = "ignore";
+    };
   };
 
   # Compressed swap in RAM — no disk IO, no SSD wear

@@ -13,13 +13,14 @@ lib.mkIf isDesktopEnabled {
   };
   services.kanshi = {
     enable = true;
-    profiles = {
-      laptop = {
-        outputs = [{
+    settings = [
+      {
+        profile.name = "laptop";
+        profile.outputs = [{
           criteria = "eDP-1";
           status = "enable";
         }];
-      };
-    };
+      }
+    ];
   };
 }

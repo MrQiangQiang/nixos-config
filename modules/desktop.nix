@@ -7,6 +7,10 @@
 
 let
   cfg = config.custom.desktop;
+
+  # Single source: import palette.nix (same file used by home-manager)
+  palette = import ../home/desktop/palette.nix { osConfig = config; };
+  tty = palette.dark;
 in
 {
   options.custom.desktop = {
@@ -43,6 +47,20 @@ in
     environment.systemPackages = [
       cfg.package
       pkgs.polkit_gnome
+    ];
+
+    programs.fish.enable = true;
+    environment.pathsToLink = [ "/share/fish" ];
+
+    # Linux TTY 16-color palette aligned with foot's ANSI mapping.
+    # Official rose-pine/linux-tty swaps green↔blue (pine↔foam) vs foot,
+    # which breaks starship ANSI color consistency. We align with foot:
+    #   0=overlay 1=love 2=foam 3=gold 4=pine 5=iris 6=rose 7=text
+    #   8=muted 9-15=bright variants
+    # Boot default is dark; fish interactiveShellInit overrides per darkman mode.
+    console.colors = with tty; [
+      overlay love foam gold pine iris rose text
+      muted bright_love bright_foam bright_gold bright_pine bright_iris bright_rose bright_text
     ];
 
     # River broadcasts org_kde_kwin_server_decoration protocol (via patch),
