@@ -94,6 +94,23 @@ let
   mkTtyEscapes = c:
     "\\033]P0${c.overlay}\\033]P1${c.love}\\033]P2${c.foam}\\033]P3${c.gold}\\033]P4${c.pine}\\033]P5${c.iris}\\033]P6${c.rose}\\033]P7${c.text}\\033]P8${c.muted}\\033]P9${c.bright_love}\\033]PA${c.bright_foam}\\033]PB${c.bright_gold}\\033]PC${c.bright_pine}\\033]PD${c.bright_iris}\\033]PE${c.bright_rose}\\033]PF${c.bright_text}";
 
+  # ANSI 16-color slot → Rose Pine color name mapping.
+  # Single source of truth for ANSI-indirect color consumers (starship).
+  # Slot mapping matches foot.nix regular0-7 and mkTtyEscapes P0-P7.
+  #   black(0)=overlay  red(1)=love     green(2)=foam
+  #   yellow(3)=gold    blue(4)=pine    magenta(5)=iris
+  #   cyan(6)=rose      white(7)=text
+  ansi = {
+    overlay = "black";
+    love    = "red";
+    foam    = "green";
+    gold    = "yellow";
+    pine    = "blue";
+    iris    = "magenta";
+    rose    = "cyan";
+    text    = "white";
+  };
+
   gtk = {
     dark_name = if dark_variant == "moon" then "rose-pine-moon" else "rose-pine";
     light_name = "rose-pine-dawn";
@@ -111,5 +128,5 @@ let
 in
 {
   _file = ./palette.nix;
-  inherit dark dawn gtk vscode dark_variant tty;
+  inherit dark dawn gtk vscode dark_variant tty ansi;
 }
