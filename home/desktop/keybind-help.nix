@@ -6,8 +6,7 @@ let
   formatMods = mods: lib.concatStringsSep "+" mods;
 
   tierTag = tier:
-    if tier == "universal" then "U"
-    else if tier == "managed" then "M"
+    if tier == "managed" then "M"
     else "D";
 
   # Format: "key  desc(alias)  tag  app  category"
@@ -21,7 +20,7 @@ let
       aliasStr = b.alias or "";
     in "${keyStr}\t${b.desc}(${aliasStr})${modeStr}\t${tag} ${app} ${b.category}";
 
-  tierOrder = [ "universal" "managed" "documented" ];
+  tierOrder = [ "managed" "documented" ];
 
   sortedEntries = lib.flatten (map (t:
     lib.mapAttrsToList (app: data:
@@ -55,7 +54,7 @@ let
   # since kwm uses Super+key and apps use Ctrl+key, but Super+key conflicts are real)
   realConflicts = lib.filter (msg:
     # Only warn about Super+key conflicts (Ctrl+key in apps vs Super+key in kwm is fine)
-    lib.hasPrefix "kwm" msg || lib.hasInfix "Super+" msg
+    lib.hasInfix "Super+" msg
   ) crossConflicts;
 
 in

@@ -26,30 +26,12 @@ let
       "keybind-registry: ${appName} has conflicting bindings: ${lib.concatStringsSep "; " dupDescs}";
       bindings;
 
-  # Cross-app conflict detection: kwm (global) vs documented (local) same key+mods = warning
-  # kwm bindings are global (always active), documented bindings are local (only when app focused)
-  # A conflict means kwm will intercept the key before the app can receive it
-  checkCrossConflicts = kwmBindings: documentedApps:
-    let
-      kwmIds = map (b: {
-        id = "${lib.concatStringsSep "+" b.mods}+${b.key}";
-        inherit (b) desc;
-      }) (lib.filter (b: (b.mode or "default") == "default") kwmBindings);
-      checkApp = app: data:
-        lib.concatMap (b:
-          let bid = "${lib.concatStringsSep "+" b.mods}+${b.key}";
-              matches = lib.filter (k: k.id == bid) kwmIds;
-          in map (k: "${app}: ${bid} → ${b.desc} conflicts with kwm: ${k.desc}") matches
-        ) data.bindings;
-      allConflicts = lib.concatMap (app: checkApp app documentedApps.${app}) (builtins.attrNames documentedApps);
-    in allConflicts;
-
 in
 {
-  universal = {
-    tier = "universal";
-    desc = "全平台通用 — Windows/macOS/Linux 一致，肌肉记忆可跨设备复用";
-    bindings = checkConflicts "universal" [
+  conventions = {
+    tier = "documented";
+    desc = "行业约定 — 跨应用行为一致的快捷键，不由 Nix 管理";
+    bindings = checkConflicts "conventions" [
       { desc = "复制"; alias = "copy"; key = "c"; mods = [ "Ctrl" ]; category = "edit"; }
       { desc = "粘贴"; alias = "paste"; key = "v"; mods = [ "Ctrl" ]; category = "edit"; }
       { desc = "剪切"; alias = "cut"; key = "x"; mods = [ "Ctrl" ]; category = "edit"; }
@@ -57,7 +39,6 @@ in
       { desc = "重做"; alias = "redo"; key = "z"; mods = [ "Ctrl" "Shift" ]; category = "edit"; }
       { desc = "全选"; alias = "select all"; key = "a"; mods = [ "Ctrl" ]; category = "edit"; }
       { desc = "查找"; alias = "find"; key = "f"; mods = [ "Ctrl" ]; category = "edit"; }
-      { desc = "查找替换"; alias = "replace"; key = "h"; mods = [ "Ctrl" ]; category = "edit"; }
       { desc = "保存"; alias = "save"; key = "s"; mods = [ "Ctrl" ]; category = "edit"; }
 
       { desc = "新建标签页"; alias = "new tab"; key = "t"; mods = [ "Ctrl" ]; category = "tab"; }
@@ -66,17 +47,7 @@ in
       { desc = "下一个标签页"; alias = "next tab"; key = "Tab"; mods = [ "Ctrl" ]; category = "tab"; }
       { desc = "上一个标签页"; alias = "prev tab"; key = "Tab"; mods = [ "Ctrl" "Shift" ]; category = "tab"; }
 
-      { desc = "截图"; alias = "screenshot"; key = "Print"; mods = []; category = "media"; }
       { desc = "全屏切换"; alias = "fullscreen"; key = "F11"; mods = []; category = "media"; }
-
-      { desc = "音量增大"; alias = "volume up"; key = "XF86_AudioRaiseVolume"; mods = []; category = "media"; }
-      { desc = "音量减小"; alias = "volume down"; key = "XF86_AudioLowerVolume"; mods = []; category = "media"; }
-      { desc = "音量静音"; alias = "mute"; key = "XF86_AudioMute"; mods = []; category = "media"; }
-      { desc = "亮度增大"; alias = "brightness up"; key = "XF86_MonBrightnessUp"; mods = []; category = "media"; }
-      { desc = "亮度减小"; alias = "brightness down"; key = "XF86_MonBrightnessDown"; mods = []; category = "media"; }
-      { desc = "播放/暂停"; alias = "play pause"; key = "XF86_AudioPlay"; mods = []; category = "media"; }
-      { desc = "下一曲"; alias = "next track"; key = "bracketright"; mods = [ "Super" ]; category = "media"; }
-      { desc = "上一曲"; alias = "prev track"; key = "bracketleft"; mods = [ "Super" ]; category = "media"; }
     ];
   };
 
@@ -165,6 +136,12 @@ in
       { desc = "快捷键速查"; alias = "cheatsheet"; key = "slash"; mods = [ "Super" ]; category = "app"; }
       { desc = "下一曲"; alias = "next track"; key = "bracketright"; mods = [ "Super" ]; category = "media"; }
       { desc = "上一曲"; alias = "prev track"; key = "bracketleft"; mods = [ "Super" ]; category = "media"; }
+      { desc = "音量增大"; alias = "volume up"; key = "XF86_AudioRaiseVolume"; mods = []; category = "media"; }
+      { desc = "音量减小"; alias = "volume down"; key = "XF86_AudioLowerVolume"; mods = []; category = "media"; }
+      { desc = "音量静音"; alias = "mute"; key = "XF86_AudioMute"; mods = []; category = "media"; }
+      { desc = "亮度增大"; alias = "brightness up"; key = "XF86_MonBrightnessUp"; mods = []; category = "media"; }
+      { desc = "亮度减小"; alias = "brightness down"; key = "XF86_MonBrightnessDown"; mods = []; category = "media"; }
+      { desc = "播放/暂停"; alias = "play pause"; key = "XF86_AudioPlay"; mods = []; category = "media"; }
 
       { desc = "移动窗口(鼠标)"; alias = "mouse move"; key = "左键"; mods = [ "Super" ]; category = "mouse"; }
       { desc = "调整窗口大小(鼠标)"; alias = "mouse resize"; key = "右键"; mods = [ "Super" ]; category = "mouse"; }
@@ -244,6 +221,7 @@ in
       { desc = "查找所有引用"; alias = "find references"; key = "F12"; mods = [ "Shift" ]; category = "nav"; }
       { desc = "AI 行内编辑"; alias = "ai inline edit"; key = "i"; mods = [ "Ctrl" ]; category = "ai"; }
       { desc = "AI Chat"; alias = "ai chat"; key = "i"; mods = [ "Ctrl" "Shift" ]; category = "ai"; }
+      { desc = "查找替换"; alias = "replace"; key = "h"; mods = [ "Ctrl" ]; category = "edit"; }
     ];
   };
 
