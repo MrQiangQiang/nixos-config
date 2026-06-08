@@ -132,8 +132,9 @@ lib.mkIf isDesktopEnabled {
 
     # Re-apply TTY palette when darkman mode changes between prompts.
     # Runs once per prompt display — zero cost when mode unchanged (one file read).
-    # No `clear` needed: Linux VT palette changes are immediate on all text
-    # (text stores color indices, not color values).
+    # fbcon renders characters as pixels in the framebuffer; palette changes via
+    # \033]Pn update the hardware cmap but do NOT re-render existing pixels.
+    # `clear` is essential to force a full-screen redraw with the new palette.
     functions.tty_theme_sync = {
       body = ''
           if test "$TERM" = "linux"
@@ -141,6 +142,7 @@ lib.mkIf isDesktopEnabled {
               if test "$_mode" != "$__tty_theme_mode"
                   set -g __tty_theme_mode $_mode
                   ${applyTtyPalette "$_mode"}
+                  clear
               end
           end
       '';
