@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
   nixosSshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@nixos";
@@ -9,6 +9,22 @@ in
     ./starship.nix
     ./fish.nix
   ];
+
+  systemd.user.services.ssh-add-key = {
+    Unit = {
+      Description = "Add SSH key to agent";
+      After = [ "ssh-agent.service" ];
+      Requires = [ "ssh-agent.service" ];
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.openssh}/bin/ssh-add ${config.home.homeDirectory}/.ssh/id_ed25519";
+    };
+  };
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
