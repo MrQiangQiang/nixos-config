@@ -112,16 +112,21 @@ let
   '';
 in
 lib.mkIf isDesktopEnabled {
-  # Theme derivations: real files via pkgs.runCommand, deployed via xdg.configFile
-  # (consistent with mako/fuzzel/foot/wob/kwm which all use xdg.configFile."theme/...").
-  # A single derivation as source means HM creates one directory-level symlink
-  # instead of per-file symlinks, eliminating gdk-pixbuf symlink chain edge cases.
-  xdg.configFile."theme/fcitx5-dark".source = mkFcitx5ThemeDerivation "dark" d;
-  xdg.configFile."theme/fcitx5-light".source = mkFcitx5ThemeDerivation "light" l;
+  # Deploy themes to XDG_DATA_HOME/fcitx5/themes/ — fcitx5's StandardPaths
+  # looks for themes there. Two fixed directories (rose-pine-dark, rose-pine-light)
+  # instead of one symlinked "current" directory.
+  xdg.dataFile."fcitx5/themes/rose-pine-dark".source = mkFcitx5ThemeDerivation "dark" d;
+  xdg.dataFile."fcitx5/themes/rose-pine-light".source = mkFcitx5ThemeDerivation "light" l;
 
-  # classicui.conf is managed by darkman (regular file, not nix store symlink —
-  # fcitx5 writes to its own conf directory and nix store symlinks interfere).
-  # Content is always the same: [ClassicUI] / Theme=rose-pine-current.
+  # UseDarkTheme=True: fcitx5 watches XDG Portal color-scheme (which darkman
+  # already sets via gsettings) and automatically switches between Theme and
+  # DarkTheme. No runtime file manipulation needed — fcitx5 handles it natively.
+  xdg.configFile."fcitx5/conf/classicui.conf".text = ''
+    [ClassicUI]
+    Theme=rose-pine-light
+    DarkTheme=rose-pine-dark
+    UseDarkTheme=True
+  '';
 
   # Make profile declarative: keyboard-us + pinyin in Default group.
   # Ensures Ctrl+Space toggles between English and Chinese input.
