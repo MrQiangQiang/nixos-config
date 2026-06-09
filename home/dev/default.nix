@@ -1,4 +1,4 @@
-{ config, lib, pkgs, palette, ... }:
+{ config, lib, pkgs, osConfig, palette, ... }:
 
 let
   traePkg = pkgs.trae-cn.override {
@@ -12,13 +12,14 @@ let
     "http.proxyStrictSSL" = false;
     "extensions.autoUpdate" = false;
     "extensions.autoCheckUpdates" = false;
+    "terminal.integrated.fontFamily" = builtins.head osConfig.fonts.fontconfig.defaultFonts.monospace;
+    "editor.fontFamily" = "'${builtins.head osConfig.fonts.fontconfig.defaultFonts.monospace}', monospace";
   };
 
   traeSettingsRemove = [
     "window.autoDetectColorScheme"
     "workbench.preferredDarkColorTheme"
     "workbench.preferredLightColorTheme"
-    "terminal.integrated.fontFamily"
   ];
 
   traeSettingsJson = (pkgs.formats.json { }).generate "trae-settings" traeSettings;
