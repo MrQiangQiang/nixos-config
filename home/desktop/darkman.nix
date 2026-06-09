@@ -41,7 +41,7 @@ let
     ${link (theme { dark = "theme/fcitx5-dark"; light = "theme/fcitx5-light"; }) "${dataHome}/fcitx5/themes/rose-pine-current"}
     mkdir -p ${cfgHome}/fcitx5/conf
     ${pkgs.coreutils}/bin/printf '[ClassicUI]\nTheme=rose-pine-current\n' > ${cfgHome}/fcitx5/conf/classicui.conf
-    ${pkgs.fcitx5}/bin/fcitx5 -r 2>/dev/null || true
+    ${pkgs.fcitx5}/bin/fcitx5-remote -r 2>/dev/null || true
 
     # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
     # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.

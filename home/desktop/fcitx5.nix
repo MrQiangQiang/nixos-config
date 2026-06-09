@@ -112,12 +112,12 @@ let
   '';
 in
 lib.mkIf isDesktopEnabled {
-  # Theme derivations (real files, no per-file nix store symlinks).
-  # home.file with a derivation source + recursive = true does not work for
-  # replacing existing real directories. Use a single derivation as source
-  # — HM replaces the target with a symlink to the derivation directory.
-  home.file."theme/fcitx5-dark".source = mkFcitx5ThemeDerivation "dark" d;
-  home.file."theme/fcitx5-light".source = mkFcitx5ThemeDerivation "light" l;
+  # Theme derivations: real files via pkgs.runCommand, deployed via xdg.configFile
+  # (consistent with mako/fuzzel/foot/wob/kwm which all use xdg.configFile."theme/...").
+  # A single derivation as source means HM creates one directory-level symlink
+  # instead of per-file symlinks, eliminating gdk-pixbuf symlink chain edge cases.
+  xdg.configFile."theme/fcitx5-dark".source = mkFcitx5ThemeDerivation "dark" d;
+  xdg.configFile."theme/fcitx5-light".source = mkFcitx5ThemeDerivation "light" l;
 
   # classicui.conf is managed by darkman (regular file, not nix store symlink —
   # fcitx5 writes to its own conf directory and nix store symlinks interfere).
