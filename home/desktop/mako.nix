@@ -26,6 +26,32 @@ in
 lib.mkIf isDesktopEnabled {
   home.packages = [ pkgs.mako ];
 
+  # Hand-written systemd service instead of services.mako:
+  # services.mako creates a read-only ~/.config/mako/config symlink,
+  # which conflicts with darkman's ln -sf for theme switching.
+  # Type=dbus ensures systemd waits for D-Bus name registration before
+  # considering the service started, matching mako's upstream service file.
+  systemd.user.services.mako = {
+    Unit = {
+      Description = "Lightweight Wayland notification daemon";
+      Documentation = "man:mako(1)";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+    Service = {
+      Type = "dbus";
+      BusName = "org.freedesktop.Notifications";
+      ExecStart = "${pkgs.mako}/bin/mako";
+      ExecReload = "${pkgs.mako}/bin/makoctl reload";
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
+
   xdg.configFile."theme/mako-config-dark" = {
     source = pkgs.writeText "mako-config-dark" (makoToText (mkMakoConfig d) + mkMakoUrgency d);
   };

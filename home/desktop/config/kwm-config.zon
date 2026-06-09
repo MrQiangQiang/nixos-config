@@ -1,6 +1,5 @@
 .{
     .startup_cmds = .{
-        .{ "mako" },
         .{ "wl-paste", "--watch", "cliphist", "store" },
         .{ "polkit-gnome-authentication-agent-1" },
     },
