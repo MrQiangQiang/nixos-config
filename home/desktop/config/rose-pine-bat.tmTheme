@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>@name@</string>
+	<key>settings</key>
+	<array>
+		<dict>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#@base@</string>
+				<key>caret</key>
+				<string>#@text@</string>
+				<key>foreground</key>
+				<string>#@text@</string>
+				<key>invisibles</key>
+				<string>#@muted@</string>
+				<key>lineHighlight</key>
+				<string>#@surface@</string>
+				<key>selection</key>
+				<string>#@highlight_med@</string>
+				<key>findHighlight</key>
+				<string>#@foam@</string>
+				<key>findHighlightForeground</key>
+				<string>#@base@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>comment, punctuation.definition.comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@muted@</string>
+				<key>fontStyle</key>
+				<string>italic</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>String</string>
+			<key>scope</key>
+			<string>string, string.quoted, punctuation.definition.string</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@gold@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Number</string>
+			<key>scope</key>
+			<string>constant.numeric, constant.language</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@foam@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword, keyword.control, keyword.operator.word, storage.type, storage.modifier</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@pine@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Operator</string>
+			<key>scope</key>
+			<string>keyword.operator, punctuation.separator, punctuation.accessor</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@subtle@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Function</string>
+			<key>scope</key>
+			<string>entity.name.function, support.function, meta.function-call</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@rose@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Type / Class</string>
+			<key>scope</key>
+			<string>entity.name.type, entity.name.class, entity.other.inherited-class, support.type</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@foam@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Variable</string>
+			<key>scope</key>
+			<string>variable, variable.parameter, variable.language</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@text@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Constant / Boolean</string>
+			<key>scope</key>
+			<string>constant, constant.character, constant.other</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@rose@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Tag / Attribute</string>
+			<key>scope</key>
+			<string>entity.name.tag, entity.other.attribute-name, markup.bold</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@iris@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Invalid / Error</string>
+			<key>scope</key>
+			<string>invalid, invalid.illegal</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@love@</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Markdown heading / title</string>
+			<key>scope</key>
+			<string>markup.heading, entity.name.section</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#@love@</string>
+				<key>fontStyle</key>
+				<string>bold</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

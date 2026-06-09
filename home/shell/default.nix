@@ -8,6 +8,7 @@ in
     ./bash.nix
     ./starship.nix
     ./fish.nix
+    ./bat.nix
   ];
 
   systemd.user.services.ssh-add-key = {

@@ -121,6 +121,11 @@ let
     light_name = "Rosé Pine Dawn";
   };
 
+  bat = {
+    dark = if dark_variant == "moon" then "Rose-Pine-Moon" else "Rose-Pine";
+    light = "Rose-Pine-Dawn";
+  };
+
   tty = {
     dark = mkTtyEscapes dark;
     light = mkTtyEscapes dawn;
@@ -128,5 +133,5 @@ let
 in
 {
   _file = ./palette.nix;
-  inherit dark dawn gtk vscode dark_variant tty ansi;
+  inherit dark dawn gtk vscode bat dark_variant tty ansi;
 }
