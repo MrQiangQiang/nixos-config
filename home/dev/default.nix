@@ -68,6 +68,8 @@ let
   nixIdsJson = (pkgs.formats.json { }).generate "nix-ext-ids" nixExtIds;
 in
 {
+  imports = [ ./toolchain.nix ];
+
   home.packages = [ traePkg ];
 
   home.activation.traeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
