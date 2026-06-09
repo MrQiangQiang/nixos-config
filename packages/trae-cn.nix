@@ -94,6 +94,7 @@ pkgs.buildFHSEnv {
     export NIX_ETC_PROTOCOLS="${pkgs.iana-etc}/etc/protocols"
     export NIX_ETC_SERVICES="${pkgs.iana-etc}/etc/services"
     export GSETTINGS_SCHEMA_DIR="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/gsettings-desktop-schemas-${pkgs.gsettings-desktop-schemas.version}/glib-2.0/schemas"
+    export PAGER=cat
     unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY no_proxy NO_PROXY
   '';
 
