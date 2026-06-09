@@ -1,0 +1,152 @@
+{ config, lib, pkgs, osConfig, palette, ... }:
+
+let
+  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  d = palette.dark;
+  l = palette.dawn;
+
+  # PNG assets co-located in ./icons/ (dark main/moon share same icons; dawn has its own).
+  # Copied from local rose-pine/fcitx5 repo — flake pure eval requires all paths within repo.
+  mkPngSource = variant: name: ./icons/fcitx5-${name}-${variant}.png;
+
+  # Build theme as a derivation with REAL files (not nix store symlinks).
+  # fcitx5's StandardPaths::open() handles symlinks but real files eliminate
+  # any potential edge cases with gdk-pixbuf image loading through symlink chains.
+  mkFcitx5ThemeDerivation = variantName: colors:
+    let
+      pngVariant = if variantName == "dark" then "dark" else "dawn";
+    in
+    pkgs.runCommand "fcitx5-theme-${variantName}" {
+      themeConf = pkgs.writeText "theme.conf" (mkFcitx5Theme colors);
+    } ''
+      mkdir $out
+      cp $themeConf $out/theme.conf
+      cp ${mkPngSource pngVariant "radio"} $out/radio.png
+      cp ${mkPngSource pngVariant "arrow"} $out/arrow.png
+    '';
+
+  mkFcitx5Theme = colors: ''
+    # vim: ft=dosini
+    [Metadata]
+    Name=Rosé Pine
+    Version=1
+    Author=rose-pine
+    Description=All natural pine, faux fur and a bit of soho vibes for the classy minimalist
+    ScaleWithDPI=True
+
+    [InputPanel]
+    Font=Sans 13
+    NormalColor=#${colors.subtle}
+    HighlightCandidateColor=#${colors.text}
+    HighlightColor=#${colors.text}
+    HighlightBackgroundColor=#${colors.overlay}
+    Spacing=3
+
+    [InputPanel/TextMargin]
+    Left=10
+    Right=10
+    Top=6
+    Bottom=6
+
+    [InputPanel/Background]
+    Color=#${colors.overlay}
+
+    [InputPanel/Background/Margin]
+    Left=2
+    Right=2
+    Top=2
+    Bottom=2
+
+    [InputPanel/Highlight]
+    Color=#${colors.highlight_med}
+
+    [InputPanel/Highlight/Margin]
+    Left=10
+    Right=10
+    Top=7
+    Bottom=7
+
+    [Menu]
+    Font=Sans 10
+    NormalColor=#${colors.text}
+    Spacing=3
+
+    [Menu/Background]
+    Color=#${colors.overlay}
+
+    [Menu/Background/Margin]
+    Left=2
+    Right=2
+    Top=2
+    Bottom=2
+
+    [Menu/ContentMargin]
+    Left=2
+    Right=2
+    Top=2
+    Bottom=2
+
+    [Menu/Highlight]
+    Color=#${colors.highlight_med}
+
+    [Menu/Highlight/Margin]
+    Left=10
+    Right=10
+    Top=5
+    Bottom=5
+
+    [Menu/Separator]
+    Color=#${colors.base}
+
+    [Menu/CheckBox]
+    Image=radio.png
+
+    [Menu/SubMenu]
+    Image=arrow.png
+
+    [Menu/TextMargin]
+    Left=5
+    Right=5
+    Top=5
+    Bottom=5
+  '';
+in
+lib.mkIf isDesktopEnabled {
+  # Theme derivations (real files, no per-file nix store symlinks).
+  # home.file with a derivation source + recursive = true does not work for
+  # replacing existing real directories. Use a single derivation as source
+  # — HM replaces the target with a symlink to the derivation directory.
+  home.file."theme/fcitx5-dark".source = mkFcitx5ThemeDerivation "dark" d;
+  home.file."theme/fcitx5-light".source = mkFcitx5ThemeDerivation "light" l;
+
+  # classicui.conf is managed by darkman (regular file, not nix store symlink —
+  # fcitx5 writes to its own conf directory and nix store symlinks interfere).
+  # Content is always the same: [ClassicUI] / Theme=rose-pine-current.
+
+  # Make profile declarative: keyboard-us + pinyin in Default group.
+  # Ensures Ctrl+Space toggles between English and Chinese input.
+  xdg.configFile."fcitx5/profile".text = ''
+    [Groups/0]
+    # Group Name
+    Name=Default
+    # Layout
+    Default Layout=us
+    # Default Input Method
+    DefaultIM=keyboard-us
+
+    [Groups/0/Items/0]
+    # Name
+    Name=keyboard-us
+    # Layout
+    Layout=
+
+    [Groups/0/Items/1]
+    # Name
+    Name=pinyin
+    # Layout
+    Layout=us
+
+    [GroupOrder]
+    0=Default
+  '';
+}

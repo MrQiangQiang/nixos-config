@@ -21,6 +21,7 @@ in
     ./filemanager.nix
     ./gtk.nix
     ./darkman.nix
+    ./fcitx5.nix
     ./polkit.nix
     ./media-keys.nix
     ./keybind-help.nix

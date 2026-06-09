@@ -3,10 +3,15 @@
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   cfgHome = config.xdg.configHome;
+  dataHome = config.xdg.dataHome;
 
+  # rm -f before ln -sf prevents self-referencing symlinks when target
+  # already exists as a symlink to a directory (the -f flag on ln does not
+  # help in this case — ln follows directory symlinks and creates inside).
   link = source: target: ''
     mkdir -p $(${pkgs.coreutils}/bin/dirname ${target})
-    ln -sf ${source} ${target}
+    ${pkgs.coreutils}/bin/rm -f ${target}
+    ${pkgs.coreutils}/bin/ln -sf ${source} ${target}
   '';
 
   signal = sig: cmd: ''
@@ -32,6 +37,11 @@ let
 
     ${link (theme { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
     ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
+
+    ${link (theme { dark = "theme/fcitx5-dark"; light = "theme/fcitx5-light"; }) "${dataHome}/fcitx5/themes/rose-pine-current"}
+    mkdir -p ${cfgHome}/fcitx5/conf
+    ${pkgs.coreutils}/bin/printf '[ClassicUI]\nTheme=rose-pine-current\n' > ${cfgHome}/fcitx5/conf/classicui.conf
+    ${pkgs.fcitx5}/bin/fcitx5 -r 2>/dev/null || true
 
     # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
     # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.
