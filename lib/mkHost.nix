@@ -34,8 +34,13 @@ inputs.nixpkgs.lib.nixosSystem {
       time.timeZone = "Asia/Shanghai";
 
       boot.loader = {
-        systemd-boot.enable = true;
+        systemd-boot = {
+          enable = true;
+          editor = true;             # 允许按 e 编辑内核参数，紧急时可加 nomodeset
+          configurationLimit = 10;   # 防止 /boot 分区被世代填满
+        };
         efi.canTouchEfiVariables = true;
+        timeout = 3;                 # 菜单显示 3 秒，足够选择旧世代回退
       };
 
       nix.settings = {
