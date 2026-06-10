@@ -20,6 +20,9 @@ let
     "window.autoDetectColorScheme"
     "workbench.preferredDarkColorTheme"
     "workbench.preferredLightColorTheme"
+    "chat.fontFamily"
+    "chat.codeBlock.fontFamily"
+    "chat.input.fontFamily"
   ];
 
   traeSettingsJson = (pkgs.formats.json { }).generate "trae-settings" traeSettings;
