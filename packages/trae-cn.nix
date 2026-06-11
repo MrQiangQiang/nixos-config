@@ -20,7 +20,7 @@ let
     pango stdenv.cc.cc.lib udev xz zeromq zlib
   ];
 
-  traeBootstrap = pkgs.replaceVars ./trae-bootstrap.cjs {
+  traeBootstrap = pkgs.replaceVars ./trae-cn/bootstrap.cjs {
     inherit vscodeDarkTheme vscodeLightTheme;
   };
 

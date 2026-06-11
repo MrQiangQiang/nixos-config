@@ -28,7 +28,7 @@ let
   patchedSrc = pkgs.applyPatches {
     inherit src;
     name = "${pname}-src-patched";
-    patches = [ ./kwm-sigusr1-reload.patch ];
+    patches = [ ./kwm/sigusr1-reload.patch ];
     postPatch = ''
       sed -i "/lazy/d" build.zig.zon
     '';

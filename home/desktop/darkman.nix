@@ -75,5 +75,5 @@ lib.mkIf isDesktopEnabled {
     categories = [ "Settings" ];
   };
 
-  xdg.dataFile."icons/hicolor/scalable/apps/darkman.svg".source = ./icons/darkman.svg;
+  xdg.dataFile."icons/hicolor/scalable/apps/darkman.svg".source = ./darkman.svg;
 }

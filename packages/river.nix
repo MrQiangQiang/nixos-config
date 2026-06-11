@@ -31,7 +31,7 @@ let
   patchedSrc = pkgs.applyPatches {
     inherit src;
     name = "${pname}-src-patched";
-    patches = [ ./river-kde-server-decoration.patch ];
+    patches = [ ./river/kde-server-decoration.patch ];
     postPatch = ''
       sed -i "/lazy/d" build.zig.zon
     '';

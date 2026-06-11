@@ -12,7 +12,7 @@ let
   d = palette.dark;
   l = palette.dawn;
 
-  rosePineUserChrome = pkgs.replaceVars ./config/rose-pine-firefox-userChrome.css {
+  rosePineUserChrome = pkgs.replaceVars ./firefox/userChrome.css {
     dark_base = "#${d.base}";
     dark_surface = "#${d.surface}";
     dark_overlay = "#${d.overlay}";
@@ -98,7 +98,7 @@ let
     dawn_text = "#${l.text}";
     dawn_highlight_med = "#${l.highlight_med}";
   };
-  gtkTooltipDark = pkgs.replaceVars ./config/gtk-tooltip-dark.css {
+  gtkTooltipDark = pkgs.replaceVars ./firefox/gtk-tooltip-dark.css {
     dark_overlay = "#${d.overlay}";
     dark_text = "#${d.text}";
     dark_highlight_med = "#${d.highlight_med}";

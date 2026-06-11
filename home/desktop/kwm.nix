@@ -4,10 +4,10 @@ let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   d = palette.dark;
   l = palette.dawn;
-  darkZON = pkgs.replaceVars ./config/kwm-config.zon {
+  darkZON = pkgs.replaceVars ./kwm/config.zon {
     inherit (d) base surface text rose foam highlight_high highlight_med;
   };
-  lightZON = pkgs.replaceVars ./config/kwm-config.zon {
+  lightZON = pkgs.replaceVars ./kwm/config.zon {
     inherit (l) base surface text rose foam highlight_high highlight_med;
   };
 in

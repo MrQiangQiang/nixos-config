@@ -24,8 +24,8 @@ let
   };
   dawnVars = mkBatThemeVars palette.dawn // { name = "Rosé Pine Dawn"; };
 
-  darkTheme = pkgs.replaceVars ../desktop/config/rose-pine-bat.tmTheme darkVars;
-  dawnTheme = pkgs.replaceVars ../desktop/config/rose-pine-bat.tmTheme dawnVars;
+  darkTheme = pkgs.replaceVars ./rose-pine-bat.tmTheme darkVars;
+  dawnTheme = pkgs.replaceVars ./rose-pine-bat.tmTheme dawnVars;
 
   darkThemeName = palette.bat.dark;
   lightThemeName = palette.bat.light;
