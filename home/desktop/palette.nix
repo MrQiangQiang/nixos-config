@@ -126,6 +126,11 @@ let
     light = "Rose-Pine-Dawn";
   };
 
+  yazi = {
+    dark = if dark_variant == "moon" then "rose-pine-moon" else "rose-pine";
+    light = "rose-pine-dawn";
+  };
+
   tty = {
     dark = mkTtyEscapes dark;
     light = mkTtyEscapes dawn;
@@ -133,5 +138,5 @@ let
 in
 {
   _file = ./palette.nix;
-  inherit dark dawn gtk vscode bat dark_variant tty ansi;
+  inherit dark dawn gtk vscode bat yazi dark_variant tty ansi;
 }

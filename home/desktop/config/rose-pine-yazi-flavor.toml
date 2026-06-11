@@ -1,0 +1,903 @@
+# vim:fileencoding=utf-8:foldmethod=marker
+
+# : App {{{
+
+[app]
+overall = { bg = "#@base@" }
+
+# : }}}
+
+
+# : Manager {{{
+
+[mgr]
+cwd = { fg = "#@foam@" }
+
+# Find
+find_keyword  = { fg = "#@gold@", bold = true, italic = true, underline = true }
+find_position = { fg = "#@iris@", bg = "reset", bold = true, italic = true }
+
+# Symlink
+symlink_target = { italic = true }
+
+# Marker
+marker_copied   = { fg = "#@pine@", bg = "#@pine@" }
+marker_cut      = { fg = "#@love@", bg = "#@love@" }
+marker_marked   = { fg = "#@rose@", bg = "#@rose@" }
+marker_selected = { fg = "#@gold@", bg = "#@gold@" }
+
+# Count
+count_copied   = { fg = "#@text@", bg = "#@pine@" }
+count_cut      = { fg = "#@text@", bg = "#@love@" }
+count_selected = { fg = "#@base@", bg = "#@gold@" }
+
+# Border
+border_symbol = "│"
+border_style  = { fg = "#@highlight_high@" }
+
+# Highlighting
+syntect_theme = ""
+
+# : }}}
+
+
+# : Tabs {{{
+
+[tabs]
+active   = { fg = "#@text@", bg = "#@pine@", bold = true }
+inactive = { fg = "#@pine@", bg = "#@text@" }
+
+# Separator
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+# : }}}
+
+
+# : Mode {{{
+
+[mode]
+normal_main = { fg = "#@base@", bg = "#@foam@", bold = true }
+normal_alt  = { fg = "#@base@", bg = "#@text@", bold = true }
+
+# Select mode
+select_main = { fg = "#@base@", bg = "#@love@", bold = true }
+select_alt  = { fg = "#@base@", bg = "#@text@", bold = true }
+
+# Unset mode
+unset_main = { fg = "#@base@", bg = "#@love@", bold = true }
+unset_alt  = { fg = "#@base@", bg = "#@text@", bold = true }
+
+# : }}}
+
+
+# : Indicator of hovered file {{{
+
+[indicator]
+parent  = { reversed = true }
+current = { reversed = true }
+preview = { underline = true }
+padding = { open = "", close = "" }
+
+# : }}}
+
+
+# : Status bar {{{
+
+[status]
+overall   = { bg = "#@base@" }
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+
+# Permissions
+perm_sep   = { fg = "#@muted@" }
+perm_type  = { fg = "#@iris@" }
+perm_read  = { fg = "#@gold@" }
+perm_write = { fg = "#@love@" }
+perm_exec  = { fg = "#@foam@" }
+
+# Progress
+progress_label  = { fg = "#@text@", bold = true }
+progress_normal = { fg = "#@pine@", bg = "#@highlight_low@" }
+progress_error  = { fg = "#@love@", bg = "#@highlight_low@" }
+
+# : }}}
+
+
+# : Which {{{
+
+[which]
+cols            = 3
+mask            = { bg = "#@surface@" }
+cand            = { fg = "#@foam@" }
+rest            = { fg = "#@muted@" }
+desc            = { fg = "#@gold@" }
+separator       = "  "
+separator_style = { fg = "#@muted@" }
+
+# : }}}
+
+
+# : Confirmation {{{
+
+[confirm]
+border     = { fg = "#@highlight_high@" }
+title      = { fg = "#@love@", bold = true }
+body       = { fg = "#@text@" }
+list       = { fg = "#@text@" }
+btn_yes    = { fg = "#@base@", bg = "#@pine@", bold = true }
+btn_no     = { fg = "#@base@", bg = "#@text@", bold = true }
+btn_labels = [ "  [y]es  ", "  (n)o  " ]
+
+# : }}}
+
+
+# : Spotter {{{
+
+[spot]
+border = { fg = "#@highlight_high@" }
+title  = { fg = "#@foam@", bold = true }
+
+# Table
+tbl_col  = { fg = "#@foam@" }
+tbl_cell = { fg = "#@base@", bg = "#@gold@", bold = true }
+
+# : }}}
+
+
+# : Notification {{{
+
+[notify]
+title_info  = { fg = "#@pine@" }
+title_warn  = { fg = "#@gold@" }
+title_error = { fg = "#@love@" }
+
+# Icons
+icon_info  = ""
+icon_warn  = ""
+icon_error = ""
+
+# : }}}
+
+
+# : Picker {{{
+
+[pick]
+border   = { fg = "#@pine@" }
+active   = { fg = "#@iris@", bold = true }
+inactive = { fg = "#@subtle@" }
+
+# : }}}
+
+
+# : Input {{{
+
+[input]
+border   = { fg = "#@pine@" }
+title    = { bold = true }
+value    = { fg = "#@text@" }
+selected = { reversed = true }
+
+# : }}}
+
+
+# : Completion {{{
+
+[cmp]
+border   = { fg = "#@pine@" }
+active   = { bg = "#@text@", fg = "#@base@", bold = true }
+inactive = { fg = "#@subtle@" }
+
+# Icons
+icon_file    = ""
+icon_folder  = ""
+icon_command = ""
+
+# : }}}
+
+
+# : Task manager {{{
+
+[tasks]
+border  = { fg = "#@pine@" }
+title   = { bold = true }
+hovered = { fg = "#@iris@", bold = true, reversed = true }
+
+# : }}}
+
+
+# : Help menu {{{
+
+[help]
+on      = { fg = "#@foam@" }
+run     = { fg = "#@iris@" }
+desc    = { fg = "#@gold@" }
+hovered = { reversed = true, bold = true }
+footer  = { fg = "#@base@", bg = "#@text@" }
+
+# : }}}
+
+
+# : File-specific styles {{{
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#@iris@" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#@gold@" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#@love@" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf}", fg = "#@rose@" },
+
+  # Empty files
+  # { mime = "inode/empty", fg = "#@love@" },
+
+  # Special files
+  { url = "*", is = "orphan", fg = "#@base@", bg = "#@love@" },
+  { url = "*", is = "exec", fg = "#@foam@" },
+
+  # Dummy files
+  { url = "*", is = "dummy", fg = "#@base@", bg = "#@love@" },
+  { url = "*/", is = "dummy", fg = "#@base@", bg = "#@love@" },
+
+  # Fallback
+  { url = "*", fg = "#@text@" },
+  { url = "*/", fg = "#@pine@" }
+]
+
+# : }}}
+[icon]
+files = [
+	{ name = ".babelrc", text = "", fg = "#@gold@" },
+	{ name = ".bash_profile", text = "", fg = "#@gold@" },
+	{ name = ".bashrc", text = "", fg = "#@gold@" },
+	{ name = ".clang-format", text = "", fg = "#@highlight_high@" },
+	{ name = ".clang-tidy", text = "", fg = "#@highlight_high@" },
+	{ name = ".codespellrc", text = "󰓆", fg = "#@gold@" },
+	{ name = ".condarc", text = "", fg = "#@gold@" },
+	{ name = ".dockerignore", text = "󰡨", fg = "#@pine@" },
+	{ name = ".ds_store", text = "", fg = "#@highlight_low@" },
+	{ name = ".editorconfig", text = "", fg = "#@text@" },
+	{ name = ".env", text = "", fg = "#@gold@" },
+	{ name = ".eslintignore", text = "", fg = "#@pine@" },
+	{ name = ".eslintrc", text = "", fg = "#@pine@" },
+	{ name = ".git-blame-ignore-revs", text = "", fg = "#@love@" },
+	{ name = ".gitattributes", text = "", fg = "#@love@" },
+	{ name = ".gitconfig", text = "", fg = "#@love@" },
+	{ name = ".gitignore", text = "", fg = "#@love@" },
+	{ name = ".gitlab-ci.yml", text = "", fg = "#@love@" },
+	{ name = ".gitmodules", text = "", fg = "#@love@" },
+	{ name = ".gtkrc-2.0", text = "", fg = "#@text@" },
+	{ name = ".gvimrc", text = "", fg = "#@gold@" },
+	{ name = ".justfile", text = "", fg = "#@text@" },
+	{ name = ".luacheckrc", text = "", fg = "#@pine@" },
+	{ name = ".luaurc", text = "", fg = "#@pine@" },
+	{ name = ".mailmap", text = "󰊢", fg = "#@love@" },
+	{ name = ".nanorc", text = "", fg = "#@pine@" },
+	{ name = ".npmignore", text = "", fg = "#@love@" },
+	{ name = ".npmrc", text = "", fg = "#@love@" },
+	{ name = ".nuxtrc", text = "󱄆", fg = "#@gold@" },
+	{ name = ".nvmrc", text = "", fg = "#@gold@" },
+	{ name = ".pre-commit-config.yaml", text = "󰛢", fg = "#@gold@" },
+	{ name = ".prettierignore", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.cjs", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.js", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.json", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.json5", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.mjs", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.toml", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.yaml", text = "", fg = "#@pine@" },
+	{ name = ".prettierrc.yml", text = "", fg = "#@pine@" },
+	{ name = ".pylintrc", text = "", fg = "#@text@" },
+	{ name = ".settings.json", text = "", fg = "#@pine@" },
+	{ name = ".SRCINFO", text = "󰣇", fg = "#@pine@" },
+	{ name = ".vimrc", text = "", fg = "#@gold@" },
+	{ name = ".Xauthority", text = "", fg = "#@love@" },
+	{ name = ".xinitrc", text = "", fg = "#@love@" },
+	{ name = ".Xresources", text = "", fg = "#@love@" },
+	{ name = ".xsession", text = "", fg = "#@love@" },
+	{ name = ".zprofile", text = "", fg = "#@gold@" },
+	{ name = ".zshenv", text = "", fg = "#@gold@" },
+	{ name = ".zshrc", text = "", fg = "#@gold@" },
+	{ name = "_gvimrc", text = "", fg = "#@gold@" },
+	{ name = "_vimrc", text = "", fg = "#@gold@" },
+	{ name = "AUTHORS", text = "", fg = "#@pine@" },
+	{ name = "AUTHORS.txt", text = "", fg = "#@pine@" },
+	{ name = "brewfile", text = "", fg = "#@love@" },
+	{ name = "bspwmrc", text = "", fg = "#@highlight_low@" },
+	{ name = "build", text = "", fg = "#@gold@" },
+	{ name = "build.gradle", text = "", fg = "#@pine@" },
+	{ name = "build.zig.zon", text = "", fg = "#@gold@" },
+	{ name = "bun.lockb", text = "", fg = "#@text@" },
+	{ name = "cantorrc", text = "", fg = "#@pine@" },
+	{ name = "checkhealth", text = "󰓙", fg = "#@pine@" },
+	{ name = "cmakelists.txt", text = "", fg = "#@text@" },
+	{ name = "code_of_conduct", text = "", fg = "#@love@" },
+	{ name = "code_of_conduct.md", text = "", fg = "#@love@" },
+	{ name = "commit_editmsg", text = "", fg = "#@love@" },
+	{ name = "commitlint.config.js", text = "󰜘", fg = "#@pine@" },
+	{ name = "commitlint.config.ts", text = "󰜘", fg = "#@pine@" },
+	{ name = "compose.yaml", text = "󰡨", fg = "#@pine@" },
+	{ name = "compose.yml", text = "󰡨", fg = "#@pine@" },
+	{ name = "config", text = "", fg = "#@text@" },
+	{ name = "containerfile", text = "󰡨", fg = "#@pine@" },
+	{ name = "copying", text = "", fg = "#@gold@" },
+	{ name = "copying.lesser", text = "", fg = "#@gold@" },
+	{ name = "Directory.Build.props", text = "", fg = "#@pine@" },
+	{ name = "Directory.Build.targets", text = "", fg = "#@pine@" },
+	{ name = "Directory.Packages.props", text = "", fg = "#@pine@" },
+	{ name = "docker-compose.yaml", text = "󰡨", fg = "#@pine@" },
+	{ name = "docker-compose.yml", text = "󰡨", fg = "#@pine@" },
+	{ name = "dockerfile", text = "󰡨", fg = "#@pine@" },
+	{ name = "eslint.config.cjs", text = "", fg = "#@pine@" },
+	{ name = "eslint.config.js", text = "", fg = "#@pine@" },
+	{ name = "eslint.config.mjs", text = "", fg = "#@pine@" },
+	{ name = "eslint.config.ts", text = "", fg = "#@pine@" },
+	{ name = "ext_typoscript_setup.txt", text = "", fg = "#@gold@" },
+	{ name = "favicon.ico", text = "", fg = "#@gold@" },
+	{ name = "fp-info-cache", text = "", fg = "#@text@" },
+	{ name = "fp-lib-table", text = "", fg = "#@text@" },
+	{ name = "FreeCAD.conf", text = "", fg = "#@love@" },
+	{ name = "Gemfile", text = "", fg = "#@love@" },
+	{ name = "gnumakefile", text = "", fg = "#@text@" },
+	{ name = "go.mod", text = "", fg = "#@pine@" },
+	{ name = "go.sum", text = "", fg = "#@pine@" },
+	{ name = "go.work", text = "", fg = "#@pine@" },
+	{ name = "gradle-wrapper.properties", text = "", fg = "#@pine@" },
+	{ name = "gradle.properties", text = "", fg = "#@pine@" },
+	{ name = "gradlew", text = "", fg = "#@pine@" },
+	{ name = "groovy", text = "", fg = "#@muted@" },
+	{ name = "gruntfile.babel.js", text = "", fg = "#@gold@" },
+	{ name = "gruntfile.coffee", text = "", fg = "#@gold@" },
+	{ name = "gruntfile.js", text = "", fg = "#@gold@" },
+	{ name = "gruntfile.ts", text = "", fg = "#@gold@" },
+	{ name = "gtkrc", text = "", fg = "#@text@" },
+	{ name = "gulpfile.babel.js", text = "", fg = "#@love@" },
+	{ name = "gulpfile.coffee", text = "", fg = "#@love@" },
+	{ name = "gulpfile.js", text = "", fg = "#@love@" },
+	{ name = "gulpfile.ts", text = "", fg = "#@love@" },
+	{ name = "hypridle.conf", text = "", fg = "#@pine@" },
+	{ name = "hyprland.conf", text = "", fg = "#@pine@" },
+	{ name = "hyprlock.conf", text = "", fg = "#@pine@" },
+	{ name = "hyprpaper.conf", text = "", fg = "#@pine@" },
+	{ name = "i18n.config.js", text = "󰗊", fg = "#@iris@" },
+	{ name = "i18n.config.ts", text = "󰗊", fg = "#@iris@" },
+	{ name = "i3blocks.conf", text = "", fg = "#@text@" },
+	{ name = "i3status.conf", text = "", fg = "#@text@" },
+	{ name = "index.theme", text = "", fg = "#@gold@" },
+	{ name = "ionic.config.json", text = "", fg = "#@pine@" },
+	{ name = "justfile", text = "", fg = "#@text@" },
+	{ name = "kalgebrarc", text = "", fg = "#@pine@" },
+	{ name = "kdeglobals", text = "", fg = "#@pine@" },
+	{ name = "kdenlive-layoutsrc", text = "", fg = "#@pine@" },
+	{ name = "kdenliverc", text = "", fg = "#@pine@" },
+	{ name = "kritadisplayrc", text = "", fg = "#@pine@" },
+	{ name = "kritarc", text = "", fg = "#@pine@" },
+	{ name = "license", text = "", fg = "#@gold@" },
+	{ name = "license.md", text = "", fg = "#@gold@" },
+	{ name = "lxde-rc.xml", text = "", fg = "#@text@" },
+	{ name = "lxqt.conf", text = "", fg = "#@pine@" },
+	{ name = "makefile", text = "", fg = "#@text@" },
+	{ name = "mix.lock", text = "", fg = "#@iris@" },
+	{ name = "mpv.conf", text = "", fg = "#@pine@" },
+	{ name = "node_modules", text = "", fg = "#@love@" },
+	{ name = "nuxt.config.cjs", text = "󱄆", fg = "#@gold@" },
+	{ name = "nuxt.config.js", text = "󱄆", fg = "#@gold@" },
+	{ name = "nuxt.config.mjs", text = "󱄆", fg = "#@gold@" },
+	{ name = "nuxt.config.ts", text = "󱄆", fg = "#@gold@" },
+	{ name = "package-lock.json", text = "", fg = "#@love@" },
+	{ name = "package.json", text = "", fg = "#@love@" },
+	{ name = "PKGBUILD", text = "", fg = "#@pine@" },
+	{ name = "platformio.ini", text = "", fg = "#@gold@" },
+	{ name = "pom.xml", text = "", fg = "#@love@" },
+	{ name = "prettier.config.cjs", text = "", fg = "#@pine@" },
+	{ name = "prettier.config.js", text = "", fg = "#@pine@" },
+	{ name = "prettier.config.mjs", text = "", fg = "#@pine@" },
+	{ name = "prettier.config.ts", text = "", fg = "#@pine@" },
+	{ name = "procfile", text = "", fg = "#@iris@" },
+	{ name = "PrusaSlicer.ini", text = "", fg = "#@gold@" },
+	{ name = "PrusaSlicerGcodeViewer.ini", text = "", fg = "#@gold@" },
+	{ name = "py.typed", text = "", fg = "#@gold@" },
+	{ name = "QtProject.conf", text = "", fg = "#@gold@" },
+	{ name = "rakefile", text = "", fg = "#@love@" },
+	{ name = "readme", text = "󰂺", fg = "#@text@" },
+	{ name = "readme.md", text = "󰂺", fg = "#@text@" },
+	{ name = "rmd", text = "", fg = "#@pine@" },
+	{ name = "robots.txt", text = "󰚩", fg = "#@muted@" },
+	{ name = "security", text = "󰒃", fg = "#@text@" },
+	{ name = "security.md", text = "󰒃", fg = "#@text@" },
+	{ name = "settings.gradle", text = "", fg = "#@pine@" },
+	{ name = "svelte.config.js", text = "", fg = "#@love@" },
+	{ name = "sxhkdrc", text = "", fg = "#@highlight_low@" },
+	{ name = "sym-lib-table", text = "", fg = "#@text@" },
+	{ name = "tailwind.config.js", text = "󱏿", fg = "#@pine@" },
+	{ name = "tailwind.config.mjs", text = "󱏿", fg = "#@pine@" },
+	{ name = "tailwind.config.ts", text = "󱏿", fg = "#@pine@" },
+	{ name = "tmux.conf", text = "", fg = "#@gold@" },
+	{ name = "tmux.conf.local", text = "", fg = "#@gold@" },
+	{ name = "tsconfig.json", text = "", fg = "#@pine@" },
+	{ name = "unlicense", text = "", fg = "#@gold@" },
+	{ name = "vagrantfile", text = "", fg = "#@pine@" },
+	{ name = "vercel.json", text = "", fg = "#@text@" },
+	{ name = "vlcrc", text = "󰕼", fg = "#@gold@" },
+	{ name = "webpack", text = "󰜫", fg = "#@pine@" },
+	{ name = "weston.ini", text = "", fg = "#@gold@" },
+	{ name = "workspace", text = "", fg = "#@gold@" },
+	{ name = "xmobarrc", text = "", fg = "#@love@" },
+	{ name = "xmobarrc.hs", text = "", fg = "#@love@" },
+	{ name = "xmonad.hs", text = "", fg = "#@love@" },
+	{ name = "xorg.conf", text = "", fg = "#@love@" },
+	{ name = "xsettingsd.conf", text = "", fg = "#@love@" },
+]
+exts = [
+	{ name = "3gp", text = "", fg = "#@gold@" },
+	{ name = "3mf", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "7z", text = "", fg = "#@gold@" },
+	{ name = "a", text = "", fg = "#@text@" },
+	{ name = "aac", text = "", fg = "#@pine@" },
+	{ name = "adb", text = "", fg = "#@pine@" },
+	{ name = "ads", text = "", fg = "#@text@" },
+	{ name = "ai", text = "", fg = "#@gold@" },
+	{ name = "aif", text = "", fg = "#@pine@" },
+	{ name = "aiff", text = "", fg = "#@pine@" },
+	{ name = "android", text = "", fg = "#@gold@" },
+	{ name = "ape", text = "", fg = "#@pine@" },
+	{ name = "apk", text = "", fg = "#@gold@" },
+	{ name = "apl", text = "", fg = "#@gold@" },
+	{ name = "app", text = "", fg = "#@love@" },
+	{ name = "applescript", text = "", fg = "#@text@" },
+	{ name = "asc", text = "󰦝", fg = "#@highlight_high@" },
+	{ name = "asm", text = "", fg = "#@pine@" },
+	{ name = "ass", text = "󰨖", fg = "#@gold@" },
+	{ name = "astro", text = "", fg = "#@love@" },
+	{ name = "avif", text = "", fg = "#@iris@" },
+	{ name = "awk", text = "", fg = "#@highlight_low@" },
+	{ name = "azcli", text = "", fg = "#@pine@" },
+	{ name = "bak", text = "󰁯", fg = "#@text@" },
+	{ name = "bash", text = "", fg = "#@gold@" },
+	{ name = "bat", text = "", fg = "#@gold@" },
+	{ name = "bazel", text = "", fg = "#@gold@" },
+	{ name = "bib", text = "󱉟", fg = "#@gold@" },
+	{ name = "bicep", text = "", fg = "#@pine@" },
+	{ name = "bicepparam", text = "", fg = "#@iris@" },
+	{ name = "bin", text = "", fg = "#@love@" },
+	{ name = "blade.php", text = "", fg = "#@love@" },
+	{ name = "blend", text = "󰂫", fg = "#@gold@" },
+	{ name = "blp", text = "󰺾", fg = "#@pine@" },
+	{ name = "bmp", text = "", fg = "#@iris@" },
+	{ name = "bqn", text = "", fg = "#@gold@" },
+	{ name = "brep", text = "󰻫", fg = "#@foam@" },
+	{ name = "bz", text = "", fg = "#@gold@" },
+	{ name = "bz2", text = "", fg = "#@gold@" },
+	{ name = "bz3", text = "", fg = "#@gold@" },
+	{ name = "bzl", text = "", fg = "#@gold@" },
+	{ name = "c", text = "", fg = "#@pine@" },
+	{ name = "c++", text = "", fg = "#@love@" },
+	{ name = "cache", text = "", fg = "#@text@" },
+	{ name = "cast", text = "", fg = "#@gold@" },
+	{ name = "cbl", text = "", fg = "#@pine@" },
+	{ name = "cc", text = "", fg = "#@love@" },
+	{ name = "ccm", text = "", fg = "#@love@" },
+	{ name = "cfg", text = "", fg = "#@text@" },
+	{ name = "cjs", text = "", fg = "#@gold@" },
+	{ name = "clj", text = "", fg = "#@gold@" },
+	{ name = "cljc", text = "", fg = "#@gold@" },
+	{ name = "cljd", text = "", fg = "#@pine@" },
+	{ name = "cljs", text = "", fg = "#@pine@" },
+	{ name = "cmake", text = "", fg = "#@text@" },
+	{ name = "cob", text = "", fg = "#@pine@" },
+	{ name = "cobol", text = "", fg = "#@pine@" },
+	{ name = "coffee", text = "", fg = "#@gold@" },
+	{ name = "conda", text = "", fg = "#@gold@" },
+	{ name = "conf", text = "", fg = "#@text@" },
+	{ name = "config.ru", text = "", fg = "#@love@" },
+	{ name = "cow", text = "󰆚", fg = "#@gold@" },
+	{ name = "cp", text = "", fg = "#@pine@" },
+	{ name = "cpp", text = "", fg = "#@pine@" },
+	{ name = "cppm", text = "", fg = "#@pine@" },
+	{ name = "cpy", text = "", fg = "#@pine@" },
+	{ name = "cr", text = "", fg = "#@text@" },
+	{ name = "crdownload", text = "", fg = "#@gold@" },
+	{ name = "cs", text = "󰌛", fg = "#@gold@" },
+	{ name = "csh", text = "", fg = "#@highlight_low@" },
+	{ name = "cshtml", text = "󱦗", fg = "#@pine@" },
+	{ name = "cson", text = "", fg = "#@gold@" },
+	{ name = "csproj", text = "󰪮", fg = "#@pine@" },
+	{ name = "css", text = "", fg = "#@pine@" },
+	{ name = "csv", text = "", fg = "#@gold@" },
+	{ name = "cts", text = "", fg = "#@pine@" },
+	{ name = "cu", text = "", fg = "#@gold@" },
+	{ name = "cue", text = "󰲹", fg = "#@iris@" },
+	{ name = "cuh", text = "", fg = "#@iris@" },
+	{ name = "cxx", text = "", fg = "#@pine@" },
+	{ name = "cxxm", text = "", fg = "#@pine@" },
+	{ name = "d", text = "", fg = "#@love@" },
+	{ name = "d.ts", text = "", fg = "#@gold@" },
+	{ name = "dart", text = "", fg = "#@pine@" },
+	{ name = "db", text = "", fg = "#@text@" },
+	{ name = "dconf", text = "", fg = "#@text@" },
+	{ name = "desktop", text = "", fg = "#@pine@" },
+	{ name = "diff", text = "", fg = "#@highlight_low@" },
+	{ name = "dll", text = "", fg = "#@overlay@" },
+	{ name = "doc", text = "󰈬", fg = "#@pine@" },
+	{ name = "Dockerfile", text = "󰡨", fg = "#@pine@" },
+	{ name = "docx", text = "󰈬", fg = "#@pine@" },
+	{ name = "dot", text = "󱁉", fg = "#@pine@" },
+	{ name = "download", text = "", fg = "#@gold@" },
+	{ name = "drl", text = "", fg = "#@rose@" },
+	{ name = "dropbox", text = "", fg = "#@pine@" },
+	{ name = "dump", text = "", fg = "#@text@" },
+	{ name = "dwg", text = "󰻫", fg = "#@foam@" },
+	{ name = "dxf", text = "󰻫", fg = "#@foam@" },
+	{ name = "ebook", text = "", fg = "#@gold@" },
+	{ name = "ebuild", text = "", fg = "#@pine@" },
+	{ name = "edn", text = "", fg = "#@pine@" },
+	{ name = "eex", text = "", fg = "#@iris@" },
+	{ name = "ejs", text = "", fg = "#@gold@" },
+	{ name = "el", text = "", fg = "#@iris@" },
+	{ name = "elc", text = "", fg = "#@iris@" },
+	{ name = "elf", text = "", fg = "#@love@" },
+	{ name = "elm", text = "", fg = "#@pine@" },
+	{ name = "eln", text = "", fg = "#@iris@" },
+	{ name = "env", text = "", fg = "#@gold@" },
+	{ name = "eot", text = "", fg = "#@text@" },
+	{ name = "epp", text = "", fg = "#@gold@" },
+	{ name = "epub", text = "", fg = "#@gold@" },
+	{ name = "erb", text = "", fg = "#@love@" },
+	{ name = "erl", text = "", fg = "#@love@" },
+	{ name = "ex", text = "", fg = "#@iris@" },
+	{ name = "exe", text = "", fg = "#@love@" },
+	{ name = "exs", text = "", fg = "#@iris@" },
+	{ name = "f#", text = "", fg = "#@pine@" },
+	{ name = "f3d", text = "󰻫", fg = "#@foam@" },
+	{ name = "f90", text = "󱈚", fg = "#@pine@" },
+	{ name = "fbx", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "fcbak", text = "", fg = "#@love@" },
+	{ name = "fcmacro", text = "", fg = "#@love@" },
+	{ name = "fcmat", text = "", fg = "#@love@" },
+	{ name = "fcparam", text = "", fg = "#@love@" },
+	{ name = "fcscript", text = "", fg = "#@love@" },
+	{ name = "fcstd", text = "", fg = "#@love@" },
+	{ name = "fcstd1", text = "", fg = "#@love@" },
+	{ name = "fctb", text = "", fg = "#@love@" },
+	{ name = "fctl", text = "", fg = "#@love@" },
+	{ name = "fdmdownload", text = "", fg = "#@gold@" },
+	{ name = "feature", text = "", fg = "#@gold@" },
+	{ name = "fish", text = "", fg = "#@highlight_low@" },
+	{ name = "flac", text = "", fg = "#@pine@" },
+	{ name = "flc", text = "", fg = "#@text@" },
+	{ name = "flf", text = "", fg = "#@text@" },
+	{ name = "fnl", text = "", fg = "#@text@" },
+	{ name = "fodg", text = "", fg = "#@gold@" },
+	{ name = "fodp", text = "", fg = "#@gold@" },
+	{ name = "fods", text = "", fg = "#@gold@" },
+	{ name = "fodt", text = "", fg = "#@pine@" },
+	{ name = "fs", text = "", fg = "#@pine@" },
+	{ name = "fsi", text = "", fg = "#@pine@" },
+	{ name = "fsscript", text = "", fg = "#@pine@" },
+	{ name = "fsx", text = "", fg = "#@pine@" },
+	{ name = "gcode", text = "󰐫", fg = "#@pine@" },
+	{ name = "gd", text = "", fg = "#@highlight_low@" },
+	{ name = "gemspec", text = "", fg = "#@love@" },
+	{ name = "gif", text = "", fg = "#@iris@" },
+	{ name = "git", text = "", fg = "#@love@" },
+	{ name = "glb", text = "", fg = "#@gold@" },
+	{ name = "gleam", text = "", fg = "#@iris@" },
+	{ name = "gnumakefile", text = "", fg = "#@highlight_low@" },
+	{ name = "go", text = "", fg = "#@pine@" },
+	{ name = "godot", text = "", fg = "#@highlight_low@" },
+	{ name = "gpr", text = "", fg = "#@love@" },
+	{ name = "gql", text = "", fg = "#@love@" },
+	{ name = "gradle", text = "", fg = "#@pine@" },
+	{ name = "graphql", text = "", fg = "#@love@" },
+	{ name = "gresource", text = "", fg = "#@text@" },
+	{ name = "gv", text = "󱁉", fg = "#@pine@" },
+	{ name = "gz", text = "", fg = "#@gold@" },
+	{ name = "h", text = "", fg = "#@iris@" },
+	{ name = "haml", text = "", fg = "#@text@" },
+	{ name = "hbs", text = "", fg = "#@gold@" },
+	{ name = "heex", text = "", fg = "#@iris@" },
+	{ name = "hex", text = "", fg = "#@love@" },
+	{ name = "hh", text = "", fg = "#@iris@" },
+	{ name = "hpp", text = "", fg = "#@iris@" },
+	{ name = "hrl", text = "", fg = "#@love@" },
+	{ name = "hs", text = "", fg = "#@iris@" },
+	{ name = "htm", text = "", fg = "#@love@" },
+	{ name = "html", text = "", fg = "#@love@" },
+	{ name = "http", text = "", fg = "#@pine@" },
+	{ name = "huff", text = "󰡘", fg = "#@pine@" },
+	{ name = "hurl", text = "", fg = "#@love@" },
+	{ name = "hx", text = "", fg = "#@gold@" },
+	{ name = "hxx", text = "", fg = "#@iris@" },
+	{ name = "ical", text = "", fg = "#@pine@" },
+	{ name = "icalendar", text = "", fg = "#@pine@" },
+	{ name = "ico", text = "", fg = "#@gold@" },
+	{ name = "ics", text = "", fg = "#@pine@" },
+	{ name = "ifb", text = "", fg = "#@pine@" },
+	{ name = "ifc", text = "󰻫", fg = "#@foam@" },
+	{ name = "ige", text = "󰻫", fg = "#@foam@" },
+	{ name = "iges", text = "󰻫", fg = "#@foam@" },
+	{ name = "igs", text = "󰻫", fg = "#@foam@" },
+	{ name = "image", text = "", fg = "#@text@" },
+	{ name = "img", text = "", fg = "#@text@" },
+	{ name = "import", text = "", fg = "#@text@" },
+	{ name = "info", text = "", fg = "#@foam@" },
+	{ name = "ini", text = "", fg = "#@highlight_low@" },
+	{ name = "ino", text = "", fg = "#@pine@" },
+	{ name = "ipynb", text = "", fg = "#@gold@" },
+	{ name = "iso", text = "", fg = "#@text@" },
+	{ name = "ixx", text = "", fg = "#@pine@" },
+	{ name = "java", text = "", fg = "#@love@" },
+	{ name = "jl", text = "", fg = "#@iris@" },
+	{ name = "jpeg", text = "", fg = "#@iris@" },
+	{ name = "jpg", text = "", fg = "#@iris@" },
+	{ name = "js", text = "", fg = "#@gold@" },
+	{ name = "json", text = "", fg = "#@gold@" },
+	{ name = "json5", text = "", fg = "#@gold@" },
+	{ name = "jsonc", text = "", fg = "#@gold@" },
+	{ name = "jsx", text = "", fg = "#@pine@" },
+	{ name = "jwmrc", text = "", fg = "#@pine@" },
+	{ name = "jxl", text = "", fg = "#@iris@" },
+	{ name = "kbx", text = "󰯄", fg = "#@highlight_low@" },
+	{ name = "kdb", text = "", fg = "#@gold@" },
+	{ name = "kdbx", text = "", fg = "#@gold@" },
+	{ name = "kdenlive", text = "", fg = "#@pine@" },
+	{ name = "kdenlivetitle", text = "", fg = "#@pine@" },
+	{ name = "kicad_dru", text = "", fg = "#@text@" },
+	{ name = "kicad_mod", text = "", fg = "#@text@" },
+	{ name = "kicad_pcb", text = "", fg = "#@text@" },
+	{ name = "kicad_prl", text = "", fg = "#@text@" },
+	{ name = "kicad_pro", text = "", fg = "#@text@" },
+	{ name = "kicad_sch", text = "", fg = "#@text@" },
+	{ name = "kicad_sym", text = "", fg = "#@text@" },
+	{ name = "kicad_wks", text = "", fg = "#@text@" },
+	{ name = "ko", text = "", fg = "#@text@" },
+	{ name = "kpp", text = "", fg = "#@love@" },
+	{ name = "kra", text = "", fg = "#@love@" },
+	{ name = "krz", text = "", fg = "#@love@" },
+	{ name = "ksh", text = "", fg = "#@highlight_low@" },
+	{ name = "kt", text = "", fg = "#@pine@" },
+	{ name = "kts", text = "", fg = "#@pine@" },
+	{ name = "lck", text = "", fg = "#@text@" },
+	{ name = "leex", text = "", fg = "#@iris@" },
+	{ name = "less", text = "", fg = "#@pine@" },
+	{ name = "lff", text = "", fg = "#@text@" },
+	{ name = "lhs", text = "", fg = "#@iris@" },
+	{ name = "lib", text = "", fg = "#@rose@" },
+	{ name = "license", text = "", fg = "#@gold@" },
+	{ name = "liquid", text = "", fg = "#@gold@" },
+	{ name = "lock", text = "", fg = "#@text@" },
+	{ name = "log", text = "󰌱", fg = "#@text@" },
+	{ name = "lrc", text = "󰨖", fg = "#@gold@" },
+	{ name = "lua", text = "", fg = "#@pine@" },
+	{ name = "luac", text = "", fg = "#@pine@" },
+	{ name = "luau", text = "", fg = "#@pine@" },
+	{ name = "m", text = "", fg = "#@pine@" },
+	{ name = "m3u", text = "󰲹", fg = "#@iris@" },
+	{ name = "m3u8", text = "󰲹", fg = "#@iris@" },
+	{ name = "m4a", text = "", fg = "#@pine@" },
+	{ name = "m4v", text = "", fg = "#@gold@" },
+	{ name = "magnet", text = "", fg = "#@love@" },
+	{ name = "makefile", text = "", fg = "#@highlight_low@" },
+	{ name = "markdown", text = "", fg = "#@text@" },
+	{ name = "material", text = "", fg = "#@love@" },
+	{ name = "md", text = "", fg = "#@text@" },
+	{ name = "md5", text = "󰕥", fg = "#@subtle@" },
+	{ name = "mdx", text = "", fg = "#@pine@" },
+	{ name = "mint", text = "󰌪", fg = "#@foam@" },
+	{ name = "mjs", text = "", fg = "#@gold@" },
+	{ name = "mk", text = "", fg = "#@highlight_low@" },
+	{ name = "mkv", text = "", fg = "#@gold@" },
+	{ name = "ml", text = "", fg = "#@gold@" },
+	{ name = "mli", text = "", fg = "#@gold@" },
+	{ name = "mm", text = "", fg = "#@pine@" },
+	{ name = "mo", text = "", fg = "#@love@" },
+	{ name = "mobi", text = "", fg = "#@gold@" },
+	{ name = "mojo", text = "", fg = "#@love@" },
+	{ name = "mov", text = "", fg = "#@gold@" },
+	{ name = "mp3", text = "", fg = "#@pine@" },
+	{ name = "mp4", text = "", fg = "#@gold@" },
+	{ name = "mpp", text = "", fg = "#@pine@" },
+	{ name = "msf", text = "", fg = "#@pine@" },
+	{ name = "mts", text = "", fg = "#@pine@" },
+	{ name = "mustache", text = "", fg = "#@gold@" },
+	{ name = "nfo", text = "", fg = "#@foam@" },
+	{ name = "nim", text = "", fg = "#@gold@" },
+	{ name = "nix", text = "", fg = "#@pine@" },
+	{ name = "norg", text = "", fg = "#@pine@" },
+	{ name = "nswag", text = "", fg = "#@gold@" },
+	{ name = "nu", text = "", fg = "#@gold@" },
+	{ name = "o", text = "", fg = "#@love@" },
+	{ name = "obj", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "odf", text = "", fg = "#@love@" },
+	{ name = "odg", text = "", fg = "#@gold@" },
+	{ name = "odin", text = "󰟢", fg = "#@pine@" },
+	{ name = "odp", text = "", fg = "#@gold@" },
+	{ name = "ods", text = "", fg = "#@gold@" },
+	{ name = "odt", text = "", fg = "#@pine@" },
+	{ name = "oga", text = "", fg = "#@pine@" },
+	{ name = "ogg", text = "", fg = "#@pine@" },
+	{ name = "ogv", text = "", fg = "#@gold@" },
+	{ name = "ogx", text = "", fg = "#@gold@" },
+	{ name = "opus", text = "", fg = "#@pine@" },
+	{ name = "org", text = "", fg = "#@foam@" },
+	{ name = "otf", text = "", fg = "#@text@" },
+	{ name = "out", text = "", fg = "#@love@" },
+	{ name = "part", text = "", fg = "#@gold@" },
+	{ name = "patch", text = "", fg = "#@highlight_low@" },
+	{ name = "pck", text = "", fg = "#@highlight_low@" },
+	{ name = "pcm", text = "", fg = "#@pine@" },
+	{ name = "pdf", text = "", fg = "#@love@" },
+	{ name = "php", text = "", fg = "#@iris@" },
+	{ name = "pl", text = "", fg = "#@pine@" },
+	{ name = "pls", text = "󰲹", fg = "#@iris@" },
+	{ name = "ply", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "pm", text = "", fg = "#@pine@" },
+	{ name = "png", text = "", fg = "#@iris@" },
+	{ name = "po", text = "", fg = "#@pine@" },
+	{ name = "pot", text = "", fg = "#@pine@" },
+	{ name = "pp", text = "", fg = "#@gold@" },
+	{ name = "ppt", text = "󰈧", fg = "#@love@" },
+	{ name = "pptx", text = "󰈧", fg = "#@love@" },
+	{ name = "prisma", text = "", fg = "#@love@" },
+	{ name = "pro", text = "", fg = "#@gold@" },
+	{ name = "ps1", text = "󰨊", fg = "#@pine@" },
+	{ name = "psb", text = "", fg = "#@pine@" },
+	{ name = "psd", text = "", fg = "#@pine@" },
+	{ name = "psd1", text = "󰨊", fg = "#@iris@" },
+	{ name = "psm1", text = "󰨊", fg = "#@iris@" },
+	{ name = "pub", text = "󰷖", fg = "#@gold@" },
+	{ name = "pxd", text = "", fg = "#@pine@" },
+	{ name = "pxi", text = "", fg = "#@pine@" },
+	{ name = "py", text = "", fg = "#@gold@" },
+	{ name = "pyc", text = "", fg = "#@gold@" },
+	{ name = "pyd", text = "", fg = "#@gold@" },
+	{ name = "pyi", text = "", fg = "#@gold@" },
+	{ name = "pyo", text = "", fg = "#@gold@" },
+	{ name = "pyw", text = "", fg = "#@pine@" },
+	{ name = "pyx", text = "", fg = "#@pine@" },
+	{ name = "qm", text = "", fg = "#@pine@" },
+	{ name = "qml", text = "", fg = "#@gold@" },
+	{ name = "qrc", text = "", fg = "#@gold@" },
+	{ name = "qss", text = "", fg = "#@gold@" },
+	{ name = "query", text = "", fg = "#@gold@" },
+	{ name = "r", text = "󰟔", fg = "#@pine@" },
+	{ name = "R", text = "󰟔", fg = "#@pine@" },
+	{ name = "rake", text = "", fg = "#@love@" },
+	{ name = "rar", text = "", fg = "#@gold@" },
+	{ name = "razor", text = "󱦘", fg = "#@pine@" },
+	{ name = "rb", text = "", fg = "#@love@" },
+	{ name = "res", text = "", fg = "#@love@" },
+	{ name = "resi", text = "", fg = "#@love@" },
+	{ name = "rlib", text = "", fg = "#@rose@" },
+	{ name = "rmd", text = "", fg = "#@pine@" },
+	{ name = "rproj", text = "󰗆", fg = "#@gold@" },
+	{ name = "rs", text = "", fg = "#@rose@" },
+	{ name = "rss", text = "", fg = "#@gold@" },
+	{ name = "s", text = "", fg = "#@pine@" },
+	{ name = "sass", text = "", fg = "#@love@" },
+	{ name = "sbt", text = "", fg = "#@love@" },
+	{ name = "sc", text = "", fg = "#@love@" },
+	{ name = "scad", text = "", fg = "#@gold@" },
+	{ name = "scala", text = "", fg = "#@love@" },
+	{ name = "scm", text = "󰘧", fg = "#@text@" },
+	{ name = "scss", text = "", fg = "#@love@" },
+	{ name = "sh", text = "", fg = "#@highlight_low@" },
+	{ name = "sha1", text = "󰕥", fg = "#@subtle@" },
+	{ name = "sha224", text = "󰕥", fg = "#@subtle@" },
+	{ name = "sha256", text = "󰕥", fg = "#@subtle@" },
+	{ name = "sha384", text = "󰕥", fg = "#@subtle@" },
+	{ name = "sha512", text = "󰕥", fg = "#@subtle@" },
+	{ name = "sig", text = "󰘧", fg = "#@gold@" },
+	{ name = "signature", text = "󰘧", fg = "#@gold@" },
+	{ name = "skp", text = "󰻫", fg = "#@foam@" },
+	{ name = "sldasm", text = "󰻫", fg = "#@foam@" },
+	{ name = "sldprt", text = "󰻫", fg = "#@foam@" },
+	{ name = "slim", text = "", fg = "#@love@" },
+	{ name = "sln", text = "", fg = "#@pine@" },
+	{ name = "slnx", text = "", fg = "#@pine@" },
+	{ name = "slvs", text = "󰻫", fg = "#@foam@" },
+	{ name = "sml", text = "󰘧", fg = "#@gold@" },
+	{ name = "so", text = "", fg = "#@text@" },
+	{ name = "sol", text = "", fg = "#@pine@" },
+	{ name = "spec.js", text = "", fg = "#@gold@" },
+	{ name = "spec.jsx", text = "", fg = "#@pine@" },
+	{ name = "spec.ts", text = "", fg = "#@pine@" },
+	{ name = "spec.tsx", text = "", fg = "#@pine@" },
+	{ name = "spx", text = "", fg = "#@pine@" },
+	{ name = "sql", text = "", fg = "#@text@" },
+	{ name = "sqlite", text = "", fg = "#@text@" },
+	{ name = "sqlite3", text = "", fg = "#@text@" },
+	{ name = "srt", text = "󰨖", fg = "#@gold@" },
+	{ name = "ssa", text = "󰨖", fg = "#@gold@" },
+	{ name = "ste", text = "󰻫", fg = "#@foam@" },
+	{ name = "step", text = "󰻫", fg = "#@foam@" },
+	{ name = "stl", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "stp", text = "󰻫", fg = "#@foam@" },
+	{ name = "strings", text = "", fg = "#@pine@" },
+	{ name = "styl", text = "", fg = "#@gold@" },
+	{ name = "sub", text = "󰨖", fg = "#@gold@" },
+	{ name = "sublime", text = "", fg = "#@gold@" },
+	{ name = "suo", text = "", fg = "#@pine@" },
+	{ name = "sv", text = "󰍛", fg = "#@gold@" },
+	{ name = "svelte", text = "", fg = "#@love@" },
+	{ name = "svg", text = "󰜡", fg = "#@gold@" },
+	{ name = "svh", text = "󰍛", fg = "#@gold@" },
+	{ name = "swift", text = "", fg = "#@gold@" },
+	{ name = "t", text = "", fg = "#@pine@" },
+	{ name = "tbc", text = "󰛓", fg = "#@pine@" },
+	{ name = "tcl", text = "󰛓", fg = "#@pine@" },
+	{ name = "templ", text = "", fg = "#@gold@" },
+	{ name = "terminal", text = "", fg = "#@gold@" },
+	{ name = "test.js", text = "", fg = "#@gold@" },
+	{ name = "test.jsx", text = "", fg = "#@pine@" },
+	{ name = "test.ts", text = "", fg = "#@pine@" },
+	{ name = "test.tsx", text = "", fg = "#@pine@" },
+	{ name = "tex", text = "", fg = "#@gold@" },
+	{ name = "tf", text = "", fg = "#@pine@" },
+	{ name = "tfvars", text = "", fg = "#@pine@" },
+	{ name = "tgz", text = "", fg = "#@gold@" },
+	{ name = "tmux", text = "", fg = "#@gold@" },
+	{ name = "toml", text = "", fg = "#@love@" },
+	{ name = "torrent", text = "", fg = "#@gold@" },
+	{ name = "tres", text = "", fg = "#@highlight_low@" },
+	{ name = "ts", text = "", fg = "#@pine@" },
+	{ name = "tscn", text = "", fg = "#@highlight_low@" },
+	{ name = "tsconfig", text = "", fg = "#@gold@" },
+	{ name = "tsx", text = "", fg = "#@pine@" },
+	{ name = "ttf", text = "", fg = "#@text@" },
+	{ name = "twig", text = "", fg = "#@gold@" },
+	{ name = "txt", text = "󰈙", fg = "#@gold@" },
+	{ name = "txz", text = "", fg = "#@gold@" },
+	{ name = "typ", text = "", fg = "#@pine@" },
+	{ name = "typoscript", text = "", fg = "#@gold@" },
+	{ name = "ui", text = "", fg = "#@love@" },
+	{ name = "v", text = "󰍛", fg = "#@gold@" },
+	{ name = "vala", text = "", fg = "#@pine@" },
+	{ name = "vh", text = "󰍛", fg = "#@gold@" },
+	{ name = "vhd", text = "󰍛", fg = "#@gold@" },
+	{ name = "vhdl", text = "󰍛", fg = "#@gold@" },
+	{ name = "vi", text = "", fg = "#@gold@" },
+	{ name = "vim", text = "", fg = "#@gold@" },
+	{ name = "vsh", text = "", fg = "#@pine@" },
+	{ name = "vsix", text = "", fg = "#@pine@" },
+	{ name = "vue", text = "", fg = "#@gold@" },
+	{ name = "wasm", text = "", fg = "#@love@" },
+	{ name = "wav", text = "", fg = "#@pine@" },
+	{ name = "webm", text = "", fg = "#@gold@" },
+	{ name = "webmanifest", text = "", fg = "#@gold@" },
+	{ name = "webp", text = "", fg = "#@iris@" },
+	{ name = "webpack", text = "󰜫", fg = "#@pine@" },
+	{ name = "wma", text = "", fg = "#@pine@" },
+	{ name = "woff", text = "", fg = "#@text@" },
+	{ name = "woff2", text = "", fg = "#@text@" },
+	{ name = "wrl", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "wrz", text = "󰆧", fg = "#@highlight_low@" },
+	{ name = "wv", text = "", fg = "#@pine@" },
+	{ name = "wvc", text = "", fg = "#@pine@" },
+	{ name = "x", text = "", fg = "#@pine@" },
+	{ name = "xaml", text = "󰙳", fg = "#@pine@" },
+	{ name = "xcf", text = "", fg = "#@highlight_low@" },
+	{ name = "xcplayground", text = "", fg = "#@gold@" },
+	{ name = "xcstrings", text = "", fg = "#@pine@" },
+	{ name = "xls", text = "󰈛", fg = "#@gold@" },
+	{ name = "xlsx", text = "󰈛", fg = "#@gold@" },
+	{ name = "xm", text = "", fg = "#@pine@" },
+	{ name = "xml", text = "󰗀", fg = "#@gold@" },
+	{ name = "xpi", text = "", fg = "#@love@" },
+	{ name = "xul", text = "", fg = "#@gold@" },
+	{ name = "xz", text = "", fg = "#@gold@" },
+	{ name = "yaml", text = "", fg = "#@highlight_low@" },
+	{ name = "yml", text = "", fg = "#@highlight_low@" },
+	{ name = "zig", text = "", fg = "#@gold@" },
+	{ name = "zip", text = "", fg = "#@gold@" },
+	{ name = "zsh", text = "", fg = "#@gold@" },
+	{ name = "zst", text = "", fg = "#@gold@" },
+	{ name = "🔥", text = "", fg = "#@love@" },
+]
