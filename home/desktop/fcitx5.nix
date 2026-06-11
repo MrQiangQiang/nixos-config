@@ -5,24 +5,20 @@ let
   d = palette.dark;
   l = palette.dawn;
 
-  # PNG assets co-located in ./icons/ (dark main/moon share same icons; dawn has its own).
-  # Copied from local rose-pine/fcitx5 repo — flake pure eval requires all paths within repo.
-  mkPngSource = variant: name: ./icons/fcitx5-${name}-${variant}.png;
-
   # Build theme as a derivation with REAL files (not nix store symlinks).
   # fcitx5's StandardPaths::open() handles symlinks but real files eliminate
   # any potential edge cases with gdk-pixbuf image loading through symlink chains.
+  #
+  # No PNG assets: radio.png/arrow.png are only used by XCBMenu (system tray
+  # right-click menu). Our Wayland + KWM environment has no system tray, so
+  # XCBMenu is never triggered (waylandui.cpp has zero menu code). Even if
+  # triggered, fcitx5 falls back to solid-color rectangles (theme.cpp:327).
   mkFcitx5ThemeDerivation = variantName: colors:
-    let
-      pngVariant = if variantName == "dark" then "dark" else "dawn";
-    in
     pkgs.runCommand "fcitx5-theme-${variantName}" {
       themeConf = pkgs.writeText "theme.conf" (mkFcitx5Theme colors);
     } ''
       mkdir $out
       cp $themeConf $out/theme.conf
-      cp ${mkPngSource pngVariant "radio"} $out/radio.png
-      cp ${mkPngSource pngVariant "arrow"} $out/arrow.png
     '';
 
   mkFcitx5Theme = colors: ''
@@ -65,50 +61,6 @@ let
     Right=10
     Top=7
     Bottom=7
-
-    [Menu]
-    Font=Sans 10
-    NormalColor=#${colors.text}
-    Spacing=3
-
-    [Menu/Background]
-    Color=#${colors.overlay}
-
-    [Menu/Background/Margin]
-    Left=2
-    Right=2
-    Top=2
-    Bottom=2
-
-    [Menu/ContentMargin]
-    Left=2
-    Right=2
-    Top=2
-    Bottom=2
-
-    [Menu/Highlight]
-    Color=#${colors.highlight_med}
-
-    [Menu/Highlight/Margin]
-    Left=10
-    Right=10
-    Top=5
-    Bottom=5
-
-    [Menu/Separator]
-    Color=#${colors.base}
-
-    [Menu/CheckBox]
-    Image=radio.png
-
-    [Menu/SubMenu]
-    Image=arrow.png
-
-    [Menu/TextMargin]
-    Left=5
-    Right=5
-    Top=5
-    Bottom=5
   '';
 in
 lib.mkIf isDesktopEnabled {
