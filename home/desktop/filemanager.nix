@@ -34,14 +34,14 @@ let
         text gold pine foam rose iris love;
     } // extra;
 
-  darkFlavor = pkgs.replaceVars ./config/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dark);
-  dawnFlavor = pkgs.replaceVars ./config/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dawn);
-  darkTmTheme = pkgs.replaceVars ./config/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dark {
+  darkFlavor = pkgs.replaceVars ./filemanager/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dark);
+  dawnFlavor = pkgs.replaceVars ./filemanager/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dawn);
+  darkTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dark {
     name = if palette.dark_variant == "moon" then "Rosé Pine Moon" else "Rosé Pine";
     semantic_class = if palette.dark_variant == "moon" then "theme.dark.rosé-pine-moon" else "theme.dark.rosé-pine";
     uuid = if palette.dark_variant == "moon" then "CC28B8FB-96BA-43EB-B71F-5AA3D3EBB0BB" else "14991673-80EB-41A2-BEFF-03216A233730";
   });
-  dawnTmTheme = pkgs.replaceVars ./config/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dawn {
+  dawnTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dawn {
     name = "Rosé Pine Dawn";
     semantic_class = "theme.light.rosé-pine-dawn";
     uuid = "BB4B4616-E742-41D5-BB5B-63D45FA614F";
