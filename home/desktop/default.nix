@@ -7,6 +7,8 @@ in
   imports = [
     ./river.nix
     ./kwm.nix
+    ./kwm-status.nix
+    ./networkmanager-dmenu.nix
     ./waylock.nix
     ./mako.nix
     ./fuzzel.nix

@@ -13,6 +13,20 @@ lib.mkIf isDesktopEnabled {
       fcitx5-gtk
       qt6Packages.fcitx5-qt
     ];
+    # ClassicUI theme: system-level config via /etc/xdg/fcitx5/conf/classicui.conf.
+    # Home Manager's xdg.configFile uses linkFarm (read-only nix store symlink
+    # directory) which prevents fcitx5's safeSave() from writing runtime config.
+    # System-level config via /etc/xdg/ avoids this — fcitx5 reads it reliably
+    # through StandardPaths::PkgConfig search (User > System priority).
+    # Theme directory names (rose-pine-dark/light) are the contract with
+    # fcitx5.nix which deploys the actual theme files to ~/.local/share/fcitx5/themes/.
+    fcitx5.settings.addons = {
+      classicui.globalSection = {
+        Theme = "rose-pine-light";
+        DarkTheme = "rose-pine-dark";
+        UseDarkTheme = "True";
+      };
+    };
   };
 
   environment.variables.QT_IM_MODULE = "fcitx";

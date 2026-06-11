@@ -26,11 +26,14 @@ let
   in ''
     ${link (theme { dark = "theme/kwm-config-dark.zon"; light = "theme/kwm-config-light.zon"; }) "${cfgHome}/kwm/config.zon"}
     ${signal "SIGUSR1" "kwm"}
+    ${signal "SIGUSR1" "kwm-status"}
 
     ${link (theme { dark = "theme/mako-config-dark"; light = "theme/mako-config-light"; }) "${cfgHome}/mako/config"}
     ${pkgs.mako}/bin/makoctl reload 2>/dev/null || true
 
     ${link (theme { dark = "theme/fuzzel-config-dark.ini"; light = "theme/fuzzel-config-light.ini"; }) "${cfgHome}/fuzzel/fuzzel.ini"}
+
+    ${link (theme { dark = "theme/networkmanager-dmenu-config-dark.ini"; light = "theme/networkmanager-dmenu-config-light.ini"; }) "${cfgHome}/networkmanager-dmenu/config.ini"}
 
     ${link (theme { dark = "theme/wob-config-dark.ini"; light = "theme/wob-config-light.ini"; }) "${cfgHome}/wob/wob.ini"}
     systemctl --user restart wob 2>/dev/null || true

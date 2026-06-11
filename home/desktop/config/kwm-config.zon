@@ -19,7 +19,10 @@
         },
 
         .status = .{
-            .data = .{ .text = "" },
+            .data = .{ .fifo = "${XDG_RUNTIME_DIR}/kwm-status.sock" },
+            .click = .{
+                .left = .{ .spawn = .{ .argv = .{ "networkmanager_dmenu" } } },
+            },
         },
 
         .override_colors = .{
@@ -802,6 +805,17 @@
                     .click = .{
                         .pressed = .{
                             .spawn = .{ .argv = .{ "fuzzel" } },
+                        },
+                    },
+                },
+            },
+            .{
+                .keysym = "n",
+                .modifiers = .{ .mod4 = true },
+                .event = .{
+                    .click = .{
+                        .pressed = .{
+                            .spawn = .{ .argv = .{ "networkmanager_dmenu" } },
                         },
                     },
                 },

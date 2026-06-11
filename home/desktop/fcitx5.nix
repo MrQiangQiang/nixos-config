@@ -118,15 +118,11 @@ lib.mkIf isDesktopEnabled {
   xdg.dataFile."fcitx5/themes/rose-pine-dark".source = mkFcitx5ThemeDerivation "dark" d;
   xdg.dataFile."fcitx5/themes/rose-pine-light".source = mkFcitx5ThemeDerivation "light" l;
 
-  # UseDarkTheme=True: fcitx5 watches XDG Portal color-scheme (which darkman
-  # already sets via gsettings) and automatically switches between Theme and
-  # DarkTheme. No runtime file manipulation needed — fcitx5 handles it natively.
-  xdg.configFile."fcitx5/conf/classicui.conf".text = ''
-    [ClassicUI]
-    Theme=rose-pine-light
-    DarkTheme=rose-pine-dark
-    UseDarkTheme=True
-  '';
+  # classicui theme is configured at system level via i18n.inputMethod.fcitx5.settings.addons
+  # in modules/im.nix, writing to /etc/xdg/fcitx5/conf/classicui.conf. fcitx5 reads this
+  # reliably via StandardPaths PkgConfig search. User-level xdg.configFile uses linkFarm
+  # (read-only nix store symlink directory) which breaks fcitx5's safeSave() write-and-rename
+  # pattern — the config content is correct but runtime persistence fails.
 
   # Make profile declarative: keyboard-us + pinyin in Default group.
   # Ensures Ctrl+Space toggles between English and Chinese input.

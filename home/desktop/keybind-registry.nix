@@ -129,6 +129,7 @@ in
       { desc = "吸附到上边"; alias = "float snap up"; key = "k"; mods = [ "Super" "Shift" ]; category = "floating"; mode = "floating"; }
 
       { desc = "应用启动器 (fuzzel)"; alias = "launcher"; key = "p"; mods = [ "Super" ]; category = "app"; }
+      { desc = "WiFi 网络管理 (networkmanager_dmenu)"; alias = "wifi"; key = "n"; mods = [ "Super" ]; category = "app"; }
       { desc = "终端 (foot)"; alias = "terminal"; key = "Return"; mods = [ "Super" "Shift" ]; category = "app"; }
       { desc = "锁屏 (waylock)"; alias = "lock"; key = "l"; mods = [ "Super" "Shift" ]; category = "app"; }
       { desc = "区域截图"; alias = "screenshot region"; key = "Print"; mods = []; category = "app"; }
