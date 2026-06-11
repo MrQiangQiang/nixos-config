@@ -45,7 +45,7 @@ let
     dawn_highlight_high = "#${l.highlight_high}";
   };
 
-  rosePineUserContent = pkgs.replaceVars ./config/rose-pine-firefox-userContent.css {
+  rosePineUserContent = pkgs.replaceVars ./firefox/userContent.css {
     dark_base = "#${d.base}";
     dark_surface = "#${d.surface}";
     dark_overlay = "#${d.overlay}";
@@ -81,7 +81,7 @@ let
   # Dark Reader settings JSON, deployed to ~/.config/dark-reader/settings.json
   # Import via: Dark Reader Settings → See all options → Import → select this file
   # After import, Dark Reader reads settings from browser.storage (not this file)
-  darkReaderSettings = pkgs.replaceVars ./config/dark-reader-settings.json {
+  darkReaderSettings = pkgs.replaceVars ./firefox/dark-reader-settings.json {
     dark_base = d.base;
     dark_text = d.text;
     dawn_base = l.base;
@@ -93,7 +93,7 @@ let
   # which userChrome.css cannot style. These files override GTK's tooltip widget
   # colors. Runtime switching does NOT work on Wayland (no GtkSettings bridge
   # from gsettings to GTK), but Firefox reads gtk.css at startup — correct.
-  gtkTooltipLight = pkgs.replaceVars ./config/gtk-tooltip-light.css {
+  gtkTooltipLight = pkgs.replaceVars ./firefox/gtk-tooltip-light.css {
     dawn_overlay = "#${l.overlay}";
     dawn_text = "#${l.text}";
     dawn_highlight_med = "#${l.highlight_med}";
