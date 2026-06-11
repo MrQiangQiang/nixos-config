@@ -54,22 +54,8 @@ let
   kwm-status = pkgs.writeShellScriptBin "kwm-status" ''
     FIFO="${kwmStatusSock}"
 
-    # Wait for NetworkManager to stabilize after boot.
-    ${pkgs.coreutils}/bin/sleep 2
-
-    # Auto-detect battery.
-    BAT_PATH=""
-    BAT_HAS_CAPACITY=0
-    for b in /sys/class/power_supply/BAT*; do
-      if [ -d "$b" ] && [ -f "$b/present" ] && [ "$(${pkgs.coreutils}/bin/cat "$b/present" 2>/dev/null)" = "1" ]; then
-        BAT_PATH="$b"
-        [ -f "$b/capacity" ] && BAT_HAS_CAPACITY=1
-        break
-      fi
-    done
-
-    # Load color set based on current darkman mode.
-    # USR1 signal from darkman triggers reload.
+    # Set USR1 handler before any blocking command. Without this,
+    # SIGUSR1 during sleep 2 kills the process (default signal action).
     reload_colors() {
       case "$(${pkgs.darkman}/bin/darkman get 2>/dev/null)" in
         light)
@@ -93,6 +79,21 @@ let
       esac
     }
     trap reload_colors USR1
+
+    # Wait for NetworkManager to stabilize after boot.
+    ${pkgs.coreutils}/bin/sleep 2
+
+    # Auto-detect battery.
+    BAT_PATH=""
+    BAT_HAS_CAPACITY=0
+    for b in /sys/class/power_supply/BAT*; do
+      if [ -d "$b" ] && [ -f "$b/present" ] && [ "$(${pkgs.coreutils}/bin/cat "$b/present" 2>/dev/null)" = "1" ]; then
+        BAT_PATH="$b"
+        [ -f "$b/capacity" ] && BAT_HAS_CAPACITY=1
+        break
+      fi
+    done
+
     reload_colors
 
     while true; do
@@ -172,12 +173,20 @@ lib.mkIf isDesktopEnabled {
       ConditionEnvironment = "WAYLAND_DISPLAY";
     };
     Service = {
-      ExecStartPre = "-${pkgs.coreutils}/bin/rm -f %t/kwm-status.sock";
+      # Preserve existing FIFO inode across service restarts. KWM opens
+      # the FIFO with O_RDWR (prevents EOF), so its fd stays valid as
+      # long as the inode survives. Deleting the FIFO (old ExecStartPre
+      # rm -f) created a new inode on restart, orphaning KWM's fd and
+      # permanently breaking the status bar. Only recreate if the file
+      # is missing or not a named pipe.
       ExecStart = pkgs.writeShellScript "kwm-status-start" ''
         while [ ! -e "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; do
           sleep 0.5
         done
-        ${pkgs.coreutils}/bin/mkfifo -m 600 ${kwmStatusSock}
+        if [ ! -p ${kwmStatusSock} ]; then
+          ${pkgs.coreutils}/bin/rm -f ${kwmStatusSock}
+          ${pkgs.coreutils}/bin/mkfifo -m 600 ${kwmStatusSock}
+        fi
         exec 3<> ${kwmStatusSock}
         exec ${kwm-status}/bin/kwm-status
       '';
