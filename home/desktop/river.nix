@@ -44,12 +44,18 @@ lib.mkIf isDesktopEnabled {
 
       fcitx5 -d --replace 2>/dev/null &
 
-      # Restore TTY palette after compositor exits. drm_lastclose() resets
-      # hardware LUT to kernel defaults (linear gradient), overwriting our
-      # custom palette. Re-apply from mode.txt + clear for a clean screen.
-      # NOTE: Cannot use `exec kwm` — shell must survive to run this.
-      # Redirect to /dev/tty explicitly in case stdout is not the TTY device.
-      restore_tty_palette() {
+      # Cleanup after compositor exits. wlroots sets VT keyboard mode to
+      # K_MEDIUMRAW on startup but may not restore it on exit, leaving the
+      # TTY keyboard-unresponsive. trap EXIT ensures cleanup runs whether
+      # kwm exits normally, crashes, or is signaled.
+      cleanup() {
+          kbd_mode -u 2>/dev/null || true
+          systemctl --user stop graphical-session.target 2>/dev/null || true
+          systemctl --user unset-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE GSETTINGS_SCHEMA_DIR XDG_DATA_DIRS QT_IM_MODULE XMODIFIERS 2>/dev/null || true
+          # Restore TTY palette after compositor exits. drm_lastclose() resets
+          # hardware LUT to kernel defaults (linear gradient), overwriting our
+          # custom palette. Re-apply from mode.txt + clear for a clean screen.
+          # Redirect to /dev/tty explicitly in case stdout is not the TTY device.
           if [ "$TERM" = "linux" ]; then
               _mode=$(cat ~/.cache/darkman/mode.txt 2>/dev/null || echo dark)
               if [ "$_mode" = "light" ]; then
@@ -60,8 +66,9 @@ lib.mkIf isDesktopEnabled {
               clear > /dev/tty 2>/dev/null
           fi
       }
+      trap cleanup EXIT
+
       kwm
-      restore_tty_palette
     '';
   };
 }
