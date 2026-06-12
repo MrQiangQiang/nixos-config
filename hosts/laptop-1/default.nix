@@ -1,4 +1,6 @@
-{ config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: let
+  keys = import ../../secrets/keys.nix;
+in {
   imports = [
     ../../modules/desktop.nix
     ../../modules/proxy.nix
@@ -32,8 +34,8 @@
       "networkmanager"
     ];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPlCRJnNW/V6jTl90yd1CMjIuorkNPJRs/dAgAbGnBx fugui@github.com"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@nixos"
+      keys.users.fugui-github
+      keys.users.fugui
     ];
   };
 

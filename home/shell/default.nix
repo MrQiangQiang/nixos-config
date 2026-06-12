@@ -1,7 +1,8 @@
 { pkgs, config, ... }:
 
 let
-  signingSshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@laptop-1";
+  keys = import ../../secrets/keys.nix;
+  signingSshPublicKey = keys.users.fugui;
 in
 {
   imports = [
