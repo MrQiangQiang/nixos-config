@@ -4,12 +4,12 @@ let
   mkHost = import ../lib/mkHost.nix;
 in
 {
-  flake.nixosConfigurations.nixos = mkHost {
+  flake.nixosConfigurations.laptop-1 = mkHost {
     inherit inputs;
-    hostName = "nixos";
+    hostName = "laptop-1";
     system = "x86_64-linux";
     extraModules = [
-      ./nixos/default.nix
+      ./laptop-1/default.nix
     ];
   };
 }

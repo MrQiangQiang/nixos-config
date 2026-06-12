@@ -25,7 +25,7 @@
   custom.desktop.enable = true;
   custom.desktop.dark_variant = "moon";
 
-  users.users.a = {
+  users.users.fugui = {
     isNormalUser = true;
     extraGroups = [
       "wheel"
@@ -37,7 +37,7 @@
     ];
   };
 
-  home-manager.users.a = {
+  home-manager.users.fugui = {
     imports = [ ../../home ];
   };
 

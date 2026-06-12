@@ -1,7 +1,7 @@
 { pkgs, config, ... }:
 
 let
-  nixosSshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@nixos";
+  signingSshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvALtc74c420xWoDLT6mwGO/Mf7JemicsoeFjFo87Ez fugui@laptop-1";
 in
 {
   imports = [
@@ -57,7 +57,7 @@ in
   programs.git = {
     enable = true;
     signing = {
-      key = nixosSshPublicKey;
+      key = signingSshPublicKey;
       signByDefault = true;
     };
     settings = {
@@ -75,7 +75,7 @@ in
   };
 
   home.file.".ssh/allowed_signers".text = ''
-    chenzhiqiang0125@gmail.com ${nixosSshPublicKey}
+    chenzhiqiang0125@gmail.com ${signingSshPublicKey}
   '';
 
   programs.vim = {
