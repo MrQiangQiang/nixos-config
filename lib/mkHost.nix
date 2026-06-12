@@ -14,6 +14,7 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules/locale.nix
     ../modules/core-utils.nix
     ../modules/fonts.nix
+    ../modules/opencode.nix
     ../modules/system.nix
     ../modules/ssh.nix
     inputs.agenix.nixosModules.default

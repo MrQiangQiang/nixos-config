@@ -71,7 +71,7 @@ let
   nixIdsJson = (pkgs.formats.json { }).generate "nix-ext-ids" nixExtIds;
 in
 {
-  imports = [ ./toolchain.nix ];
+  imports = [ ./toolchain.nix ./opencode.nix ];
 
   home.packages = [ traePkg ];
 
