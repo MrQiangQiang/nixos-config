@@ -110,6 +110,8 @@ let
 
       # ── Proxy (mihomo) ───────────────────────────────────────
       # 3-state: running / crashed / stopped
+      # Node health is managed internally by mihomo (url-test + fallback).
+      # Use http://127.0.0.1:9090/ui/ (Metacubexd) for node-level management.
       px_i="${ICON_PX_OFF}"; px_c=$PX_OFF  # default: stopped
       px_state=$(${pkgs.systemd}/bin/systemctl is-active mihomo 2>/dev/null || echo "unknown")
       if [ "$px_state" = "active" ]; then

@@ -70,10 +70,10 @@ let
         lazy: true
         interval: 86400
         path: airport-cache.yaml
-        health-check: { enable: true, interval: 600, url: http://www.gstatic.com/generate_204 }
+        health-check: { enable: true, interval: 600, url: http://www.gstatic.com/generate_204, timeout: 5000, expected-status: 204 }
 
     proxy-groups:
-      - { name: "全自动最优节点", type: url-test, use: [my-airport], url: http://www.gstatic.com/generate_204, interval: 300, tolerance: 50 }
+      - { name: "全自动最优节点", type: url-test, use: [my-airport], url: http://www.gstatic.com/generate_204, interval: 300, tolerance: 50, timeout: 5000, max-failed-times: 3, expected-status: 204 }
 
     rules:
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
@@ -115,6 +115,7 @@ in {
   services.mihomo = {
     enable = true;
     tunMode = true;
+    webui = pkgs.metacubexd;
     configFile = mihomoConfigTemplate;
   };
 
@@ -124,7 +125,7 @@ in {
     restartTriggers = [ config.age.secrets.proxy-subscription-url.file ];
     serviceConfig = {
       ExecStartPre = [ mihomoPrestart ];
-      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f /tmp/mihomo-config.yaml";
+      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f /tmp/mihomo-config.yaml -ext-ui ${config.services.mihomo.webui}";
       LoadCredential = lib.mkForce [ "proxy-url:${config.age.secrets.proxy-subscription-url.path}" ];
       AmbientCapabilities = lib.mkForce [ "CAP_NET_ADMIN" ];
       CapabilityBoundingSet = lib.mkForce [ "CAP_NET_ADMIN" ];
