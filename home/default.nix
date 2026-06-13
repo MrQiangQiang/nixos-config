@@ -14,5 +14,5 @@ in
   _module.args.palette = palette;
   _module.args.keybinds = keybinds;
 
-  home.stateVersion = "25.11";
+  home.stateVersion = "26.11";
 }

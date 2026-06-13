@@ -5,6 +5,8 @@ in {
     ../../modules/desktop.nix
     ../../modules/proxy.nix
     ../../modules/im.nix
+    ../../modules/tailscale.nix
+    ../../modules/syncthing.nix
     ./hardware-configuration.nix
   ];
 
@@ -64,4 +66,10 @@ in {
   };
 
   home-manager.backupFileExtension = "hm-bak";
+
+  # ── Tailscale proxy (mihomo 已运行) ────────────────────────
+
+  systemd.services.tailscaled.environment = {
+    HTTPS_PROXY = "http://127.0.0.1:7890";
+  };
 }
