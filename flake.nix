@@ -11,6 +11,10 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs:
@@ -19,6 +23,7 @@
       imports = [
         ./packages
         ./hosts
+        inputs.pre-commit-hooks.flakeModule
       ];
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
@@ -28,6 +33,12 @@
             inputs.nix-vscode-extensions.overlays.default
           ];
           config.allowUnfree = true;
+        };
+
+        formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt;
+
+        pre-commit.settings.hooks = {
+          nixfmt.enable = true;
         };
       };
     };

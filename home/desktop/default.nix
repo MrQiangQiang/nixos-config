@@ -1,8 +1,5 @@
 { config, lib, pkgs, osConfig, ... }:
 
-let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
-in
 {
   imports = [
     ./river.nix
