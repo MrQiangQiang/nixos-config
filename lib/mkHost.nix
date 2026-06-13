@@ -7,7 +7,10 @@
   ...
 }:
 
-inputs.nixpkgs.lib.nixosSystem {
+let
+  lib = inputs.nixpkgs.lib;
+in
+lib.nixosSystem {
   inherit system;
   specialArgs = { inherit inputs; };
   modules = [
@@ -27,21 +30,22 @@ inputs.nixpkgs.lib.nixosSystem {
       nixpkgs.config.allowUnfree = true;
 
       networking.hostName = hostName;
-      networking.nameservers = [ "223.5.5.5" "119.29.29.29" ];
-      networking.networkmanager.enable = true;
+      networking.nameservers = lib.mkDefault [ "223.5.5.5" "119.29.29.29" ];
+      networking.networkmanager.enable = lib.mkDefault true;
+      networking.firewall.enable = lib.mkDefault true;
 
       hardware.enableRedistributableFirmware = true;
 
-      time.timeZone = "Asia/Shanghai";
+      time.timeZone = lib.mkDefault "Asia/Shanghai";
 
       boot.loader = {
         systemd-boot = {
-          enable = true;
-          editor = true;             # 允许按 e 编辑内核参数，紧急时可加 nomodeset
-          configurationLimit = 10;   # 防止 /boot 分区被世代填满
+          enable = lib.mkDefault true;
+          editor = true;
+          configurationLimit = 10;
         };
-        efi.canTouchEfiVariables = true;
-        timeout = 3;                 # 菜单显示 3 秒，足够选择旧世代回退
+        efi.canTouchEfiVariables = lib.mkDefault true;
+        timeout = lib.mkDefault 3;
       };
 
       nix.settings = {
@@ -50,7 +54,7 @@ inputs.nixpkgs.lib.nixosSystem {
           "root"
           "@wheel"
         ];
-        substituters = [
+        substituters = lib.mkDefault [
           "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=10"
           "https://mirror.sjtu.edu.cn/nix-channels/store?priority=20"
           "https://mirrors.ustc.edu.cn/nix-channels/store?priority=30"

@@ -1,22 +1,7 @@
 { config, pkgs, lib, ...}:
 {
-  services.logind = {
-    settings.Login = {
-      HandleSuspendKey = "suspend";
-      HandleLidSwitch = "suspend";
-      HandleLidSwitchDocked = "ignore";
-    };
-  };
-
-  # Compressed swap in RAM — no disk IO, no SSD wear
-  # Recommended by NixOS Wiki for systems with enough RAM
-  zramSwap.enable = true;
-
-  # OOM killer — required by NixOS Wiki when using zram swap
-  # Prevents system lockup when zram capacity is exhausted
+  # OOM killer — prevents system lockup under memory pressure
   systemd.oomd.enable = true;
-
-  services.upower.enable = true;
 
   services.pipewire = {
     enable = true;
@@ -42,6 +27,9 @@
     "::/96" = 20;
     "::ffff:0:0/96" = 100;
   };
+
+  # mDNS — useful for Tailscale local name resolution and service discovery
+  networking.networkmanager.connectionConfig = {
+    "connection.mdns" = 2;
+  };
 }
-
-

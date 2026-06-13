@@ -139,12 +139,7 @@ in {
   };
 
   networking.firewall = {
-    enable = true;
     trustedInterfaces = [ "tun0" ];
     checkReversePath = false;
-  };
-
-  networking.networkmanager.connectionConfig = {
-    "connection.mdns" = 2;
   };
 }

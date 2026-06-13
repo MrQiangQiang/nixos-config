@@ -10,13 +10,29 @@ in {
 
   system.stateVersion = "25.11";
 
+  # ── Laptop-specific config ────────────────────────────────
+
+  # Lid behavior — desktop machines have no lid
+  services.logind.settings.Login = {
+    HandleSuspendKey = "suspend";
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchDocked = "ignore";
+  };
+
+  # Battery management — desktop machines have no battery
+  services.upower.enable = true;
+
+  # Compressed swap in RAM — laptop has limited RAM
+  zramSwap.enable = true;
+
+  # ── Hardware ──────────────────────────────────────────────
+
   # Skylake HD 530 i915 驱动 workaround
   # 禁用 RC6/PSR/FBC 电源管理，防止 KMS 初始化时死锁
-  # 参考: https://static.vivaolinux.com.br/dica/Travamentos-completos-no-Linux-com-Intel-HD-520530-Skylake-solucao-definitiva/
   boot.kernelParams = [
-    "i915.enable_rc6=0"    # 禁用 RC6 渲染 C-state（主因：KMS init 死锁）
-    "i915.enable_psr=0"    # 禁用面板自刷新（次因：显示管线死锁）
-    "i915.powersave=0"     # 禁用 FBC+HWP（代价：+2-5W 功耗，换稳定性）
+    "i915.enable_rc6=0"
+    "i915.enable_psr=0"
+    "i915.powersave=0"
   ];
 
   hardware.graphics.extraPackages = with pkgs; [
@@ -24,8 +40,12 @@ in {
       intel-vaapi-driver
   ];
 
+  # ── Desktop ───────────────────────────────────────────────
+
   custom.desktop.enable = true;
   custom.desktop.dark_variant = "moon";
+
+  # ── User ──────────────────────────────────────────────────
 
   users.users.fugui = {
     isNormalUser = true;
