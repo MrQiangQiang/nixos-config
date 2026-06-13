@@ -31,26 +31,26 @@ in
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "*" = {
-        identitiesOnly = true;
-        addKeysToAgent = "yes";
+        IdentitiesOnly = true;
+        AddKeysToAgent = "yes";
       };
       "github.com" = {
-        hostname = "ssh.github.com";
-        port = 443;
-        user = "git";
-        identityFile = "~/.ssh/id_ed25519";
+        HostName = "ssh.github.com";
+        Port = 443;
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519";
       };
       "gitlab.com" = {
-        hostname = "gitlab.com";
-        user = "git";
-        identityFile = "~/.ssh/id_ed25519";
+        HostName = "gitlab.com";
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519";
       };
       "codeberg.org" = {
-        hostname = "codeberg.org";
-        user = "git";
-        identityFile = "~/.ssh/id_ed25519";
+        HostName = "codeberg.org";
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519";
       };
     };
   };
