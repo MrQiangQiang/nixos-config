@@ -36,6 +36,11 @@ lib.nixosSystem {
 
       hardware.enableRedistributableFirmware = true;
 
+      environment.variables = {
+        EDITOR = "hx";
+        VISUAL = "hx";
+      };
+
       time.timeZone = lib.mkDefault "Asia/Shanghai";
 
       boot.loader = {

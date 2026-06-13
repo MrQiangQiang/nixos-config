@@ -10,6 +10,7 @@ in
     ./starship.nix
     ./fish.nix
     ./bat.nix
+    ./helix.nix
   ];
 
   systemd.user.services.ssh-add-key = {
