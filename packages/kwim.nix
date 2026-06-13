@@ -36,6 +36,8 @@ let
     src = patchedSrc;
     hash = "sha256-rOZZu/Y/rZ7who3hl1qIBHXZtRP7s4FXo0+LNnM6dYo=";
   };
+
+  zigPostConfigure = import ./zig-post-configure.nix zigDeps;
 in
 stdenv.mkDerivation {
   inherit pname version;
@@ -58,19 +60,7 @@ stdenv.mkDerivation {
     libxkbcommon
   ];
 
-  postConfigure = ''
-    export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
-    mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
-
-    if [ -d "${zigDeps}/p" ]; then
-      cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/"
-    else
-      mkdir -p "$ZIG_GLOBAL_CACHE_DIR/p"
-      cp -af "${zigDeps}/." "$ZIG_GLOBAL_CACHE_DIR/p/"
-    fi
-
-    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR"
-  '';
+  postConfigure = zigPostConfigure;
 
   zigBuildFlags = [
     "-Doptimize=ReleaseSafe"
