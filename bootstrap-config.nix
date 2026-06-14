@@ -101,4 +101,6 @@
   };
 
   system.stateVersion = "26.11";
+
+  users.users.root.hashedPassword = "";
 }
