@@ -32,7 +32,7 @@ in
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.stable ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.stable.open ];
 
   hardware.cpu.amd.updateMicrocode = true;
 
