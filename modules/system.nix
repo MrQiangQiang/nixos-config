@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ...}:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   # OOM killer — prevents system lockup under memory pressure
   systemd.oomd.enable = true;
@@ -17,7 +22,7 @@
 
   programs.nix-ld = {
     enable = true;
-    libraries = [];
+    libraries = [ ];
   };
 
   networking.getaddrinfo.precedence = {
@@ -32,4 +37,14 @@
   networking.networkmanager.connectionConfig = {
     "connection.mdns" = 2;
   };
+
+  # Periodic TRIM for SSD health
+  services.fstrim.enable = true;
+
+  # systemd-resolved — DNS stub resolver, required for Tailscale MagicDNS integration.
+  # Without this, Tailscale overwrites /etc/resolv.conf with only MagicDNS (100.100.100.100),
+  # discarding any fallback nameservers and breaking DNS when Tailscale is disconnected.
+  # With resolved, Tailscale uses resolvectl(8) to add MagicDNS via the resolved API,
+  # and networking.nameservers serves as the fallback DNS pool.
+  services.resolved.enable = true;
 }
