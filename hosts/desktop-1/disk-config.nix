@@ -28,7 +28,6 @@
             content = {
               type = "btrfs";
               extraArgs = [ "-f" ];
-              mountpoint = "/";
               subvolumes = {
                 "@" = {
                   mountpoint = "/";
