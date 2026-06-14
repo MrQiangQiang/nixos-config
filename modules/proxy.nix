@@ -132,12 +132,6 @@ in {
     };
   };
 
-  environment.sessionVariables = {
-    http_proxy = "http://127.0.0.1:7890";
-    https_proxy = "http://127.0.0.1:7890";
-    no_proxy = "localhost,127.0.0.1,::1";
-  };
-
   networking.firewall = {
     trustedInterfaces = [ "tun0" ];
     checkReversePath = false;
