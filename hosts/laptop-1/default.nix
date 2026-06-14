@@ -58,6 +58,7 @@ in {
     openssh.authorizedKeys.keys = [
       keys.users.fugui-github
       keys.users.fugui
+      keys.users.fugui-desktop
     ];
   };
 
