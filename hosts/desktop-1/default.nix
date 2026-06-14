@@ -30,6 +30,8 @@ in
     "amd_pstate=active"
   ];
 
+  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
   hardware.cpu.amd.updateMicrocode = true;
 
   zramSwap.enable = true;
