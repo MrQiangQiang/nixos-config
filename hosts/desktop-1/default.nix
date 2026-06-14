@@ -32,6 +32,8 @@ in
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.stable ];
+
   hardware.cpu.amd.updateMicrocode = true;
 
   zramSwap.enable = true;
