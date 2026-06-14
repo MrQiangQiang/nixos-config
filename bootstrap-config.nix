@@ -2,6 +2,53 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@" ];
+    };
+    "/boot" = {
+      device = "/dev/disk/by-partlabel/disk-main-boot";
+      fsType = "ext4";
+    };
+    "/boot/efi" = {
+      device = "/dev/disk/by-partlabel/disk-main-ESP";
+      fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
+    };
+    "/home" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@home" ];
+    };
+    "/nix" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@nix" ];
+    };
+    "/var/cache" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@var_cache" ];
+    };
+    "/var/log" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@var_log" ];
+    };
+    "/home/fugui/.ollama" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@ollama" ];
+    };
+    "/data/cold" = {
+      device = "/dev/disk/by-partlabel/disk-main-root";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=@data_cold" ];
+    };
+  };
+
   boot.loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
