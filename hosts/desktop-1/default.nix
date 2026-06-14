@@ -100,7 +100,12 @@ in
     ];
   };
 
-  users.users.ollama.extraGroups = [ "users" ];
+  users.users.ollama = {
+    isSystemUser = true;
+    group = "ollama";
+    extraGroups = [ "users" ];
+  };
+  users.groups.ollama = { };
 
   home-manager.users.fugui = {
     imports = [ ../../home ];
