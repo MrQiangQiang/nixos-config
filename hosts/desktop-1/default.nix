@@ -60,6 +60,8 @@ in
 
   # ── Ollama ─────────────────────────────────────────────────
 
+  systemd.services.ollama.serviceConfig.ProtectHome = lib.mkForce "read-only";
+
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
