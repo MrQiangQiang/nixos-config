@@ -43,15 +43,14 @@ in
     modesetting.enable = true;
     powerManagement.enable = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-    # TODO: set after lspci -D -d ::03xx on target, then uncomment:
-    # prime = {
-    #   offload = {
-    #     enable = true;
-    #     enableOffloadCmd = true;
-    #   };
-    #   amdgpuBusId = "PCI:xx:x:x.x";
-    #   nvidiaBusId = "PCI:xx:x:x.x";
-    # };
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+      amdgpuBusId = "PCI:115@0:0:0";
+      nvidiaBusId = "PCI:1@0:0:0";
+    };
   };
 
   # iGPU OpenCL via Mesa rusticl (built-in, hardware.graphics.enable = true)
