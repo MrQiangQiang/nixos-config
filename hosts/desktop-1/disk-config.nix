@@ -16,7 +16,7 @@
             };
           };
           boot = {
-            size = "1G";
+            size = "2G";
             content = {
               type = "filesystem";
               format = "ext4";
@@ -32,35 +32,52 @@
               subvolumes = {
                 "@" = {
                   mountpoint = "/";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@home" = {
                   mountpoint = "/home";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@nix" = {
                   mountpoint = "/nix";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@var_cache" = {
                   mountpoint = "/var/cache";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@var_log" = {
                   mountpoint = "/var/log";
-                  mountOptions = [ "compress=zstd" "noatime" ];
-                };
-                "@swap" = {
-                  mountpoint = "/swap";
-                  mountOptions = [ "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@ollama" = {
                   mountpoint = "/home/fugui/.ollama";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@data_cold" = {
                   mountpoint = "/data/cold";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
               };
             };

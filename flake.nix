@@ -15,31 +15,48 @@
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs:
+  outputs =
+    inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux"];
+      systems = [ "x86_64-linux" ];
       imports = [
         ./packages
         ./hosts
         inputs.pre-commit-hooks.flakeModule
       ];
-      perSystem = { system, ... }: {
-        _module.args.pkgs = import inputs.nixpkgs {
-          inherit system;
-          overlays = [
-            inputs.self.overlays.default
-            inputs.nix-vscode-extensions.overlays.default
-          ];
-          config.allowUnfree = true;
-        };
+      perSystem =
+        {
+          system,
+          lib,
+          inputs',
+          ...
+        }:
+        {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              inputs.self.overlays.default
+              inputs.nix-vscode-extensions.overlays.default
+            ];
+            config.allowUnfree = true;
+          };
 
-        formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt;
+          formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt;
 
-        pre-commit.settings.hooks = {
-          nixfmt.enable = true;
+          apps.disko = {
+            type = "app";
+            program = lib.getExe inputs'.disko.packages.disko;
+          };
+
+          pre-commit.settings.hooks = {
+            nixfmt.enable = true;
+          };
         };
-      };
     };
 }

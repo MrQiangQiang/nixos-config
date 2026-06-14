@@ -1,9 +1,17 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   keys = import ../../secrets/keys.nix;
 in
 {
   imports = [
+    inputs.disko.nixosModules.disko
+    ./disk-config.nix
     ../../modules/desktop.nix
     ../../modules/proxy.nix
     ../../modules/im.nix
@@ -22,9 +30,11 @@ in
     "amd_pstate=active"
   ];
 
-  # ── GPU: PRIME Offload ─────────────────────────────────────
+  hardware.cpu.amd.updateMicrocode = true;
 
-  services.xserver.videoDrivers = [ "amdgpu" "nvidia" ];
+  zramSwap.enable = true;
+
+  # ── GPU: PRIME Offload ─────────────────────────────────────
 
   hardware.nvidia = {
     open = true;
