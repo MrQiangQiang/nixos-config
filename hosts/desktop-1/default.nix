@@ -63,6 +63,8 @@ in
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
+    user = "fugui";
+    group = "users";
     home = "/home/fugui/.ollama";
     models = "/home/fugui/.ollama/models";
     environmentVariables = {
