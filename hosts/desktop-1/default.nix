@@ -63,8 +63,6 @@ in
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
-    user = "fugui";
-    group = "users";
     home = "/home/fugui/.ollama";
     models = "/home/fugui/.ollama/models";
     environmentVariables = {
@@ -91,6 +89,7 @@ in
 
   users.users.fugui = {
     isNormalUser = true;
+    homeMode = "750";
     extraGroups = [
       "wheel"
       "networkmanager"
@@ -100,6 +99,8 @@ in
       keys.users.fugui
     ];
   };
+
+  users.users.ollama.extraGroups = [ "users" ];
 
   home-manager.users.fugui = {
     imports = [ ../../home ];
