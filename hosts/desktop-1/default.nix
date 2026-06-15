@@ -28,6 +28,8 @@ in
   boot.kernelParams = [
     "pcie_aspm=off"
     "amd_pstate=active"
+    "modprobe.blacklist=nouveau"
+    "nouveau.modeset=0"
   ];
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
