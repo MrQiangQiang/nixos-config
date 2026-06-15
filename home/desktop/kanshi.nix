@@ -21,6 +21,15 @@ lib.mkIf isDesktopEnabled {
           status = "enable";
         }];
       }
+      {
+        profile.name = "desktop";
+        profile.outputs = [{
+          criteria = "HDMI-A-1";
+          mode = "3840x2160@60";
+          scale = 1.5;
+          status = "enable";
+        }];
+      }
     ];
   };
 }
