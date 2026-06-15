@@ -43,7 +43,6 @@ in
   # ── GPU: PRIME Offload ─────────────────────────────────────
 
   boot.blacklistedKernelModules = [ "nouveau" ];
-  boot.extraModprobeConfig = "blacklist nouveau";
   boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
   hardware.nvidia = {
@@ -62,8 +61,6 @@ in
   };
 
   # iGPU OpenCL via Mesa rusticl (built-in, hardware.graphics.enable = true)
-  # rocmPackages.clr not useful — gfx1150 not on ROCm supported GPU list
-  hardware.graphics.extraPackages = with pkgs; [ ];
 
   # ── Ollama ─────────────────────────────────────────────────
 
