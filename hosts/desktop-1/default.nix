@@ -40,6 +40,9 @@ in
 
   # ── GPU: PRIME Offload ─────────────────────────────────────
 
+  boot.blacklistedKernelModules = [ "nouveau" ];
+  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+
   hardware.nvidia = {
     open = true;
     modesetting.enable = true;
