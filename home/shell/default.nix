@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 
 let
   keys = import ../../secrets/keys.nix;
@@ -11,6 +11,7 @@ in
     ./fish.nix
     ./bat.nix
     ./helix.nix
+    ./rbw.nix
   ];
 
   systemd.user.services.ssh-add-key = {
@@ -29,32 +30,30 @@ in
     };
   };
 
-  programs.ssh = {
-    enable = true;
-    enableDefaultConfig = false;
-    settings = {
-      "*" = {
-        IdentitiesOnly = true;
-        AddKeysToAgent = "yes";
-      };
-      "github.com" = {
-        HostName = "ssh.github.com";
-        Port = 443;
-        User = "git";
-        IdentityFile = "~/.ssh/id_ed25519";
-      };
-      "gitlab.com" = {
-        HostName = "gitlab.com";
-        User = "git";
-        IdentityFile = "~/.ssh/id_ed25519";
-      };
-      "codeberg.org" = {
-        HostName = "codeberg.org";
-        User = "git";
-        IdentityFile = "~/.ssh/id_ed25519";
-      };
-    };
-  };
+  # SSH config 用 home.activation 直接写入文件，而非 home-manager 默认的 nix store 软链接。
+  # 软链接属主为 nobody，SSH 9.x+ 会因 Bad owner 拒绝读取。
+  home.activation.writeSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$HOME/.ssh"
+    $DRY_RUN_CMD cp -f ${pkgs.writeText "ssh-config" ''
+      Host *
+        IdentitiesOnly yes
+        AddKeysToAgent yes
+      Host github.com
+        HostName ssh.github.com
+        Port 443
+        User git
+        IdentityFile ~/.ssh/id_ed25519
+      Host gitlab.com
+        HostName gitlab.com
+        User git
+        IdentityFile ~/.ssh/id_ed25519
+      Host codeberg.org
+        HostName codeberg.org
+        User git
+        IdentityFile ~/.ssh/id_ed25519
+    ''} "$HOME/.ssh/config"
+    $DRY_RUN_CMD chmod 600 "$HOME/.ssh/config"
+  '';
 
   programs.git = {
     enable = true;
