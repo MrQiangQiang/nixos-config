@@ -74,6 +74,11 @@ lib.mkIf isDesktopEnabled {
         linemode = "size_and_mtime";
         scrolloff = 5;
       };
+      opener = {
+        pdf = [
+          { run = ''zathura "$1"''; orphan = true; desc = "zathura"; }
+        ];
+      };
     };
     flavors = {
       ${darkFlavorName} = mkFlavorPkg darkFlavorName darkFlavor darkTmTheme;
@@ -107,12 +112,14 @@ lib.mkIf isDesktopEnabled {
     ffmpegthumbnailer
     poppler-utils
     unrar
+    zathura
   ];
 
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
       "inode/directory" = [ "thunar.desktop" ];
+      "application/pdf" = [ "org.pwmt.zathura.desktop" ];
     };
   };
 
