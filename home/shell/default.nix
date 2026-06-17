@@ -11,7 +11,7 @@ in
     ./fish.nix
     ./bat.nix
     ./helix.nix
-    ./rbw.nix
+    ./passage.nix
   ];
 
   systemd.user.services.ssh-add-key = {
