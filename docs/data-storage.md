@@ -29,7 +29,7 @@ git-annex 的唯一职责是**管理文件内容在 desktop-1 和 laptop-N 之�
 - 职责清晰: 每块盘只做一件事，不跨界
 - 媒体文件 HDD 顺序读 ~100MB/s: 10MB 照片 <100ms，音乐/视频流无感
 - Linux 页面缓存: 二次访问的文件在 RAM 中，等同 SSD 速度
-- btrfs autoScrub + smartd 已覆盖 HDD 完整性
+- btrfs autoScrub + smartd 已覆盖磁盘完整性(HDD + NVMe)
 
 ## 为什么不用冷热迁移
 
@@ -88,7 +88,8 @@ git annex group here manual
 ## 源码真理
 
 - `modules/git-annex.nix` — 安装 git-annex (仅 desktop-1 import)
+- `modules/disk-health.nix` — smartd 磁盘健康监测 (所有主机共享)
 - `hosts/desktop-1/disk-config.nix` — HDD disk.data (btrfs, /data/annex, nofail)
-- `hosts/desktop-1/default.nix` — autoScrub, smartd
+- `hosts/desktop-1/default.nix` — autoScrub
 - `docs/data-sync.md` — 跨主机同步
 - `docs/data-protection.md` — 数据保护

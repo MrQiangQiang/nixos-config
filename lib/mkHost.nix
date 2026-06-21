@@ -16,6 +16,7 @@ lib.nixosSystem {
   modules = [
     ../modules/locale.nix
     ../modules/core-utils.nix
+    ../modules/disk-health.nix
     ../modules/fonts.nix
     ../modules/opencode.nix
     ../modules/system.nix

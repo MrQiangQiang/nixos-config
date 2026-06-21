@@ -63,8 +63,9 @@ btrfs 快照是 CoW(Copy on Write), 与原始数据在同一物理磁盘。磁�
 
 ## 源码真理
 
+- `modules/disk-health.nix` — smartd 磁盘健康监测 (所有主机共享)
 - `hosts/desktop-1/disk-config.nix` — NVMe + HDD 布局 (/data/annex)
-- `hosts/desktop-1/default.nix` — autoScrub, smartd
+- `hosts/desktop-1/default.nix` — autoScrub
 - `modules/analysis.nix` — nix gc + tmpfiles + docker prune
 - `modules/git-annex.nix` — git-annex 安装
 - `docs/data-storage.md` — 存储架构 (HDD 定位, numcopies 语义)
