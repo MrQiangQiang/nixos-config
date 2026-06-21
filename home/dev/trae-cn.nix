@@ -74,6 +74,21 @@ let
 
   nixExtJson = (pkgs.formats.json { }).generate "nix-extensions" nixExts;
   nixIdsJson = (pkgs.formats.json { }).generate "nix-ext-ids" nixExtIds;
+
+  # ── MCP (from SSOT) ──
+  # Transform programs.mcp.servers to Trae CN mcp.json format.
+  # Trae CN reads from ~/.trae-cn/mcp.json
+  # Format: {"mcpServers": {name: {url|command, args?, env?, headers?}}}
+  # Note: env {file=...;} submodules are opencode-specific, not supported by Trae CN.
+  traeMcpServers = lib.mapAttrs (_: server:
+    lib.filterAttrs (k: v:
+      k != "enabled" && v != null && v != [ ] && v != { }
+    ) server
+  ) config.programs.mcp.servers;
+
+  traeMcpJson = (pkgs.formats.json { }).generate "trae-mcp" {
+    mcpServers = traeMcpServers;
+  };
 in
 {
   options.custom.trae-cn = {
@@ -124,6 +139,11 @@ in
         deny = cfg.network.extraDeny;
       };
     };
+
+    # MCP servers — read-only symlink (Nix store)
+    # Source: programs.mcp.servers (SSOT in home/agents/mcp-servers.nix)
+    # To add/modify MCP servers, edit home/agents/mcp-servers.nix (not this file)
+    home.file.".trae-cn/mcp.json".source = traeMcpJson;
 
     # settings — writable merge (home.activation: preserves IDE runtime writes)
     home.activation.traeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

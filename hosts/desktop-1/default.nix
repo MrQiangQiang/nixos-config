@@ -16,7 +16,7 @@ in
     ../../modules/proxy.nix
     ../../modules/im.nix
     ../../modules/tailscale.nix
-    ../../modules/syncthing.nix
+    ../../modules/git-annex.nix
     ./hardware-configuration.nix
   ];
 
@@ -96,6 +96,7 @@ in
   users.users.fugui = {
     isNormalUser = true;
     homeMode = "750";
+    linger = true;
     extraGroups = [
       "wheel"
       "networkmanager"
@@ -116,6 +117,7 @@ in
 
   home-manager.users.fugui = {
     imports = [ ../../home ];
+    custom.qmd.enable = true;
   };
 
   home-manager.backupFileExtension = "hm-bak";
@@ -131,9 +133,17 @@ in
 
   services.btrfs.autoScrub = {
     enable = true;
-    fileSystems = [ "/" ];
+    fileSystems = [
+      "/"
+      "/data/annex"
+    ];
     interval = "monthly";
   };
+
+  # ── HDD health monitoring ──────────────────────────────────
+  # smartd auto-detects all SMART-capable devices (HDD + NVMe).
+  # No need to list devices explicitly — autodetect = true (default).
+  services.smartd.enable = true;
 
   # ── Tailscale proxy (mihomo 已运行) ────────────────────────
 

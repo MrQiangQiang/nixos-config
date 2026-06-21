@@ -71,15 +71,33 @@
                     "noatime"
                   ];
                 };
-                "@data_cold" = {
-                  mountpoint = "/data/cold";
-                  mountOptions = [
-                    "compress=zstd"
-                    "noatime"
-                  ];
-                };
               };
             };
+          };
+        };
+      };
+    };
+
+    # ── HDD: Data disk (1TB, 5400 RPM) ──
+    # Mounted at /data/annex — git-annex primary repository.
+    # nofail: don't block boot if HDD fails.
+    # smartd monitors drive health (configured in default.nix).
+    disk.data = {
+      type = "disk";
+      device = "/dev/sda";
+      content = {
+        type = "gpt";
+        partitions.data = {
+          size = "100%";
+          content = {
+            type = "filesystem";
+            format = "btrfs";
+            mountpoint = "/data/annex";
+            mountOptions = [
+              "compress=zstd"
+              "noatime"
+              "nofail"
+            ];
           };
         };
       };

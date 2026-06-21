@@ -3,7 +3,7 @@
 # Architecture:
 #   SSH ed25519 key → age identity (decrypt)
 #   SSH ed25519 pub → age recipient (encrypt)
-#   ~/.passage/store/*.age → syncthing 同步跨机器
+#   ~/.passage/store/*.age → git 同步跨机器(age 加密,安全推 GitHub)
 #   .age-recipients → 列出所有机器的 SSH pubkey
 #
 # No daemon, no type system, no cloud dependency.

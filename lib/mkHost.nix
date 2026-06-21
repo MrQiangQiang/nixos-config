@@ -20,6 +20,7 @@ lib.nixosSystem {
     ../modules/opencode.nix
     ../modules/system.nix
     ../modules/ssh.nix
+    ../modules/analysis.nix
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     {
@@ -72,6 +73,7 @@ lib.nixosSystem {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
+        extraSpecialArgs = { inherit inputs; };
       };
     }
   ] ++ extraModules;

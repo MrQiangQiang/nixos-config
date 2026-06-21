@@ -1,0 +1,184 @@
+# 开发工具链架构
+
+> Nix + mise + uv · 三层拼图 · 声明式 · AI 高可维护
+
+---
+
+## 设计原则
+
+1. **唯一来源**：每个工具只有一个管理来源，不重复
+2. **职责单一**：Nix 管系统，mise 管版本，uv 管 Python 包
+3. **简单优雅**：2 文件 2 变更，无 direnv/fnm/nvm/pyenv 等额外工具
+4. **面向未来**：新增语言 = 编辑 toolchain.nix → rebuild → mise install
+5. **像拼图**：三层独立，通过 `programs.mise.globalConfig` 和 `home.sessionPath` 连接
+
+---
+
+## 核心架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Nix 层（声明式，不可变）                                 │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │ programs.mise                                       ││
+│  │   .enable = true          → 安装 mise 二进制        ││
+│  │   .globalConfig.tools     → 声明全局工具版本        ││
+│  │   .globalConfig.settings  → 声明安全策略            ││
+│  │   .enableFishIntegration  → fish 中自动 activate    ││
+│  │                                                     ││
+│  │ home.sessionPath          → shim 目录加入 PATH       ││
+│  │ programs.nix-ld           → 预编译二进制兼容         ││
+│  └─────────────────────────────────────────────────────┘│
+│                         │                               │
+│                         ▼                               │
+│  mise 层（版本管理，mise.lock 可复现）                    │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │ 全局工具（由 Nix 声明，mise 安装）                    ││
+│  │   python@3.11, 3.12, 3.13, 3.14                     ││
+│  │   node@24, go@1.24, zig@0.14, uv@latest             ││
+│  │   rust@stable, pipx:ruff@latest                      ││
+│  │                                                     ││
+│  │ 项目工具（由 mise.toml 声明，mise 安装）              ││
+│  │   每个项目的特定版本和依赖                            ││
+│  └─────────────────────────────────────────────────────┘│
+│                         │                               │
+│                         ▼                               │
+│  语言包管理器（各语言原生）                               │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │ Python: uv (venv + pyproject.toml + uv.lock)        ││
+│  │ Node:   pnpm (package.json + pnpm-lock.yaml)        ││
+│  │ Go:     go mod (go.mod + go.sum)                    ││
+│  │ Rust:   cargo (Cargo.toml + Cargo.lock)             ││
+│  │ Zig:    build.zig                                   ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 为什么是 Nix + mise + uv 而非纯 Nix
+
+| 维度 | 纯 Nix（mitchellh 风格） | Nix + mise + uv |
+|------|------------------------|-----------------|
+| 声明式 | ✅✅✅ | ✅✅（`programs.mise.globalConfig`） |
+| 可复现 | ✅✅✅ bit-for-bit | ✅✅ mise.lock |
+| 版本灵活 | ❌ 受 nixpkgs 更新周期限制 | ✅ 任意版本 |
+| AI 可维护 | ❌ Nix 语言 | ✅ TOML |
+| 非 Nix 协作者 | ❌ 无法使用 | ✅ 可使用 mise.toml |
+| 项目样板 | ❌ 每个项目写 flake.nix | ✅ `mise use node@24` 一行 |
+
+纯 Nix 的"完全可复现"在个人桌面场景下是过度设计。`programs.mise.globalConfig` 让声明式等价，但灵活性远超。
+
+---
+
+## 为什么不用 direnv / devenv / proto / pixi
+
+| 工具 | 为什么不用 |
+|------|-----------|
+| direnv | mise `[env]` 段直接替代，不引入额外工具 |
+| devenv / devbox | 在 Nix 上再加一层抽象，违反简单原则 |
+| proto | 无 lockfile，致命缺陷 |
+| pixi | conda 生态，不是通用 dev toolchain |
+
+---
+
+## 为什么需要 shim
+
+`mise activate` 是 shell hook，只在交互式 shell 的 prompt 显示时触发。非交互式上下文（Trae CN、systemd、GUI 应用）永远不会触发 shell hook。shim 是符号链接，放在 PATH 上，任何上下文都能找到。
+
+| 上下文 | 发现机制 |
+|--------|---------|
+| 用户终端（fish） | `mise activate fish`（PATH 模式） |
+| Trae CN 主进程 | shim（`home.sessionPath`） |
+| systemd / cron / GUI 应用 | shim |
+
+shim 不加载 `[env]` 环境变量、不运行 hooks。集成终端中 mise activate 生效，无此限制。
+
+---
+
+## 为什么 Python 用 `"source"` 而非 `"create|source"`
+
+`python.uv_venv_auto = "source"` 只激活已存在的 `.venv`，让 `uv sync` 负责创建。职责更清晰：uv 管 venv 生命周期，mise 管激活。
+
+---
+
+## 为什么用 `node.corepack = true` 而非 `[hooks] enter = "corepack enable"`
+
+| 维度 | hooks 方案 | `node.corepack = true` |
+|------|-----------|----------------------|
+| 依赖 | Node 内置 Corepack（Node 26+ 可能移除） | mise 直接安装 shims |
+| 复杂度 | 需要 `experimental = true` + hook | 一行配置 |
+| 失败处理 | `|| true` 静默忽略 | mise 处理 |
+
+Node.js TSC 于 2025 年 3 月投票停止随 Node 分发 Corepack。mise v2026.6.0 的 `node.corepack` 不依赖 Node 内置 Corepack，面向未来。
+
+---
+
+## 为什么 `mise use --global` 不可用
+
+`programs.mise.globalConfig` 生成只读的 `config.toml`，`mise use --global` 会失败。这是**特性**：强制所有全局工具变更通过 .nix 文件，确保声明式和唯一来源。
+
+---
+
+## 全局 CLI 边界规则
+
+| 规则 | 示例 | 管理方式 |
+|------|------|---------|
+| 语言无关的工具 → Nix | git, ripgrep, fd, bat, jq | `pkgs.xxx` |
+| 语言相关的工具 → mise 对应后端 | ruff(Python), tsc(Node) | `pipx:ruff`, `npm:typescript` |
+| 绝不用 `pip install --global` 或 `npm install -g` | — | — |
+
+判断标准：这个工具依赖某个特定语言运行时吗？是 → mise，否 → Nix。
+
+---
+
+## Rust 特殊性
+
+mise 委托 rustup 管理 Rust 工具链（`rust = "stable"` 已自说明）。
+
+---
+
+## 已修复
+
+### Fix 1: uv 由 mise 安装而非 Nix ✅
+
+初版在 `home.packages` 中安装 `pkgs.uv`。但 mise 的 `python.uv_venv_auto` 集成需要 uv 在 mise 管理下。修正：`globalConfig.tools.uv = "latest"`。
+
+### Fix 2: 启用 mise shim 模式 ✅
+
+`mise activate` 只在交互式 shell 中生效，Trae CN 等 AI agent 找不到工具。修正：`home.sessionPath = [ "$HOME/.local/share/mise/shims" ]`。
+
+### Fix 3: 声明式全局配置 ✅
+
+初版不管理 `~/.config/mise/config.toml`，全局工具版本是命令式的。修正：`programs.mise.globalConfig` 让全局配置完全声明式。
+
+### Fix 4: 用 `programs.mise` 替代手动配置 ✅
+
+初版手动 `home.packages` + `xdg.configFile` + 手动 shell hook。修正：`programs.mise` 模块自动处理安装、配置、shell 集成。bash.nix 和 fish.nix 不需要修改。
+
+### Fix 5: `node.corepack = true` 替代 hooks ✅
+
+初版用 `[hooks] enter = "corepack enable"`。Node.js TSC 投票停止分发 Corepack，mise v2026.6.0 新增 `node.corepack` 直接安装 shims，不依赖 Node 内置 Corepack。
+
+### Fix 6: `globalConfig.settings` 替代 `settings` ✅
+
+`programs.mise.settings` 已被重定向到 `programs.mise.globalConfig.settings`。使用新路径避免弃用警告。
+
+### Fix 7: `node.compile = false` ✅
+
+mise 默认从源码编译 Node.js，在 NixOS 上因缺少编译工具而失败。添加 `node.compile = false` 强制使用预编译二进制。
+
+### Fix 8: `home.activation.miseInstall` ✅
+
+`nixos-rebuild switch` 不会自动安装/更新 mise 管理的工具。添加 activation hook 让每次 switch 自动执行 `mise install --yes`。
+
+---
+
+## 不需要修复
+
+| # | 原计划问题 | 为什么不需要修复 |
+|---|---|---|
+| 1 | bash.nix 需要 mise activate | bash 是 login shell 跳板（exec fish），mise 在 fish 中激活 |
+| 2 | `mise activate --shims` | 不需要。`mise activate fish`（PATH 模式）+ `home.sessionPath`（shim 目录）组合更优 |
+| 3 | shim 不加载 `[env]` | 已知限制，交互式终端中 mise activate 加载 `[env]`，非交互式上下文不需要 |
+| 4 | 全 Nix 更符合哲学 | 声明式等价（`globalConfig`），版本灵活性远超，代价不值得 |

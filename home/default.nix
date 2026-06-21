@@ -6,16 +6,16 @@ let
 in
 {
   imports = [
+    ./agents
     ./desktop
     ./dev
     ./shell
-    ./trae
   ];
 
   _module.args.palette = palette;
   _module.args.keybinds = keybinds;
 
-  custom.trae.enable = true;
+  custom.trae-cn.enable = true;
 
   home.stateVersion = "26.11";
 }

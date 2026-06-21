@@ -1,4 +1,4 @@
 { ... }:
 {
-  imports = [ ./toolchain.nix ./opencode.nix ./trae-cn.nix ];
+  imports = [ ./toolchain.nix ./opencode.nix ./trae-cn.nix ./qmd.nix ];
 }

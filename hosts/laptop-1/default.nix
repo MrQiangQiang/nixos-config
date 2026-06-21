@@ -6,7 +6,6 @@ in {
     ../../modules/proxy.nix
     ../../modules/im.nix
     ../../modules/tailscale.nix
-    ../../modules/syncthing.nix
     ./hardware-configuration.nix
   ];
 
