@@ -3,30 +3,29 @@
 ## 核心架构
 
 ```
-desktop-1 (唯一来源, 7x24) ─── Tailscale SSH ─── laptop-N (消费者)
+desktop-1 (唯一来源, 7x24) ─── git/GitHub ─── laptop-1 (消费者)
     │                                              │
-    │  /data/annex/ (git-annex on HDD)              │  ~/annex/ (git clone)
-    │  group=backup, required="present"             │  group=manual
-    │                                              │
-    │  git annex add <file>                         │  git annex sync (元数据)
-    │  git annex sync                               │  git annex get <file>  (按需拉取)
-    │                                              │  git annex drop <file> (用完释放)
+    │  git push/pull over Tailscale SSH            │  git push/pull
+    │  git-annex sync (大文件元数据)                │  git-annex get/drop (按需)
 ```
 
-## git-annex 职责
+## git-annex 跨机同步
 
-git-annex 的唯一职责是**管理文件内容在 desktop-1 和 laptop-N 之间的分布**。desktop-1 `/data/annex/` 是 canonical 仓库（group=backup, required="present"），所有文件内容的唯一存放地。laptop-N 按需 `git annex get`/`drop`。
+git-annex 的职责是**管理文件内容在多个 remote 之间的分布**。本文档描述"跨机同步"用例(desktop-1↔laptop-1),容量扩展用例见 [cold-data-storage.md](cold-data-storage.md)。两个用例是同一职责的不同应用。
 
-## laptop 拉取工作流
+desktop-1 有两个 git-annex 仓库(SSD + HDD,见 cold-data-storage.md)。laptop-1 需要访问两者:
 
 ```
-laptop-1 ~/annex/:
-  git annex sync                 # 拉取元数据 (whereis, git-annex branch)
-  git annex get <file>           # 从 desktop-1 HDD 拉取单个文件内容
-  git annex drop <file>          # 用完后释放本地空间
+laptop-1 ~/annex/
+├── remote: desktop-1-ssd → fugui@desktop-1:~/annex/        (热文件)
+└── remote: desktop-1-hdd → fugui@desktop-1:/data/cold/annex/  (冷文件)
+
+git annex sync     # 同步位置元数据 (whereis)
+git annex get <file>  # 从有内容的 remote 拉取 (SSD 或 HDD)
+git annex drop <file> # 用完释放 laptop-1 空间
 ```
 
-laptop-1 是 `group=manual`：用户（或 AI agent）显式控制 get/drop，不自动保留内容。`git annex sync` 在 manual 组下只传输元数据，不触发自动内容传输。
+laptop-1 是 `group=manual`(用户控制 get/drop),不自动保留内容。
 
 ## 数据分类与同步方式
 
@@ -36,7 +35,7 @@ laptop-1 是 `group=manual`：用户（或 AI agent）显式控制 get/drop，�
 | 知识库 (markdown) | git only | 版本历史 + 冲突解决 + 人类审查 agent 修改 |
 | 密码库 (passage + age) | git only | age 加密设计上允许密文推 GitHub |
 | dotfiles / AI 配置 | git only | 已在 nixos-config 仓库 (home-manager 声明式) |
-| 大媒体 (照片/视频/音乐/文档) | git-annex | partial checkout 适合低配 laptop; 可释放空间 |
+| 大媒体 (照片/视频) | git-annex | partial checkout 适合低配 laptop; 可释放空间 |
 | 浏览器书签 | Firefox Sync | places.sqlite 是活跃 SQLite, git/annex 会损坏 |
 
 ## 为什么不用 Syncthing
@@ -56,39 +55,11 @@ desktop-1: git pull (或直接编辑) → git push
 审查:      git diff 强制人类审查 agent 修改
 ```
 
-## AI 搜索策略（递进式）
-
-```
-AI 搜索大文件
-├── Layer 1: 本地文件名搜索 (始终可用, 0 网络)
-│   find ~/annex -name "*keyword*"
-│   git annex find --in=here            ← 列出内容在本地的文件
-│
-├── Layer 2: git-annex 元数据查询 (始终可用, 0 网络)
-│   git annex whereis <file>            ← 文件在哪个 remote
-│   git annex list                      ← 列出所有被跟踪的文件名
-│
-└── Layer 3: 按需拉取后内容搜索 (需网络)
-    git annex get <file>                ← 拉取候选文件
-    本地搜索文件内容 (EXIF, 全文)
-    git annex drop <file>               ← 用完释放
-```
-
 ## 唯一来源验证
 
 desktop-1 在所有数据类型上都是唯一来源:
 - 代码: git 仓库本地副本 + push 源 (GitHub 是远程备份)
 - 知识库: ~/knowledge/ 主副本 + qmd daemon 主实例
 - 密码: passage store 主副本 (git 同步)
-- 大媒体: /data/annex/ 是唯一 canonical 仓库 (HDD, group=backup, required="present")
+- 大媒体: git-annex 主仓库 (SSD + HDD, desktop-1 是唯一完整节点)
 - AI 配置: nixos-config flake 主副本
-
-desktop-1 有且仅有一个 git-annex 仓库: `/data/annex/`。所有 laptop 从这一个源 clone 和拉取。
-
-## 源码真理
-
-- `modules/git-annex.nix` — 安装 git-annex (仅 desktop-1)
-- `hosts/desktop-1/disk-config.nix` — HDD disk.data (btrfs, /data/annex, nofail)
-- `hosts/desktop-1/default.nix` — autoScrub, smartd
-- `docs/data-storage.md` — 存储架构 (HDD 定位, numcopies 语义)
-- `docs/data-protection.md` — 数据保护

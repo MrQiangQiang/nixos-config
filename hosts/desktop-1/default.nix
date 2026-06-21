@@ -145,6 +145,26 @@ in
   # No need to list devices explicitly — autodetect = true (default).
   services.smartd.enable = true;
 
+  # ── Tailscale Serve (QMD MCP) ──────────────────────────────
+  # Exposes qmd-mcp (localhost:8181) to tailnet via HTTPS.
+  # Requires HTTPS certificates enabled in Tailscale admin console:
+  #   https://login.tailscale.com/admin/settings/general
+  # (one-time per tailnet, not nixifiable — human auth required).
+  # tailscale serve --bg stores config in tailscaled state;
+  # survives reboot. Idempotent re-run on every activation.
+
+  systemd.services.tailscale-serve-qmd = {
+    description = "Tailscale Serve for QMD MCP (localhost:8181)";
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg localhost:8181";
+    };
+  };
+
   # ── Tailscale proxy (mihomo 已运行) ────────────────────────
 
   systemd.services.tailscaled.environment = {

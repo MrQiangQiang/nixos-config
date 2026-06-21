@@ -25,7 +25,7 @@ Tailscale  → network (mesh VPN, MagicDNS)
 desktop-1 (source of truth, 7x24) ─── Tailscale ─── laptop-1 (consumer)
     │  ~/nixos-config (git)                           │  ~/nixos-config (git clone)
     │  ~/knowledge (git, qmd master)                  │  ~/knowledge (git clone)
-    │  /data/annex (git-annex on HDD, backup)          │  ~/annex (git clone, manual)
+    │  ~/annex (git-annex, SSD + HDD)                 │  ~/annex (git-annex, manual)
     │  ~/.passage (git, age encrypted)                │  ~/.passage (git clone)
 ```
 

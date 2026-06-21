@@ -78,8 +78,8 @@
       };
     };
 
-    # ── HDD: Data disk (1TB, 5400 RPM) ──
-    # Mounted at /data/annex — git-annex primary repository.
+    # ── HDD: Cold data storage (1TB, 5400 RPM) ──
+    # Mounted at /data/cold — replaces former NVMe @data_cold subvolume.
     # nofail: don't block boot if HDD fails.
     # smartd monitors drive health (configured in default.nix).
     disk.data = {
@@ -92,7 +92,7 @@
           content = {
             type = "filesystem";
             format = "btrfs";
-            mountpoint = "/data/annex";
+            mountpoint = "/data/cold";
             mountOptions = [
               "compress=zstd"
               "noatime"
