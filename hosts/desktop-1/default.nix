@@ -43,7 +43,12 @@ in
   # ── GPU: PRIME Offload ─────────────────────────────────────
 
   boot.blacklistedKernelModules = [ "nouveau" ];
-  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.kernelModules = [
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_uvm"
+    "nvidia_drm"
+  ];
 
   hardware.nvidia = {
     open = true;
@@ -62,29 +67,24 @@ in
 
   # iGPU OpenCL via Mesa rusticl (built-in, hardware.graphics.enable = true)
 
-  # ── Ollama ─────────────────────────────────────────────────
-
-  systemd.services.ollama.serviceConfig.ProtectHome = lib.mkForce "read-only";
-
+  # ── Ollama (本地 LLM 推理，CUDA) ──────────────────────────
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
-    home = "/home/fugui/.ollama";
-    models = "/home/fugui/.ollama/models";
+    user = "ollama";  # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
+    group = "ollama";
+    host = "0.0.0.0";  # 靠防火墙收口到 tailscale0
+    loadModels = [ "qwen3.6:27b-q4_K_M" ];  # 显式锁定量化（NixOS 可复现性）
+    syncModels = true;  # 强制声明==实际，移除未声明模型
     environmentVariables = {
-      CUDA_VISIBLE_DEVICES = "0";
       OLLAMA_FLASH_ATTENTION = "1";
       OLLAMA_MAX_LOADED_MODELS = "1";
+      CUDA_VISIBLE_DEVICES = "0";
+      OLLAMA_ORIGINS = "*";  # tailnet 内可信
     };
   };
 
-  environment.sessionVariables = {
-    CUDA_VISIBLE_DEVICES = "0";
-  };
-
-  environment.systemPackages = with pkgs; [
-    cudaPackages.cudatoolkit
-  ];
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 11434 ];
 
   # ── Desktop ────────────────────────────────────────────────
 
@@ -107,13 +107,6 @@ in
       keys.users.fugui-desktop
     ];
   };
-
-  users.users.ollama = {
-    isSystemUser = true;
-    group = "ollama";
-    extraGroups = [ "users" ];
-  };
-  users.groups.ollama = { };
 
   home-manager.users.fugui = {
     imports = [ ../../home ];
@@ -140,11 +133,6 @@ in
     interval = "monthly";
   };
 
-  # ── HDD health monitoring ──────────────────────────────────
-  # smartd auto-detects all SMART-capable devices (HDD + NVMe).
-  # No need to list devices explicitly — autodetect = true (default).
-  services.smartd.enable = true;
-
   # ── Tailscale Serve (QMD MCP) ──────────────────────────────
   # Exposes qmd-mcp (localhost:8181) to tailnet via HTTPS.
   # Requires HTTPS certificates enabled in Tailscale admin console:
@@ -152,22 +140,36 @@ in
   # (one-time per tailnet, not nixifiable — human auth required).
   # tailscale serve --bg stores config in tailscaled state;
   # survives reboot. Idempotent re-run on every activation.
-
+  #
+  # Boot race: tailscaled.service reports "active" before the node
+  # reaches BackendState == Running (login + DERP + tailscale0 up).
+  # `tailscale serve` called during that window fails with
+  # "unexpected state: NoState". We gate on `tailscale status`
+  # (returns 0 only at Running), mirroring nixpkgs' own
+  # tailscaled-autoconnect unit. Restart=on-failure keeps retrying
+  # until tailscale comes up (mihomo/Tailscale boot ordering).
+  # Ref: https://github.com/tailscale/tailscale/issues/11504
   systemd.services.tailscale-serve-qmd = {
     description = "Tailscale Serve for QMD MCP (localhost:8181)";
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
     wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.tailscale ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg localhost:8181";
+      Restart = "on-failure";
+      RestartSec = 10;
     };
-  };
-
-  # ── Tailscale proxy (mihomo 已运行) ────────────────────────
-
-  systemd.services.tailscaled.environment = {
-    HTTPS_PROXY = "http://127.0.0.1:7890";
+    script = ''
+      for i in $(seq 1 60); do
+        if tailscale status --peers=false >/dev/null 2>&1; then
+          exec tailscale serve --bg localhost:8181
+        fi
+        sleep 1
+      done
+      echo "tailscale not online after 60s; will retry" >&2
+      exit 1
+    '';
   };
 }

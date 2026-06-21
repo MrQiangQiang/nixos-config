@@ -67,9 +67,37 @@ desktop-1 是唯一模型推理节点 (Qwen3-Embedding + Reranker + query-expans
 ~/knowledge/ 在所有主机上通过 repos.nix 自动 clone (for Obsidian 浏览, AGENTS.md 读取)。
 不推荐多机运行独立 qmd (模型资源重, 索引不一致)。
 
+## 本地 LLM 推理
+
+```
+desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M, 17GB VRAM)
+           host=0.0.0.0 + firewall tailscale0:11434
+           syncModels=true (nix 配置是模型清单唯一来源)
+laptop-1:  opencode → http://desktop-1.tail0f7af0.ts.net:11434/v1 (Tailscale)
+```
+
+## 为什么用 Ollama 而非 llama.cpp 直接
+
+- Ollama = llama.cpp 封装 + 模型仓库 + REST API + CLI
+- 速度差异 <11%, VRAM 开销 +1.2GB (可接受)
+- agent 集成简单: OpenAI 兼容端点, opencode 一行配置
+
+## 为什么用 qwen3.6:27b-q4_K_M
+
+- 单卡 RTX 5090 32GB 最佳: 17GB 权重 + 6GB KV cache = 159K 上下文
+- dense 27B > MoE 35B-A3B (编码场景, SWE-bench 68.9-72.5%)
+- 显式量化 tag: NixOS 可复现性, 不受 Ollama 默认变更影响
+
+## 为什么用 syncModels
+
+- 声明式唯一来源: nix 配置 = 实际模型清单
+- 未声明模型自动移除, 防止漂移
+- 切换模型只需改一行 loadModels
+
 ## 源码真理
 
 - `home/agents/mcp-servers.nix` — MCP SSOT
 - `home/dev/qmd.nix` — qmd wrapper + MCP service + refresh timer
+- `home/dev/opencode.nix` — opencode + Ollama provider
 - `home/default.nix` — imports `./agents`
 - `flake.nix` — `qmd.url = "github:tobi/qmd"`

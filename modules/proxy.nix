@@ -76,6 +76,12 @@ let
       - { name: "全自动最优节点", type: url-test, use: [my-airport], url: http://www.gstatic.com/generate_204, interval: 300, tolerance: 50, timeout: 5000, max-failed-times: 3, expected-status: 204 }
 
     rules:
+      # Tailscale: tailnet 流量直连，控制平面走代理
+      - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+      - DST-PORT,41641,DIRECT
+      - DOMAIN-SUFFIX,tailscale.com,全自动最优节点
+      - DOMAIN-SUFFIX,tailscale.io,全自动最优节点
+
       - DOMAIN-SUFFIX,bigairport-twentieth-sub.com,DIRECT
 
       - DOMAIN-SUFFIX,trae.com.cn,DIRECT

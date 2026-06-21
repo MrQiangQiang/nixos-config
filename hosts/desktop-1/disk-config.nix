@@ -65,7 +65,7 @@
                   ];
                 };
                 "@ollama" = {
-                  mountpoint = "/home/fugui/.ollama";
+                  mountpoint = "/var/lib/ollama";
                   mountOptions = [
                     "compress=zstd"
                     "noatime"
@@ -81,7 +81,7 @@
     # ── HDD: git-annex data storage (1TB, 5400 RPM) ──
     # Mounted at /data/annex — single source of truth for binary data.
     # nofail: don't block boot if HDD fails.
-    # smartd monitors drive health (configured in default.nix).
+    # smartd monitors drive health (configured in modules/disk-health.nix).
     disk.data = {
       type = "disk";
       device = "/dev/sda";

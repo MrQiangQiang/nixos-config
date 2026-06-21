@@ -67,10 +67,4 @@ in {
   };
 
   home-manager.backupFileExtension = "hm-bak";
-
-  # ── Tailscale proxy (mihomo 已运行) ────────────────────────
-
-  systemd.services.tailscaled.environment = {
-    HTTPS_PROXY = "http://127.0.0.1:7890";
-  };
 }

@@ -26,7 +26,7 @@
 | No `http_proxy` env vars | Redundant with TUN. Caused nix-daemon deadlock when mihomo down |
 | systemd-resolved | Tailscale Wiki recommends. `networking.nameservers` = fallback pool |
 | Tailscale auth-state ephemeral | Re-auth after rebuild if service restarts |
-| `tailscaled` HTTPS_PROXY | Per-service override only. Not global |
+| mihomo rules for Tailscale | `100.64.0.0/10` + port 41641 DIRECT; `tailscale.com`/`tailscale.io` via proxy |
 | `nix.settings.substituters` | Domestic mirrors with cache.nixos.org fallback; priority-ordered |
 
 ## Remote deploy

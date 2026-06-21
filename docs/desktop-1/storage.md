@@ -14,7 +14,7 @@ nvme0n1 (Samsung 990 Pro 2 TiB)  GPT  disko
   @nix       /nix                  Nix store (snapshot-excluded)
   @var_cache /var/cache            package cache
   @var_log   /var/log              logs
-  @ollama    /home/fugui/.ollama   LLM models (snapshot-excluded)
+  @ollama    /var/lib/ollama     LLM models (snapshot-excluded)
 
 sda (HDD 1TB)  GPT  disko
 └── p1  100%  btrfs  /data/annex   git-annex data repository (nofail, compress=zstd)
@@ -38,4 +38,5 @@ sda (HDD 1TB)  GPT  disko
 ## Source of truth
 
 `hosts/desktop-1/disk-config.nix`
-`hosts/desktop-1/default.nix` (zramSwap, autoScrub, smartd)
+`hosts/desktop-1/default.nix` (zramSwap, autoScrub)
+`modules/disk-health.nix` (smartd, 所有主机共享)
