@@ -30,9 +30,12 @@ home/dev/opencode.nix        → enableMcpIntegration 消费
 └── wiki/                       agent 编译的 wiki (agent 通过 filesystem MCP 写)
     ├── index.md  log.md  concepts/  people/  projects/  tools/
 
-desktop-1: qmd-mcp systemd service (localhost:8181, HTTP)
-           qmd-refresh timer (5min 增量刷新索引)
-laptop-1:  SSH 隧道访问 desktop-1 qmd (ssh -L 8181:localhost:8181)
+desktop-1: qmd-mcp systemd service (localhost:8181)
+           qmd-refresh timer (5min)
+           Tailscale Serve proxy (tailscale serve --bg localhost:8181)
+           Qwen3-Embedding + Reranker + query-expansion (model inference)
+laptop-1:  qmd MCP → https://desktop-1.tail0f7af0.ts.net/mcp (Tailscale Serve)
+           URL forks in mcp-servers.nix via config.custom.qmd.enable
 ```
 
 ## 为什么用 qmd
@@ -59,9 +62,10 @@ laptop-1:  SSH 隧道访问 desktop-1 qmd (ssh -L 8181:localhost:8181)
 
 ## 多主机策略
 
-desktop-1 是唯一知识库服务节点 (ingest + 搜索 + git master)。
-其他主机都是消费者: git clone 只读 + SSH 隧道访问 qmd。
-不推荐多机运行独立 qmd (两个索引 + 两个 ingest 节点 = 冲突风险)。
+desktop-1 是唯一模型推理节点 (Qwen3-Embedding + Reranker + query-expansion, VRAM/CPU)。
+其他主机通过 Tailscale Serve 访问 qmd MCP (URL 在 mcp-servers.nix 中由 config.custom.qmd.enable 分叉)。
+~/knowledge/ 在所有主机上通过 repos.nix 自动 clone (for Obsidian 浏览, AGENTS.md 读取)。
+不推荐多机运行独立 qmd (模型资源重, 索引不一致)。
 
 ## 源码真理
 

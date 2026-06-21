@@ -23,10 +23,13 @@ Tailscale  → network (mesh VPN, MagicDNS)
 
 ```
 desktop-1 (source of truth, 7x24) ─── Tailscale ─── laptop-1 (consumer)
-    │  ~/nixos-config (git)                           │  ~/nixos-config (git clone)
-    │  ~/knowledge (git, qmd master)                  │  ~/knowledge (git clone)
-    │  ~/annex (git-annex, SSD + HDD)                 │  ~/annex (git-annex, manual)
-    │  ~/.passage (git, age encrypted)                │  ~/.passage (git clone)
+    │  ~/nixos-config (git master)                  │  ~/nixos-config (git clone)
+    │  ~/knowledge (git, qmd master)                │  ~/knowledge (git clone, Obsidian)
+    │  ~/annex → /data/annex (git-annex on HDD)     │  ~/annex (git-annex, manual)
+    │  ~/.passage/store (git, age encrypted)        │  ~/.passage/store (git clone)
+    │  repos.nix → home-manager activation          │  同 repos.nix
+    │  qmd-mcp:8181 → Tailscale Serve:443           │  qmd via https://desktop-1...ts.net/mcp
+    │  Qwen3-Embedding + Reranker (model inference) │
 ```
 
 ## Tool selection
@@ -34,8 +37,10 @@ desktop-1 (source of truth, 7x24) ─── Tailscale ─── laptop-1 (consum
 | Tool | Why | Rejected alternative |
 |------|-----|---------------------|
 | Tailscale | Zero-config WireGuard mesh, MagicDNS | NetBird (less NixOS integration) |
+| Tailscale Serve | Expose localhost services to tailnet via HTTPS with auto TLS | SSH tunnel (fragile, manual) |
 | git | Version history, conflict resolution, review workflow | Syncthing (mixing git+syncthing is anti-pattern) |
 | git-annex | Partial checkout, content-addressed, drop frees space | git-lfs (cannot drop files) |
+| repos.nix | Declarative personal repo clone SSOT, idempotent activation | Manual clone per machine (inconsistent paths) |
 | flake-parts | Community standard, perSystem | flake-utils (less opinionated) |
 | agenix | Minimal, 2-host optimal | sops-nix (heavier) |
 | nixos-rebuild | Built-in, zero deps | deploy-rs, colmena (overkill for 2 hosts) |

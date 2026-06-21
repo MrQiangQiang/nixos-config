@@ -5,24 +5,25 @@
 ```
 desktop-1 (唯一来源, 7x24) ─── git/GitHub ─── laptop-1 (消费者)
     │                                              │
-    │  git push/pull over Tailscale SSH            │  git push/pull
+    │  git push/pull (文本数据)                     │  git push/pull
     │  git-annex sync (大文件元数据)                │  git-annex get/drop (按需)
+    │  Tailscale Serve (qmd MCP,见 multi-machine.md)
+    │                                              │
+    │  repos.nix → clone: knowledge, secrets       │  同 repos.nix
+    │              (home-manager activation)        │
 ```
 
 ## git-annex 跨机同步
 
-git-annex 的职责是**管理文件内容在多个 remote 之间的分布**。本文档描述"跨机同步"用例(desktop-1↔laptop-1),容量扩展用例见 [cold-data-storage.md](cold-data-storage.md)。两个用例是同一职责的不同应用。
-
-desktop-1 有两个 git-annex 仓库(SSD + HDD,见 cold-data-storage.md)。laptop-1 需要访问两者:
+单一 canonical 仓库: desktop-1 `/data/annex/` (HDD, btrfs)。详见 [data-storage.md](data-storage.md)。
 
 ```
 laptop-1 ~/annex/
-├── remote: desktop-1-ssd → fugui@desktop-1:~/annex/        (热文件)
-└── remote: desktop-1-hdd → fugui@desktop-1:/data/cold/annex/  (冷文件)
+  remote: desktop-1 → fugui@desktop-1:/data/annex/
 
-git annex sync     # 同步位置元数据 (whereis)
-git annex get <file>  # 从有内容的 remote 拉取 (SSD 或 HDD)
-git annex drop <file> # 用完释放 laptop-1 空间
+git annex sync         # 同步位置元数据 (whereis)
+git annex get <file>   # 从 desktop-1 HDD 拉取
+git annex drop <file>  # 用完释放 laptop-1 空间
 ```
 
 laptop-1 是 `group=manual`(用户控制 get/drop),不自动保留内容。
@@ -59,7 +60,8 @@ desktop-1: git pull (或直接编辑) → git push
 
 desktop-1 在所有数据类型上都是唯一来源:
 - 代码: git 仓库本地副本 + push 源 (GitHub 是远程备份)
-- 知识库: ~/knowledge/ 主副本 + qmd daemon 主实例
+- 知识库: ~/knowledge/ 主副本 + qmd 搜索主实例
 - 密码: passage store 主副本 (git 同步)
-- 大媒体: git-annex 主仓库 (SSD + HDD, desktop-1 是唯一完整节点)
+- 大媒体: /data/annex/ 唯一 canonical 仓库 (HDD, group=backup, required="present")
 - AI 配置: nixos-config flake 主副本
+- 个人仓库: repos.nix SSOT, home-manager activation 自动 clone

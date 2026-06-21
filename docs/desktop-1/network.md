@@ -13,6 +13,7 @@
 ├─ Tailscale ──────────────────────────────────────┤
 │  WireGuard mesh: desktop-1 ↔ laptop-1            │
 │  MagicDNS: <host>.tail0f7af0.ts.net              │
+│  Serve: localhost:8181 → HTTPS tailnet (qmd MCP)  │
 │  SSH via Tailscale IP (no port forwarding)        │
 └──────────────────────────────────────────────────┘
 ```
