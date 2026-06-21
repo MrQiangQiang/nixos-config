@@ -51,24 +51,7 @@ in
     enable = lib.mkEnableOption "QMD local search engine";
   };
 
-  config = lib.mkMerge [
-    {
-      # knowledge repo clone runs on ALL machines (Obsidian browsing, AGENTS.md).
-      # idempotent: skips if ~/knowledge/.git already exists.
-      # entryAfter writeSshConfig ensures ~/.ssh/config is in place for git clone.
-      home.activation.ensureKnowledgeRepo = lib.hm.dag.entryAfter [ "writeSshConfig" ] ''
-        if [ ! -d "$HOME/knowledge/.git" ]; then
-          if $DRY_RUN_CMD git clone git@github.com:MrQiangQiang/knowledge.git "$HOME/knowledge"; then
-            :
-          else
-            echo "Warning: knowledge repo clone failed, run manually later:" >&2
-            echo "  git clone git@github.com:MrQiangQiang/knowledge.git ~/knowledge" >&2
-          fi
-        fi
-      '';
-    }
-
-    (lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
       home.packages = [ qmdFixed ];
 
       # Declarative qmd config (read-only symlink to Nix store)
@@ -151,6 +134,5 @@ in
           WantedBy = [ "timers.target" ];
         };
       };
-    })
-  ];
+    };
 }
