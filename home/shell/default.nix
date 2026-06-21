@@ -70,12 +70,11 @@ in
         name = "fugui";
         email = "chenzhiqiang0125@gmail.com";
       };
-      gpg = {
-        format = "ssh";
-      };
-      gpg.ssh = {
-        allowedSignersFile = "~/.ssh/allowed_signers";
-      };
+      # git 历史遗留命名：早期只支持 GPG 签名，2.34+ 增加 SSH 签名时保留了 `gpg.*` 命名空间。
+      # 此处实际使用 SSH 签名（format = "ssh"），本地不使用 GPG。
+      # 不可改名，见 https://git-scm.com/docs/git-config#Documentation/git-config.txt-gpgformat
+      gpg.format = "ssh";
+      gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
     };
   };
 
