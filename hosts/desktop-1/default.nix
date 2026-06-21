@@ -34,7 +34,11 @@ in
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.stable.open ];
+  # ── GPU: NVIDIA + AMD iGPU (PRIME Offload) ────────────────
+  # 必须声明 videoDrivers，否则 hardware.nvidia 模块不激活，
+  # GSP 固件不会安装到 /lib/firmware/nvidia/，导致 RmInitAdapter failed。
+  # Blackwell (RTX 5090) 强制要求 open kernel module + GSP 固件。
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.cpu.amd.updateMicrocode = true;
 
