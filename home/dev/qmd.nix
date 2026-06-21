@@ -51,102 +51,106 @@ in
     enable = lib.mkEnableOption "QMD local search engine";
   };
 
-  # knowledge repo clone runs on ALL machines (Obsidian browsing, AGENTS.md).
-  # idempotent: skips if ~/knowledge/.git already exists.
-  # entryAfter writeSshConfig ensures ~/.ssh/config is in place for git clone.
-  home.activation.ensureKnowledgeRepo = lib.hm.dag.entryAfter [ "writeSshConfig" ] ''
-    if [ ! -d "$HOME/knowledge/.git" ]; then
-      if $DRY_RUN_CMD git clone git@github.com:MrQiangQiang/knowledge.git "$HOME/knowledge"; then
-        :
-      else
-        echo "Warning: knowledge repo clone failed, run manually later:" >&2
-        echo "  git clone git@github.com:MrQiangQiang/knowledge.git ~/knowledge" >&2
-      fi
-    fi
-  '';
+  config = lib.mkMerge [
+    {
+      # knowledge repo clone runs on ALL machines (Obsidian browsing, AGENTS.md).
+      # idempotent: skips if ~/knowledge/.git already exists.
+      # entryAfter writeSshConfig ensures ~/.ssh/config is in place for git clone.
+      home.activation.ensureKnowledgeRepo = lib.hm.dag.entryAfter [ "writeSshConfig" ] ''
+        if [ ! -d "$HOME/knowledge/.git" ]; then
+          if $DRY_RUN_CMD git clone git@github.com:MrQiangQiang/knowledge.git "$HOME/knowledge"; then
+            :
+          else
+            echo "Warning: knowledge repo clone failed, run manually later:" >&2
+            echo "  git clone git@github.com:MrQiangQiang/knowledge.git ~/knowledge" >&2
+          fi
+        fi
+      '';
+    }
 
-  config = lib.mkIf cfg.enable {
-    home.packages = [ qmdFixed ];
+    (lib.mkIf cfg.enable {
+      home.packages = [ qmdFixed ];
 
-    # Declarative qmd config (read-only symlink to Nix store)
-    # Changes to collections/contexts must go through this file.
-    home.file.".config/qmd/index.yml".text = ''
-      # QMD collections configuration (managed by NixOS)
-      global_context: "Personal knowledge base — raw sources and AI-generated wiki"
+      # Declarative qmd config (read-only symlink to Nix store)
+      # Changes to collections/contexts must go through this file.
+      home.file.".config/qmd/index.yml".text = ''
+        # QMD collections configuration (managed by NixOS)
+        global_context: "Personal knowledge base — raw sources and AI-generated wiki"
 
-      collections:
-        knowledge:
-          path: ${knowledgeDir}
-          pattern: "**/*.md"
-          context:
-            "/raw/articles": "Source articles (blog posts, web clippings)"
-            "/raw/papers": "Academic papers and research documents"
-            "/raw/notes": "Personal notes and meeting transcripts"
-            "/raw/transcripts": "Audio/video transcripts"
-            "/wiki": "AI-generated wiki pages (summaries, concepts, indexes)"
-            "/": "Knowledge base root"
-    '';
+        collections:
+          knowledge:
+            path: ${knowledgeDir}
+            pattern: "**/*.md"
+            context:
+              "/raw/articles": "Source articles (blog posts, web clippings)"
+              "/raw/papers": "Academic papers and research documents"
+              "/raw/notes": "Personal notes and meeting transcripts"
+              "/raw/transcripts": "Audio/video transcripts"
+              "/wiki": "AI-generated wiki pages (summaries, concepts, indexes)"
+              "/": "Knowledge base root"
+      '';
 
-    # Knowledge directory structure (writable, created on activation)
-    # Layout follows Karpathy LLM Wiki pattern: raw/ (immutable) + wiki/ (AI-generated)
-    home.activation.qmdKnowledgeDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD mkdir -p \
-        ${knowledgeDir}/raw/articles \
-        ${knowledgeDir}/raw/papers \
-        ${knowledgeDir}/raw/notes \
-        ${knowledgeDir}/raw/transcripts \
-        ${knowledgeDir}/raw/assets \
-        ${knowledgeDir}/wiki
-    '';
+      # Knowledge directory structure (writable, created on activation)
+      # Layout follows Karpathy LLM Wiki pattern: raw/ (immutable) + wiki/ (AI-generated)
+      home.activation.qmdKnowledgeDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        $DRY_RUN_CMD mkdir -p \
+          ${knowledgeDir}/raw/articles \
+          ${knowledgeDir}/raw/papers \
+          ${knowledgeDir}/raw/notes \
+          ${knowledgeDir}/raw/transcripts \
+          ${knowledgeDir}/raw/assets \
+          ${knowledgeDir}/wiki
+      '';
 
-    # MCP HTTP server (foreground, managed by systemd)
-    # Endpoint: http://localhost:8181/mcp
-    # Models stay loaded in VRAM across requests (5 min idle timeout)
-    # QMD_FORCE_CPU=1: skip GPU probe (node-llama-cpp prebuilt lacks GPU support
-    # in NixOS; probe triggers NoBinaryFoundError)
-    systemd.user.services.qmd-mcp = {
-      Unit = {
-        Description = "QMD MCP HTTP server (localhost:8181)";
+      # MCP HTTP server (foreground, managed by systemd)
+      # Endpoint: http://localhost:8181/mcp
+      # Models stay loaded in VRAM across requests (5 min idle timeout)
+      # QMD_FORCE_CPU=1: skip GPU probe (node-llama-cpp prebuilt lacks GPU support
+      # in NixOS; probe triggers NoBinaryFoundError)
+      systemd.user.services.qmd-mcp = {
+        Unit = {
+          Description = "QMD MCP HTTP server (localhost:8181)";
+        };
+        Service = {
+          ExecStart = "${qmdBin} mcp --http --port 8181";
+          Environment = [
+            "QMD_EMBED_MODEL=${embedModel}"
+            "QMD_FORCE_CPU=1"
+          ];
+          Restart = "on-failure";
+          RestartSec = 10;
+        };
+        Install = {
+          WantedBy = [ "default.target" ];
+        };
       };
-      Service = {
-        ExecStart = "${qmdBin} mcp --http --port 8181";
-        Environment = [
-          "QMD_EMBED_MODEL=${embedModel}"
-          "QMD_FORCE_CPU=1"
-        ];
-        Restart = "on-failure";
-        RestartSec = 10;
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
 
-    # Index refresh (incremental, every 5 min)
-    # qmd update: rebuild keyword index (fast)
-    # qmd embed: rebuild embedding index (incremental, only new/changed docs)
-    systemd.user.services.qmd-refresh = {
-      Unit = {
-        Description = "QMD index refresh (incremental)";
+      # Index refresh (incremental, every 5 min)
+      # qmd update: rebuild keyword index (fast)
+      # qmd embed: rebuild embedding index (incremental, only new/changed docs)
+      systemd.user.services.qmd-refresh = {
+        Unit = {
+          Description = "QMD index refresh (incremental)";
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.bash}/bin/bash -lc '${qmdBin} update && ${qmdBin} embed'";
+          Environment = [
+            "QMD_EMBED_MODEL=${embedModel}"
+            "QMD_FORCE_CPU=1"
+          ];
+        };
       };
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.bash}/bin/bash -lc '${qmdBin} update && ${qmdBin} embed'";
-        Environment = [
-          "QMD_EMBED_MODEL=${embedModel}"
-          "QMD_FORCE_CPU=1"
-        ];
+      systemd.user.timers.qmd-refresh = {
+        Timer = {
+          OnBootSec = "5min";
+          OnUnitActiveSec = "5min";
+          Persistent = true;
+        };
+        Install = {
+          WantedBy = [ "timers.target" ];
+        };
       };
-    };
-    systemd.user.timers.qmd-refresh = {
-      Timer = {
-        OnBootSec = "5min";
-        OnUnitActiveSec = "5min";
-        Persistent = true;
-      };
-      Install = {
-        WantedBy = [ "timers.target" ];
-      };
-    };
-  };
+    })
+  ];
 }
