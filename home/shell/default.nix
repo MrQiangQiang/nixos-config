@@ -83,6 +83,9 @@ in
     chenzhiqiang0125@gmail.com ${lib.concatStringsSep "\n  chenzhiqiang0125@gmail.com " allSigningKeys}
   '';
 
+  # 确保 SSH_AUTH_SOCK 在所有终端中可用（包括 IDE 集成终端）
+  home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
+
   programs.vim = {
     enable = true;
     extraConfig = ''
