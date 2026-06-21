@@ -1,8 +1,13 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, osConfig, ... }:
 
 let
   keys = import ../../secrets/keys.nix;
-  signingSshPublicKey = keys.users.fugui;
+  # 每台主机用自己的 SSH 密钥签名（ssh-agent 只有本机密钥）
+  signingSshPublicKey =
+    if osConfig.networking.hostName == "desktop-1" then keys.users.fugui-desktop
+    else keys.users.fugui;
+  # allowed_signers 包含所有主机密钥（验证签名时需要）
+  allSigningKeys = builtins.attrValues keys.users;
 in
 {
   imports = [
@@ -76,7 +81,7 @@ in
   };
 
   home.file.".ssh/allowed_signers".text = ''
-    chenzhiqiang0125@gmail.com ${signingSshPublicKey}
+    chenzhiqiang0125@gmail.com ${lib.concatStringsSep "\n  chenzhiqiang0125@gmail.com " allSigningKeys}
   '';
 
   programs.vim = {
