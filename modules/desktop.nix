@@ -21,7 +21,10 @@ in
       description = "The river package to use";
     };
     dark_variant = lib.mkOption {
-      type = lib.types.enum [ "main" "moon" ];
+      type = lib.types.enum [
+        "main"
+        "moon"
+      ];
       default = "main";
       description = "Rose Pine dark variant: main (standard) or moon (deeper, higher contrast)";
     };
@@ -59,8 +62,22 @@ in
     #   8=muted 9-15=bright variants
     # Boot default is dark; fish interactiveShellInit overrides per darkman mode.
     console.colors = with tty; [
-      overlay love foam gold pine iris rose text
-      muted bright_love bright_foam bright_gold bright_pine bright_iris bright_rose bright_text
+      overlay
+      love
+      foam
+      gold
+      pine
+      iris
+      rose
+      text
+      muted
+      bright_love
+      bright_foam
+      bright_gold
+      bright_pine
+      bright_iris
+      bright_rose
+      bright_text
     ];
 
     # River broadcasts org_kde_kwin_server_decoration protocol (via patch),
@@ -77,15 +94,22 @@ in
     programs.dconf.enable = true;
     services.displayManager.sessionPackages = [ cfg.package ];
     security.polkit.enable = true;
-    security.pam.services.waylock = {};
+    security.pam.services.waylock = { };
     xdg.portal = {
       enable = true;
       wlr.enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.darkman ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.darkman
+      ];
       config.river = {
         "org.freedesktop.impl.portal.Settings" = [ "darkman" ];
         "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-        "default" = [ "darkman" "gtk" "wlr" ];
+        "default" = [
+          "darkman"
+          "gtk"
+          "wlr"
+        ];
       };
     };
   };

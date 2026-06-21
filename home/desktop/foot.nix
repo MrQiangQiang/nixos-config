@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -9,14 +16,14 @@ let
     foreground = c.text;
     background = c.base;
     # regular colors — strictly match official rose-pine/foot
-    regular0 = c.overlay;   # black (Overlay)
-    regular1 = c.love;      # red (Love)
-    regular2 = c.foam;      # green (Foam)
-    regular3 = c.gold;      # yellow (Gold)
-    regular4 = c.pine;      # blue (Pine)
-    regular5 = c.iris;      # magenta (Iris)
-    regular6 = c.rose;      # cyan (Rose)
-    regular7 = c.text;      # white (Text)
+    regular0 = c.overlay; # black (Overlay)
+    regular1 = c.love; # red (Love)
+    regular2 = c.foam; # green (Foam)
+    regular3 = c.gold; # yellow (Gold)
+    regular4 = c.pine; # blue (Pine)
+    regular5 = c.iris; # magenta (Iris)
+    regular6 = c.rose; # cyan (Rose)
+    regular7 = c.text; # white (Text)
     # bright colors — official lighter variants
     bright0 = c.bright_overlay;
     bright1 = c.bright_love;
@@ -39,13 +46,16 @@ let
     colors-light = mkFootColors l;
   };
 
-  footDarkIni = pkgs.writeText "foot-dark.ini" (
-    lib.generators.toINI {} footSettings
-  );
+  footDarkIni = pkgs.writeText "foot-dark.ini" (lib.generators.toINI { } footSettings);
   footLightIni = pkgs.writeText "foot-light.ini" (
-    lib.generators.toINI {} (footSettings // {
-      main = footSettings.main // { initial-color-theme = "light"; };
-    })
+    lib.generators.toINI { } (
+      footSettings
+      // {
+        main = footSettings.main // {
+          initial-color-theme = "light";
+        };
+      }
+    )
   );
 in
 lib.mkIf isDesktopEnabled {

@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -32,8 +39,15 @@ lib.mkIf isDesktopEnabled {
   services.swayidle = {
     enable = true;
     timeouts = [
-      { timeout = 300; command = "${waylock-theme}/bin/waylock-theme"; }
-      { timeout = 600; command = "${pkgs.wlopm}/bin/wlopm --off '*'"; resumeCommand = "${pkgs.wlopm}/bin/wlopm --on '*'"; }
+      {
+        timeout = 300;
+        command = "${waylock-theme}/bin/waylock-theme";
+      }
+      {
+        timeout = 600;
+        command = "${pkgs.wlopm}/bin/wlopm --off '*'";
+        resumeCommand = "${pkgs.wlopm}/bin/wlopm --on '*'";
+      }
     ];
     events = {
       "before-sleep" = "${waylock-theme}/bin/waylock-theme";

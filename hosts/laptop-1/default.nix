@@ -1,6 +1,10 @@
-{ config, lib, pkgs, ... }: let
-  keys = import ../../secrets/keys.nix;
-in {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
   imports = [
     ../../modules/desktop.nix
     ../../modules/proxy.nix
@@ -37,8 +41,8 @@ in {
   ];
 
   hardware.graphics.extraPackages = with pkgs; [
-      intel-media-driver
-      intel-vaapi-driver
+    intel-media-driver
+    intel-vaapi-driver
   ];
 
   # ── Desktop ───────────────────────────────────────────────
@@ -48,23 +52,5 @@ in {
 
   # ── User ──────────────────────────────────────────────────
 
-  users.users.fugui = {
-    isNormalUser = true;
-    linger = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    openssh.authorizedKeys.keys = [
-      keys.users.fugui-github
-      keys.users.fugui
-      keys.users.fugui-desktop
-    ];
-  };
-
-  home-manager.users.fugui = {
-    imports = [ ../../home ];
-  };
-
-  home-manager.backupFileExtension = "hm-bak";
+  # 共享 home-manager 配置见 lib/mkHost.nix
 }

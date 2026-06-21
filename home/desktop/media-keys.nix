@@ -1,8 +1,14 @@
-{ config, lib, pkgs, osConfig, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
-  wobSock = ''$XDG_RUNTIME_DIR/wob.sock'';
+  wobSock = "$XDG_RUNTIME_DIR/wob.sock";
 
   getVolume = ''
     vol=$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)

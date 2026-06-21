@@ -1,33 +1,46 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
 
-  mkWobConfig = colors: let
-    c = colors;
-  in {
-    "" = {
-      timeout = 1000;
-      anchor = "top right";
-      margin = 10;
-      border_offset = 5;
-      border_size = 2;
-      bar_padding = 5;
-      background_color = "${c.base}ff";
-      bar_color = "${c.pine}ff";
-      border_color = "${c.highlight_high}ff";
+  mkWobConfig =
+    colors:
+    let
+      c = colors;
+    in
+    {
+      "" = {
+        timeout = 1000;
+        anchor = "top right";
+        margin = 10;
+        border_offset = 5;
+        border_size = 2;
+        bar_padding = 5;
+        background_color = "${c.base}ff";
+        bar_color = "${c.pine}ff";
+        border_color = "${c.highlight_high}ff";
+      };
+      "style.muted" = {
+        background_color = "${c.base}ff";
+        bar_color = "${c.love}ff";
+        border_color = "${c.highlight_high}ff";
+      };
     };
-    "style.muted" = {
-      background_color = "${c.base}ff";
-      bar_color = "${c.love}ff";
-      border_color = "${c.highlight_high}ff";
-    };
-  };
 
   wobSock = "$XDG_RUNTIME_DIR/wob.sock";
 in
 lib.mkIf isDesktopEnabled {
-  home.packages = [ pkgs.brightnessctl pkgs.wob ];
+  home.packages = [
+    pkgs.brightnessctl
+    pkgs.wob
+  ];
 
   # Custom systemd service using exec 3<> to keep FIFO write end open.
   # This avoids the POLLHUP busy loop caused by systemd socket activation,
@@ -66,14 +79,12 @@ lib.mkIf isDesktopEnabled {
   };
 
   xdg.configFile."theme/wob-config-dark.ini" = {
-    source = pkgs.writeText "wob-config-dark.ini" (
-      lib.generators.toINI {} (mkWobConfig palette.dark)
-    );
+    source = pkgs.writeText "wob-config-dark.ini" (lib.generators.toINI { } (mkWobConfig palette.dark));
   };
 
   xdg.configFile."theme/wob-config-light.ini" = {
     source = pkgs.writeText "wob-config-light.ini" (
-      lib.generators.toINI {} (mkWobConfig palette.dawn)
+      lib.generators.toINI { } (mkWobConfig palette.dawn)
     );
   };
 }

@@ -75,16 +75,16 @@ in
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
-    user = "ollama";  # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
+    user = "ollama"; # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
     group = "ollama";
-    host = "0.0.0.0";  # 靠防火墙收口到 tailscale0
-    loadModels = [ "qwen3.6:27b-q4_K_M" ];  # 显式锁定量化（NixOS 可复现性）
-    syncModels = true;  # 强制声明==实际，移除未声明模型
+    host = "0.0.0.0"; # 靠防火墙收口到 tailscale0
+    loadModels = [ "qwen3.6:27b-q4_K_M" ]; # 显式锁定量化（NixOS 可复现性）
+    syncModels = true; # 强制声明==实际，移除未声明模型
     environmentVariables = {
       OLLAMA_FLASH_ATTENTION = "1";
       OLLAMA_MAX_LOADED_MODELS = "1";
       CUDA_VISIBLE_DEVICES = "0";
-      OLLAMA_ORIGINS = "*";  # tailnet 内可信
+      OLLAMA_ORIGINS = "*"; # tailnet 内可信
     };
   };
 
@@ -97,34 +97,20 @@ in
 
   # ── User ───────────────────────────────────────────────────
 
-  users.users.fugui = {
-    isNormalUser = true;
-    homeMode = "750";
-    linger = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    openssh.authorizedKeys.keys = [
-      keys.users.fugui-github
-      keys.users.fugui
-      keys.users.fugui-desktop
-    ];
-  };
+  # homeMode 比 laptop 更严格(共享基础配置见 modules/users.nix)
+  users.users.fugui.homeMode = "750";
 
-  home-manager.users.fugui = {
-    imports = [ ../../home ];
-    custom.qmd.enable = true;
-  };
-
-  home-manager.backupFileExtension = "hm-bak";
+  # QMD 仅 desktop 启用(共享 home-manager 配置见 lib/mkHost.nix)
+  home-manager.users.fugui.custom.qmd.enable = true;
 
   # ── Remote deploy ──────────────────────────────────────────
-
-  security.sudo = {
-    wheelNeedsPassword = false;
-    execWheelOnly = true;
-  };
+  # 通过 root SSH 密钥登录实现远程部署(nixos-rebuild --target-host root@desktop-1),
+  # 替代旧的 wheelNeedsPassword=false(全 wheel 组免密 sudo = 完整 root 后门)。
+  # 仅允许密钥登录(ProhibitRootLogin),部署密钥来自 laptop-1 的 fugui 用户。
+  services.openssh.settings.PermitRootLogin = "prohibit-password";
+  users.users.root.openssh.authorizedKeys.keys = [
+    keys.users.fugui
+  ];
 
   # ── Filesystem ─────────────────────────────────────────────
 

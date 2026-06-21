@@ -14,7 +14,12 @@
 # To add a new repo:
 #   1. Append an entry to `repos` below
 #   2. nixos-rebuild switch — auto-cloned on next activation
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   home = config.home.homeDirectory;
@@ -35,19 +40,18 @@ let
   ];
 in
 {
-  home.activation.clonePersonalRepos =
-    lib.hm.dag.entryAfter [ "writeSshConfig" ] (
-      builtins.concatStringsSep "\n" (
-        map (repo: ''
-          if [ ! -d '${repo.path}/.git' ]; then
-            if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone '${repo.url}' '${repo.path}'; then
-              :
-            else
-              echo "Warning: ${repo.name} clone failed, run manually:" >&2
-              echo "  git clone ${repo.url} ${repo.path}" >&2
-            fi
+  home.activation.clonePersonalRepos = lib.hm.dag.entryAfter [ "writeSshConfig" ] (
+    builtins.concatStringsSep "\n" (
+      map (repo: ''
+        if [ ! -d '${repo.path}/.git' ]; then
+          if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone '${repo.url}' '${repo.path}'; then
+            :
+          else
+            echo "Warning: ${repo.name} clone failed, run manually:" >&2
+            echo "  git clone ${repo.url} ${repo.path}" >&2
           fi
-        '') repos
-      )
-    );
+        fi
+      '') repos
+    )
+  );
 }

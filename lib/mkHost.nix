@@ -11,7 +11,6 @@ let
   lib = inputs.nixpkgs.lib;
 in
 lib.nixosSystem {
-  inherit system;
   specialArgs = { inherit inputs; };
   modules = [
     ../modules/locale.nix
@@ -21,6 +20,7 @@ lib.nixosSystem {
     ../modules/opencode.nix
     ../modules/system.nix
     ../modules/ssh.nix
+    ../modules/users.nix
     ../modules/analysis.nix
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
@@ -30,9 +30,9 @@ lib.nixosSystem {
         inputs.nix-vscode-extensions.overlays.default
       ];
       nixpkgs.config.allowUnfree = true;
+      nixpkgs.hostPlatform = system;
 
       networking.hostName = hostName;
-      networking.nameservers = lib.mkDefault [ "223.5.5.5" "119.29.29.29" ];
       networking.networkmanager.enable = lib.mkDefault true;
       networking.firewall.enable = lib.mkDefault true;
 
@@ -48,7 +48,10 @@ lib.nixosSystem {
       boot.loader = {
         systemd-boot = {
           enable = lib.mkDefault true;
-          editor = true;
+          # 允许在启动时编辑内核参数(可获 root)。
+          # 个人桌面可接受(物理访问=root,FDE 才是正确缓解);
+          # 服务器应覆盖为 false。
+          editor = lib.mkDefault true;
           configurationLimit = 10;
         };
         efi.canTouchEfiVariables = lib.mkDefault true;
@@ -56,7 +59,10 @@ lib.nixosSystem {
       };
 
       nix.settings = {
-        experimental-features = [ "nix-command" "flakes" ];
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
         trusted-users = [
           "root"
           "@wheel"
@@ -69,13 +75,21 @@ lib.nixosSystem {
         ];
       };
 
+      # Flakes 时代禁用传统 channel,避免双来源(唯一来源原则)
+      nix.channel.enable = false;
+
       users.users = users;
 
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = { inherit inputs; };
+        backupFileExtension = "hm-bak";
+        users.fugui = {
+          imports = [ ../home ];
+        };
       };
     }
-  ] ++ extraModules;
+  ]
+  ++ extraModules;
 }

@@ -9,7 +9,12 @@
 #
 # No daemon, no type system, no cloud dependency.
 # One file = one secret. Filename = description.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   keys = import ../../secrets/keys.nix;

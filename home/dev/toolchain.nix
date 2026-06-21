@@ -38,8 +38,16 @@
     # Quick one-off experiments: mise use (project) / mise exec (one-shot)
     globalConfig = {
       tools = {
-        node = { version = "24"; corepack = true; };
-        python = [ "3.11" "3.12" "3.13" "3.14" ];
+        node = {
+          version = "24";
+          corepack = true;
+        };
+        python = [
+          "3.11"
+          "3.12"
+          "3.13"
+          "3.14"
+        ];
         go = "1.24";
         zig = "0.14";
         rust = "stable";
@@ -49,8 +57,8 @@
 
       # Security policy + compile settings + Python venv auto-activation
       settings = {
-        node.compile = false;        # Use prebuilt binaries (source build needs python/cc)
-        python.compile = false;      # Use prebuilt binaries (source build needs cc)
+        node.compile = false; # Use prebuilt binaries (source build needs python/cc)
+        python.compile = false; # Use prebuilt binaries (source build needs cc)
         lockfile = true;
         minimum_release_age = "5d";
         python.uv_venv_auto = "source";

@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   programs.ssh = {
     startAgent = true;
@@ -21,12 +26,16 @@
   services.openssh = {
     enable = true;
     listenAddresses = [
-      { addr = "0.0.0.0"; port = 22; }
+      {
+        addr = "0.0.0.0";
+        port = 22;
+      }
     ];
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      PermitRootLogin = "no";
+      # mkDefault 允许需要远程部署的主机覆盖为 "prohibit-password"(仅密钥登录)
+      PermitRootLogin = lib.mkDefault "no";
     };
   };
 }

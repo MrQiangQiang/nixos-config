@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -13,13 +20,16 @@ let
   # right-click menu). Our Wayland + KWM environment has no system tray, so
   # XCBMenu is never triggered (waylandui.cpp has zero menu code). Even if
   # triggered, fcitx5 falls back to solid-color rectangles (theme.cpp:327).
-  mkFcitx5ThemeDerivation = variantName: colors:
-    pkgs.runCommand "fcitx5-theme-${variantName}" {
-      themeConf = pkgs.writeText "theme.conf" (mkFcitx5Theme colors);
-    } ''
-      mkdir $out
-      cp $themeConf $out/theme.conf
-    '';
+  mkFcitx5ThemeDerivation =
+    variantName: colors:
+    pkgs.runCommand "fcitx5-theme-${variantName}"
+      {
+        themeConf = pkgs.writeText "theme.conf" (mkFcitx5Theme colors);
+      }
+      ''
+        mkdir $out
+        cp $themeConf $out/theme.conf
+      '';
 
   mkFcitx5Theme = colors: ''
     # vim: ft=dosini

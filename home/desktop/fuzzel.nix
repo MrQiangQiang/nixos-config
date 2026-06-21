@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -30,14 +37,10 @@ lib.mkIf isDesktopEnabled {
   home.packages = [ pkgs.fuzzel ];
 
   xdg.configFile."theme/fuzzel-config-dark.ini" = {
-    source = pkgs.writeText "fuzzel-config-dark.ini" (
-      lib.generators.toINI {} (mkFuzzelConfig d)
-    );
+    source = pkgs.writeText "fuzzel-config-dark.ini" (lib.generators.toINI { } (mkFuzzelConfig d));
   };
 
   xdg.configFile."theme/fuzzel-config-light.ini" = {
-    source = pkgs.writeText "fuzzel-config-light.ini" (
-      lib.generators.toINI {} (mkFuzzelConfig l)
-    );
+    source = pkgs.writeText "fuzzel-config-light.ini" (lib.generators.toINI { } (mkFuzzelConfig l));
   };
 }

@@ -16,7 +16,14 @@
 #
 # Icon colors integrated via [icon] section in flavor.toml template.
 # De-emphasized colors match official Rose Pine: highlight_low for dim icons, overlay for dll.
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -24,33 +31,72 @@ let
   # flavor.toml uses: base surface overlay muted subtle text love gold rose pine foam iris highlight_low highlight_high
   # tmtheme.xml uses: name base surface highlight_low highlight_med highlight_high subtle text gold pine foam rose iris love
   mkFlavorVars = c: {
-    inherit (c) base surface overlay muted subtle text love gold rose pine foam iris
-      highlight_low highlight_high;
+    inherit (c)
+      base
+      surface
+      overlay
+      muted
+      subtle
+      text
+      love
+      gold
+      rose
+      pine
+      foam
+      iris
+      highlight_low
+      highlight_high
+      ;
   };
 
-  mkTmThemeVars = c: extra:
+  mkTmThemeVars =
+    c: extra:
     {
-      inherit (c) base surface highlight_low highlight_med highlight_high subtle
-        text gold pine foam rose iris love;
-    } // extra;
+      inherit (c)
+        base
+        surface
+        highlight_low
+        highlight_med
+        highlight_high
+        subtle
+        text
+        gold
+        pine
+        foam
+        rose
+        iris
+        love
+        ;
+    }
+    // extra;
 
   darkFlavor = pkgs.replaceVars ./filemanager/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dark);
   dawnFlavor = pkgs.replaceVars ./filemanager/rose-pine-yazi-flavor.toml (mkFlavorVars palette.dawn);
-  darkTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dark {
-    name = if palette.dark_variant == "moon" then "Rosé Pine Moon" else "Rosé Pine";
-    semantic_class = if palette.dark_variant == "moon" then "theme.dark.rosé-pine-moon" else "theme.dark.rosé-pine";
-    uuid = if palette.dark_variant == "moon" then "CC28B8FB-96BA-43EB-B71F-5AA3D3EBB0BB" else "14991673-80EB-41A2-BEFF-03216A233730";
-  });
-  dawnTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (mkTmThemeVars palette.dawn {
-    name = "Rosé Pine Dawn";
-    semantic_class = "theme.light.rosé-pine-dawn";
-    uuid = "BB4B4616-E742-41D5-BB5B-63D45FA614F";
-  });
+  darkTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (
+    mkTmThemeVars palette.dark {
+      name = if palette.dark_variant == "moon" then "Rosé Pine Moon" else "Rosé Pine";
+      semantic_class =
+        if palette.dark_variant == "moon" then "theme.dark.rosé-pine-moon" else "theme.dark.rosé-pine";
+      uuid =
+        if palette.dark_variant == "moon" then
+          "CC28B8FB-96BA-43EB-B71F-5AA3D3EBB0BB"
+        else
+          "14991673-80EB-41A2-BEFF-03216A233730";
+    }
+  );
+  dawnTmTheme = pkgs.replaceVars ./filemanager/rose-pine-yazi-tmtheme.xml (
+    mkTmThemeVars palette.dawn {
+      name = "Rosé Pine Dawn";
+      semantic_class = "theme.light.rosé-pine-dawn";
+      uuid = "BB4B4616-E742-41D5-BB5B-63D45FA614F";
+    }
+  );
 
   # Build flavor as a derivation with real files (not nix store symlinks).
   # Each flavor directory contains flavor.toml + tmtheme.xml.
-  mkFlavorPkg = name: flavor: tmtheme:
-    pkgs.runCommand "yazi-flavor-${name}" {} ''
+  mkFlavorPkg =
+    name: flavor: tmtheme:
+    pkgs.runCommand "yazi-flavor-${name}" { } ''
       mkdir $out
       cp ${flavor} $out/flavor.toml
       cp ${tmtheme} $out/tmtheme.xml
@@ -70,13 +116,21 @@ lib.mkIf isDesktopEnabled {
         sort_dir_first = true;
         show_hidden = true;
         show_symlink = false;
-        ratio = [ 1 3 4 ];
+        ratio = [
+          1
+          3
+          4
+        ];
         linemode = "size_and_mtime";
         scrolloff = 5;
       };
       opener = {
         pdf = [
-          { run = ''zathura "$1"''; orphan = true; desc = "zathura"; }
+          {
+            run = ''zathura "$1"'';
+            orphan = true;
+            desc = "zathura";
+          }
         ];
       };
     };

@@ -20,9 +20,12 @@
     enable32Bit = true;
   };
 
+  # nix-ld — 为未打包的预编译二进制提供 FHS 兼容的动态链接器。
+  # libraries 不能为空,否则 nix-ld 虽启用但无任何库可用。
+  # stdenv.cc.cc.lib 提供 libstdc++.so(预编译二进制最常见依赖)。
   programs.nix-ld = {
     enable = true;
-    libraries = [ ];
+    libraries = [ pkgs.stdenv.cc.cc.lib ];
   };
 
   networking.getaddrinfo.precedence = {

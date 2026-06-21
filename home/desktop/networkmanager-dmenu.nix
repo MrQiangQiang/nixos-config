@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -43,13 +50,13 @@ lib.mkIf isDesktopEnabled {
 
   xdg.configFile."theme/networkmanager-dmenu-config-dark.ini" = {
     source = pkgs.writeText "networkmanager-dmenu-config-dark.ini" (
-      lib.generators.toINI {} (mkNmdmConfig d)
+      lib.generators.toINI { } (mkNmdmConfig d)
     );
   };
 
   xdg.configFile."theme/networkmanager-dmenu-config-light.ini" = {
     source = pkgs.writeText "networkmanager-dmenu-config-light.ini" (
-      lib.generators.toINI {} (mkNmdmConfig l)
+      lib.generators.toINI { } (mkNmdmConfig l)
     );
   };
 }
