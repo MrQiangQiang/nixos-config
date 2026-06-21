@@ -19,6 +19,7 @@
 let
   home = config.home.homeDirectory;
   git = "${pkgs.git}/bin/git";
+  ssh = "${pkgs.openssh}/bin/ssh";
 
   repos = [
     {
@@ -39,7 +40,7 @@ in
       builtins.concatStringsSep "\n" (
         map (repo: ''
           if [ ! -d '${repo.path}/.git' ]; then
-            if $DRY_RUN_CMD ${git} clone '${repo.url}' '${repo.path}'; then
+            if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone '${repo.url}' '${repo.path}'; then
               :
             else
               echo "Warning: ${repo.name} clone failed, run manually:" >&2

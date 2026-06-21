@@ -50,6 +50,7 @@ in {
 
   users.users.fugui = {
     isNormalUser = true;
+    linger = true;
     extraGroups = [
       "wheel"
       "networkmanager"
