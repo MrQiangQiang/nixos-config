@@ -1,11 +1,11 @@
 { pkgs, lib, vscodeDarkTheme ? "Rosé Pine", vscodeLightTheme ? "Rosé Pine Dawn", ... }:
 let
   pname = "trae-cn";
-  version = "2.3.38425";
+  version = "2.3.44175";
 
   src = pkgs.fetchurl {
     url = "https://lf-cdn.trae.com.cn/obj/trae-com-cn/pkg/app/releases/stable/${version}/linux/Trae_CN-linux-x64.tar.gz";
-    hash = "sha256-2Upp9g8FaAkK4nI4X1nh5WO00vTz2fyblcUPot2Yk10=";
+    hash = "sha256-v5AujpaKp7AQqyBJHlozeULKF8+/TbckWwcPUkeJSHU=";
   };
 
   runtimeLibs = with pkgs; [
