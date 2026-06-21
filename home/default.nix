@@ -9,6 +9,7 @@ in
     ./agents
     ./desktop
     ./dev
+    ./repos.nix
     ./shell
   ];
 

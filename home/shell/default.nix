@@ -12,7 +12,6 @@ in
     ./bat.nix
     ./helix.nix
     ./passage.nix
-    ./repos.nix
   ];
 
   systemd.user.services.ssh-add-key = {
