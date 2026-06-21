@@ -3,11 +3,10 @@
 let
   keys = import ../../secrets/keys.nix;
   # 每台主机用自己的 SSH 密钥签名（ssh-agent 只有本机密钥）
-  signingSshPublicKey =
-    if osConfig.networking.hostName == "desktop-1" then keys.users.fugui-desktop
-    else keys.users.fugui;
+  # 加新主机时在 keys.nix 的 signingKeys 添加映射即可
+  signingSshPublicKey = keys.signingKeys.${osConfig.networking.hostName};
   # allowed_signers 包含所有主机密钥（验证签名时需要）
-  allSigningKeys = builtins.attrValues keys.users;
+  allSigningKeys = builtins.attrValues keys.signingKeys;
 in
 {
   imports = [
