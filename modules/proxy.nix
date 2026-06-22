@@ -148,7 +148,9 @@ in
     serviceConfig = {
       RuntimeDirectory = "mihomo";
       ExecStartPre = [ mihomoPrestart ];
-      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f $RUNTIME_DIRECTORY/config.yaml -ext-ui ${config.services.mihomo.webui}";
+      # systemd 260 ExecStart 中 $VAR(无花括号)不展开,只有 ${VAR} 展开。
+      # 用 $RUNTIME_DIRECTORY 会导致 -f 参数为空,mihomo 将 -ext-ui 误认为配置路径。
+      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f \${RUNTIME_DIRECTORY}/config.yaml -ext-ui ${config.services.mihomo.webui}";
       LoadCredential = lib.mkForce [ "proxy-url:${config.age.secrets.proxy-subscription-url.path}" ];
       AmbientCapabilities = lib.mkForce [ "CAP_NET_ADMIN" ];
       CapabilityBoundingSet = lib.mkForce [ "CAP_NET_ADMIN" ];
