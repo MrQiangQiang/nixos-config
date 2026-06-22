@@ -32,5 +32,7 @@
 ## Remote deploy
 
 ```
-nixos-rebuild switch --flake .#desktop-1 --target-host fugui@desktop-1.tail0f7af0.ts.net
+nixos-rebuild switch --flake .#desktop-1 --target-host root@desktop-1.tail0f7af0.ts.net
 ```
+
+Root SSH key deploy (`PermitRootLogin = "prohibit-password"`). Replaces `wheelNeedsPassword = false` (root backdoor).
