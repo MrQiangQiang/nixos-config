@@ -81,10 +81,13 @@ in
     loadModels = [ "qwen3.6:27b-q4_K_M" ]; # 显式锁定量化（NixOS 可复现性）
     syncModels = true; # 强制声明==实际，移除未声明模型
     environmentVariables = {
-      OLLAMA_FLASH_ATTENTION = "1";
+      OLLAMA_FLASH_ATTENTION = "1"; # KV 量化的前置条件
       OLLAMA_MAX_LOADED_MODELS = "1";
       CUDA_VISIBLE_DEVICES = "0";
       OLLAMA_ORIGINS = "*"; # tailnet 内可信
+      OLLAMA_CONTEXT_LENGTH = "262144"; # 256K,Qwen3.6 原生上限
+      OLLAMA_KV_CACHE_TYPE = "q8_0"; # 8-bit KV,官方推荐近无损(PPL +0.0000)
+      OLLAMA_KEEP_ALIVE = "30m"; # 避免反复加载
     };
   };
 
