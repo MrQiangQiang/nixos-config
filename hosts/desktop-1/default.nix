@@ -17,6 +17,7 @@ in
     ../../modules/im.nix
     ../../modules/tailscale.nix
     ../../modules/git-annex.nix
+    ../../modules/ollama.nix
     ./hardware-configuration.nix
   ];
 
@@ -72,23 +73,8 @@ in
   # iGPU OpenCL via Mesa rusticl (built-in, hardware.graphics.enable = true)
 
   # ── Ollama (本地 LLM 推理，CUDA) ──────────────────────────
-  services.ollama = {
-    enable = true;
-    package = pkgs.ollama-cuda;
-    user = "ollama";  # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
-    group = "ollama";
-    host = "0.0.0.0";  # 靠防火墙收口到 tailscale0
-    loadModels = [ "qwen3.6:27b-q4_K_M" ];  # 显式锁定量化（NixOS 可复现性）
-    syncModels = true;  # 强制声明==实际，移除未声明模型
-    environmentVariables = {
-      OLLAMA_FLASH_ATTENTION = "1";
-      OLLAMA_MAX_LOADED_MODELS = "1";
-      CUDA_VISIBLE_DEVICES = "0";
-      OLLAMA_ORIGINS = "*";  # tailnet 内可信
-    };
-  };
-
-  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 11434 ];
+  # 配置在 modules/ollama.nix，通过 options 参数化
+  custom.ollama.enable = true;
 
   # ── Desktop ────────────────────────────────────────────────
 

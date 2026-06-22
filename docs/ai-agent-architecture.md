@@ -70,11 +70,14 @@ desktop-1 是唯一模型推理节点 (Qwen3-Embedding + Reranker + query-expans
 ## 本地 LLM 推理
 
 ```
-desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M, 17GB VRAM)
+desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M, 256K context, 27.7GB VRAM)
            host=0.0.0.0 + firewall tailscale0:11434
            syncModels=true (nix 配置是模型清单唯一来源)
+           KEEP_ALIVE=-1 + ollama-prewarm.service (永久驻留 VRAM)
 laptop-1:  opencode → http://desktop-1.tail0f7af0.ts.net:11434/v1 (Tailscale)
 ```
+
+VRAM 分配策略详见 `docs/desktop-1/vram-allocation.md`
 
 ## 为什么用 Ollama 而非 llama.cpp 直接
 
@@ -84,7 +87,7 @@ laptop-1:  opencode → http://desktop-1.tail0f7af0.ts.net:11434/v1 (Tailscale)
 
 ## 为什么用 qwen3.6:27b-q4_K_M
 
-- 单卡 RTX 5090 32GB 最佳: 17GB 权重 + 6GB KV cache = 159K 上下文
+- 单卡 RTX 5090 32GB: 17GB 权重 + 10.7GB KV cache (q8_0) = 256K 上下文, 占 27.7GB VRAM
 - dense 27B > MoE 35B-A3B (编码场景, SWE-bench 68.9-72.5%)
 - 显式量化 tag: NixOS 可复现性, 不受 Ollama 默认变更影响
 

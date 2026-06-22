@@ -31,11 +31,15 @@ let
 
   # qmd wrapper with correct LD_LIBRARY_PATH.
   # Upstream qmd package's makeWrapper only sets sqlite in LD_LIBRARY_PATH,
-  # missing libstdc++ which is required by node-llama-cpp's prebuilt .node
-  # binaries (FHS-linked ELF). Without this, `qmd embed` fails with
-  # NoBinaryFoundError. We bypass the wrapper and call bun directly.
+  # missing libstdc++ (required by node-llama-cpp's prebuilt .node binaries)
+  # and CUDA libraries (required for GPU acceleration).
+  # - /run/opengl-driver/lib: libcuda.so, libnvidia-ml.so (NVIDIA driver)
+  # - cuda_cudart: libcudart.so.13 (CUDA 13 runtime, matches prebuilt binary)
+  # - libcublas.lib: libcublas.so.13 + libcublasLt.so.13 (CUDA 13 BLAS)
+  #   Note: libcublas has split outputs; libraries are in the .lib output.
+  #   Note: node-llama-cpp prebuilt CUDA binary requires CUDA 13 (not 12).
   qmdFixed = pkgs.writeShellScriptBin "qmd" ''
-    export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.sqlite.out}/lib"
+    export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.sqlite.out}/lib:/run/opengl-driver/lib:${pkgs.cudaPackages_13.cuda_cudart}/lib:${pkgs.cudaPackages_13.libcublas.lib}/lib"
     exec ${pkgs.bun}/bin/bun ${qmdPkg}/lib/qmd/src/cli/qmd.ts "$@"
   '';
   qmdBin = "${qmdFixed}/bin/qmd";
@@ -88,8 +92,8 @@ in
       # MCP HTTP server (foreground, managed by systemd)
       # Endpoint: http://localhost:8181/mcp
       # Models stay loaded in VRAM across requests (5 min idle timeout)
-      # QMD_FORCE_CPU=1: skip GPU probe (node-llama-cpp prebuilt lacks GPU support
-      # in NixOS; probe triggers NoBinaryFoundError)
+      # QMD_LLAMA_GPU=cuda: use CUDA GPU acceleration via node-llama-cpp prebuilt
+      # binary. Requires /run/opengl-driver/lib in LD_LIBRARY_PATH (set in wrapper).
       systemd.user.services.qmd-mcp = {
         Unit = {
           Description = "QMD MCP HTTP server (localhost:8181)";
@@ -98,7 +102,7 @@ in
           ExecStart = "${qmdBin} mcp --http --port 8181";
           Environment = [
             "QMD_EMBED_MODEL=${embedModel}"
-            "QMD_FORCE_CPU=1"
+            "QMD_LLAMA_GPU=cuda"
           ];
           Restart = "on-failure";
           RestartSec = 10;
@@ -120,7 +124,7 @@ in
           ExecStart = "${pkgs.bash}/bin/bash -lc '${qmdBin} update && ${qmdBin} embed'";
           Environment = [
             "QMD_EMBED_MODEL=${embedModel}"
-            "QMD_FORCE_CPU=1"
+            "QMD_LLAMA_GPU=cuda"
           ];
         };
       };
