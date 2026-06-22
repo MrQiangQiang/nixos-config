@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   mihomoConfigTemplate = pkgs.writeText "mihomo-config-template.yaml" ''
@@ -9,6 +14,10 @@ let
     ipv6: false
 
     external-controller: 127.0.0.1:9090
+    # mihomo RESTful API 认证 token。硬编码在 nix store 中(非真正密钥),
+    # 但 external-controller 仅绑定 127.0.0.1,无远程暴露面。
+    # 本地进程若能访问 localhost:9090 也能读 nix store,故此 token 仅防误访问。
+    # 真正的密钥(订阅 URL)已通过 agenix + LoadCredential 安全管理。
     secret: "local_only_secure_token_2026_auto_generated"
 
     sniffing:
@@ -105,11 +114,15 @@ let
       - MATCH,全自动最优节点
   '';
 
+  # 生成含真实订阅URL的配置文件到 $RUNTIME_DIRECTORY(/run/mihomo,root:root 700)。
+  # 旧实现写入 /tmp/mihomo-config.yaml(全局可读 644),任何本地用户可读取订阅URL,
+  # 完全抵消 agenix 密钥管理。RuntimeDirectory 由 systemd 自动创建并设置 700 权限。
   mihomoPrestart = pkgs.writeShellScript "mihomo-prestart" ''
     ${pkgs.gnused}/bin/sed "s|__PROXY_SUBSCRIPTION_URL__|$(cat $CREDENTIALS_DIRECTORY/proxy-url)|" \
-      ${mihomoConfigTemplate} > /tmp/mihomo-config.yaml
+      ${mihomoConfigTemplate} > "$RUNTIME_DIRECTORY/config.yaml"
   '';
-in {
+in
+{
   age.secrets.proxy-subscription-url = {
     file = ../secrets/proxy-subscription-url.age;
   };
@@ -126,12 +139,18 @@ in {
   };
 
   systemd.services.mihomo = {
-    after = [ "agenix.service" "time-sync.target" ];
+    after = [
+      "agenix.service"
+      "time-sync.target"
+    ];
     wants = [ "time-sync.target" ];
     restartTriggers = [ config.age.secrets.proxy-subscription-url.file ];
     serviceConfig = {
+      RuntimeDirectory = "mihomo";
       ExecStartPre = [ mihomoPrestart ];
-      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f /tmp/mihomo-config.yaml -ext-ui ${config.services.mihomo.webui}";
+      # systemd 260 ExecStart 中 $VAR(无花括号)不展开,只有 ${VAR} 展开。
+      # 用 $RUNTIME_DIRECTORY 会导致 -f 参数为空,mihomo 将 -ext-ui 误认为配置路径。
+      ExecStart = lib.mkForce "${pkgs.mihomo}/bin/mihomo -d /var/lib/private/mihomo -f \${RUNTIME_DIRECTORY}/config.yaml -ext-ui ${config.services.mihomo.webui}";
       LoadCredential = lib.mkForce [ "proxy-url:${config.age.secrets.proxy-subscription-url.path}" ];
       AmbientCapabilities = lib.mkForce [ "CAP_NET_ADMIN" ];
       CapabilityBoundingSet = lib.mkForce [ "CAP_NET_ADMIN" ];

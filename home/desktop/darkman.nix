@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -20,39 +27,74 @@ let
     fi
   '';
 
-  applyTheme = mode: let
-    isDark = mode == "dark";
-    theme = { dark ? null, light ? null }: "${cfgHome}/${if isDark then dark else light}";
-  in ''
-    ${link (theme { dark = "theme/kwm-config-dark.zon"; light = "theme/kwm-config-light.zon"; }) "${cfgHome}/kwm/config.zon"}
-    ${signal "SIGUSR1" "kwm"}
-    ${signal "SIGUSR1" "kwm-status"}
+  applyTheme =
+    mode:
+    let
+      isDark = mode == "dark";
+      theme =
+        {
+          dark ? null,
+          light ? null,
+        }:
+        "${cfgHome}/${if isDark then dark else light}";
+    in
+    ''
+      ${link (theme {
+        dark = "theme/kwm-config-dark.zon";
+        light = "theme/kwm-config-light.zon";
+      }) "${cfgHome}/kwm/config.zon"}
+      ${signal "SIGUSR1" "kwm"}
+      ${signal "SIGUSR1" "kwm-status"}
 
-    ${link (theme { dark = "theme/mako-config-dark"; light = "theme/mako-config-light"; }) "${cfgHome}/mako/config"}
-    ${pkgs.mako}/bin/makoctl reload 2>/dev/null || true
+      ${link (theme {
+        dark = "theme/mako-config-dark";
+        light = "theme/mako-config-light";
+      }) "${cfgHome}/mako/config"}
+      ${pkgs.mako}/bin/makoctl reload 2>/dev/null || true
 
-    ${link (theme { dark = "theme/fuzzel-config-dark.ini"; light = "theme/fuzzel-config-light.ini"; }) "${cfgHome}/fuzzel/fuzzel.ini"}
+      ${link (theme {
+        dark = "theme/fuzzel-config-dark.ini";
+        light = "theme/fuzzel-config-light.ini";
+      }) "${cfgHome}/fuzzel/fuzzel.ini"}
 
-    ${link (theme { dark = "theme/networkmanager-dmenu-config-dark.ini"; light = "theme/networkmanager-dmenu-config-light.ini"; }) "${cfgHome}/networkmanager-dmenu/config.ini"}
+      ${link (theme {
+        dark = "theme/networkmanager-dmenu-config-dark.ini";
+        light = "theme/networkmanager-dmenu-config-light.ini";
+      }) "${cfgHome}/networkmanager-dmenu/config.ini"}
 
-    ${link (theme { dark = "theme/wob-config-dark.ini"; light = "theme/wob-config-light.ini"; }) "${cfgHome}/wob/wob.ini"}
-    systemctl --user restart wob 2>/dev/null || true
+      ${link (theme {
+        dark = "theme/wob-config-dark.ini";
+        light = "theme/wob-config-light.ini";
+      }) "${cfgHome}/wob/wob.ini"}
+      systemctl --user restart wob 2>/dev/null || true
 
-    ${link (theme { dark = "theme/foot-dark.ini"; light = "theme/foot-light.ini"; }) "${cfgHome}/foot/foot.ini"}
-    ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
+      ${link (theme {
+        dark = "theme/foot-dark.ini";
+        light = "theme/foot-light.ini";
+      }) "${cfgHome}/foot/foot.ini"}
+      ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
-    # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
-    # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.
-    # This symlink ensures gtk.css is correct at Firefox startup. Runtime switching
-    # does NOT work on Wayland (no GtkSettings bridge from gsettings to GTK).
-    ${link (theme { dark = "theme/gtk-tooltip-dark.css"; light = "theme/gtk-tooltip-light.css"; }) "${cfgHome}/gtk-3.0/gtk.css"}
+      # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
+      # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.
+      # This symlink ensures gtk.css is correct at Firefox startup. Runtime switching
+      # does NOT work on Wayland (no GtkSettings bridge from gsettings to GTK).
+      ${link (theme {
+        dark = "theme/gtk-tooltip-dark.css";
+        light = "theme/gtk-tooltip-light.css";
+      }) "${cfgHome}/gtk-3.0/gtk.css"}
 
-    # System color-scheme. GTK applications (and Firefox content processes
-    # via xdg-desktop-portal-gtk) read this to determine prefers-color-scheme.
-    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface color-scheme "${if isDark then "prefer-dark" else "prefer-light"}"
-    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme "${if isDark then palette.gtk.dark_name else palette.gtk.light_name}"
-    ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-application-prefer-dark-theme "${if isDark then "true" else "false"}"
-  '';
+      # System color-scheme. GTK applications (and Firefox content processes
+      # via xdg-desktop-portal-gtk) read this to determine prefers-color-scheme.
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface color-scheme "${
+        if isDark then "prefer-dark" else "prefer-light"
+      }"
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.interface gtk-theme "${
+        if isDark then palette.gtk.dark_name else palette.gtk.light_name
+      }"
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-application-prefer-dark-theme "${
+        if isDark then "true" else "false"
+      }"
+    '';
 in
 lib.mkIf isDesktopEnabled {
   services.darkman = {

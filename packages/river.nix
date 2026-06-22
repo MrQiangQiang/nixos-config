@@ -14,7 +14,7 @@
   libinput,
   pixman,
   scdoc,
-  mesa
+  mesa,
 }:
 
 let

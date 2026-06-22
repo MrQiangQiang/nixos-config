@@ -5,7 +5,12 @@
 # Login layer: apply TTY palette from darkman state before exec fish.
 # This ensures correct colors immediately after login, independent of which
 # interactive shell is used. Runtime sync is handled by fish tty_theme_sync.
-{ lib, osConfig, palette, ... }:
+{
+  lib,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;

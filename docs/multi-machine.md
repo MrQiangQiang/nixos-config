@@ -55,6 +55,15 @@ home/              → user environment (shell, desktop, dev tools, agents)
 lib/mkHost.nix     → host constructor (single source for defaults)
 ```
 
+## Version management
+
+| What | Scope | Why |
+|------|-------|-----|
+| nixpkgs, home-manager packages | Shared (flake.lock) | Single source of truth, all hosts in sync |
+| `system.stateVersion` | Per-host | Records install-time NixOS release, never changes |
+| `home.stateVersion` | Per-host | Records install-time home-manager release, never changes |
+| `boot.kernelPackages` | Per-host | Hardware-dependent (e.g., laptop-1 default, desktop-1 latest) |
+
 ## Secrets
 
 `secrets/keys.nix` = single source of truth for all SSH public keys. `secrets/secrets.nix` declares which key encrypts which age file. `agenix -r` rekeys when adding a host.
@@ -62,7 +71,14 @@ lib/mkHost.nix     → host constructor (single source for defaults)
 ## Remote deploy
 
 ```
-nixos-rebuild switch --flake .#desktop-1 --target-host fugui@desktop-1.tail0f7af0.ts.net
+nixos-rebuild switch --flake .#desktop-1 --target-host root@desktop-1.tail0f7af0.ts.net
 ```
 
 Builds on laptop-1, deploys to desktop-1 via Tailscale. No deploy-rs needed; two-host scale is trivial.
+
+| Decision | Rationale |
+|----------|-----------|
+| `root@` not `fugui@` | SSH directly as root via key; no sudo needed |
+| `PermitRootLogin = "prohibit-password"` | Key-only root login (no password) |
+| Root SSH key from laptop-1 `fugui` | Deploy key lives in user space, not a shared secret |
+| Rejected: `wheelNeedsPassword = false` | Full wheel-group passwordless sudo = silent root backdoor for any user-level process |

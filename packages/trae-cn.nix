@@ -1,4 +1,10 @@
-{ pkgs, lib, vscodeDarkTheme ? "Rosé Pine", vscodeLightTheme ? "Rosé Pine Dawn", ... }:
+{
+  pkgs,
+  lib,
+  vscodeDarkTheme ? "Rosé Pine",
+  vscodeLightTheme ? "Rosé Pine Dawn",
+  ...
+}:
 let
   pname = "trae-cn";
   version = "2.3.44175";
@@ -9,15 +15,45 @@ let
   };
 
   runtimeLibs = with pkgs; [
-    alsa-lib at-spi2-atk at-spi2-core atk
-    cairo cups dbus expat fontconfig freetype
-    glib gnutls gtk3
-    libdrm libgcrypt libgbm libglvnd libnotify libsecret
-    libX11 libXcomposite libXdamage libXext libXfixes libXrandr
-    libxkbcommon libxkbfile libxcb
-    mesa nspr nss
-    openssl openssl_1_1_unsecure
-    pango stdenv.cc.cc.lib udev xz zeromq zlib
+    alsa-lib
+    at-spi2-atk
+    at-spi2-core
+    atk
+    cairo
+    cups
+    dbus
+    expat
+    fontconfig
+    freetype
+    glib
+    gnutls
+    gtk3
+    libdrm
+    libgcrypt
+    libgbm
+    libglvnd
+    libnotify
+    libsecret
+    libX11
+    libXcomposite
+    libXdamage
+    libXext
+    libXfixes
+    libXrandr
+    libxkbcommon
+    libxkbfile
+    libxcb
+    mesa
+    nspr
+    nss
+    openssl
+    openssl_1_1_unsecure
+    pango
+    stdenv.cc.cc.lib
+    udev
+    xz
+    zeromq
+    zlib
   ];
 
   traeBootstrap = pkgs.replaceVars ./trae-cn/bootstrap.cjs {
@@ -58,7 +94,11 @@ let
     exec = "trae-cn %U";
     icon = "${trae-unwrapped}/share/pixmaps/trae.png";
     comment = "AI-powered IDE";
-    categories = [ "Development" "IDE" "TextEditor" ];
+    categories = [
+      "Development"
+      "IDE"
+      "TextEditor"
+    ];
     startupWMClass = "trae";
     terminal = false;
   };
@@ -67,15 +107,23 @@ in
 pkgs.buildFHSEnv {
   name = "trae-cn";
 
-  targetPkgs = pkgs: runtimeLibs ++ (with pkgs; [
-    bash coreutils curl git
-    cacert iana-etc xdg-utils
-  ]);
+  targetPkgs =
+    pkgs:
+    runtimeLibs
+    ++ (with pkgs; [
+      bash
+      coreutils
+      curl
+      git
+      cacert
+      iana-etc
+      xdg-utils
+    ]);
 
   unshareUser = false;
-  unshareIpc  = false;
-  unshareNet  = false;
-  unsharePid  = false;
+  unshareIpc = false;
+  unshareNet = false;
+  unsharePid = false;
   dieWithParent = false;
 
   profile = ''

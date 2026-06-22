@@ -24,7 +24,11 @@ let
   patchedSrc = stdenv.mkDerivation {
     name = "kwim-src-final";
     inherit src;
-    phases = [ "unpackPhase" "patchPhase" "installPhase" ];
+    phases = [
+      "unpackPhase"
+      "patchPhase"
+      "installPhase"
+    ];
     patchPhase = ''
       sed -i "/lazy/d" build.zig.zon
     '';

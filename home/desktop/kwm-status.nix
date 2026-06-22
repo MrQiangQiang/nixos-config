@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -13,19 +20,19 @@ let
   # not signal gradient. Signal info is low-value (user can't act on it
   # from the bar) and KWM bar has no tooltip for detail display.
   mkColors = c: {
-    net_ok   = c.pine + "ff";
-    net_off  = c.love + "ff";
-    px_ok    = c.foam + "ff";    # mihomo running
-    px_crash = c.love + "ff";    # mihomo crashed (exclamation icon)
-    px_off   = c.subtle + "ff";  # mihomo stopped intentionally (globe)
+    net_ok = c.pine + "ff";
+    net_off = c.love + "ff";
+    px_ok = c.foam + "ff"; # mihomo running
+    px_crash = c.love + "ff"; # mihomo crashed (exclamation icon)
+    px_off = c.subtle + "ff"; # mihomo stopped intentionally (globe)
     bat_high = c.foam + "ff";
-    bat_mid  = c.gold + "ff";
-    bat_low  = c.love + "ff";
-    bat_chg  = c.gold + "ff";
-    time     = c.subtle + "ff";
+    bat_mid = c.gold + "ff";
+    bat_low = c.love + "ff";
+    bat_chg = c.gold + "ff";
+    time = c.subtle + "ff";
   };
 
-  darkColors  = mkColors d;
+  darkColors = mkColors d;
   lightColors = mkColors l;
 
   kwmStatusSock = "$XDG_RUNTIME_DIR/kwm-status.sock";
@@ -35,18 +42,18 @@ let
   # FA + MDI + Octicons coverage. FA is used for guaranteed reliability.
   # Must use actual UTF-8 characters, not \uXXXX escapes.
 
-  ICON_WIFI      = "";  # fa-wifi (U+F1EB)
+  ICON_WIFI = ""; # fa-wifi (U+F1EB)
 
-  ICON_PX_ON     = "";  # fa-shield (U+F132)
-  ICON_PX_CRASH  = "";  # fa-exclamation-triangle (U+F071)
-  ICON_PX_OFF    = "";  # fa-globe (U+F0AC)
+  ICON_PX_ON = ""; # fa-shield (U+F132)
+  ICON_PX_CRASH = ""; # fa-exclamation-triangle (U+F071)
+  ICON_PX_OFF = ""; # fa-globe (U+F0AC)
 
-  ICON_BAT_FULL  = "";  # fa-battery-full (U+F240)
-  ICON_BAT_34    = "";  # fa-battery-three-quarters (U+F241)
-  ICON_BAT_HALF  = "";  # fa-battery-half (U+F242)
-  ICON_BAT_14    = "";  # fa-battery-quarter (U+F243)
-  ICON_BAT_EMPTY = "";  # fa-battery-empty (U+F244)
-  ICON_BAT_CHG   = "";  # fa-bolt (U+F0E7)
+  ICON_BAT_FULL = ""; # fa-battery-full (U+F240)
+  ICON_BAT_34 = ""; # fa-battery-three-quarters (U+F241)
+  ICON_BAT_HALF = ""; # fa-battery-half (U+F242)
+  ICON_BAT_14 = ""; # fa-battery-quarter (U+F243)
+  ICON_BAT_EMPTY = ""; # fa-battery-empty (U+F244)
+  ICON_BAT_CHG = ""; # fa-bolt (U+F0E7)
 
   # KWM FIFO buffer limit: 256 bytes (bar.zig status_buffer). Current max
   # output ~90 bytes. Adding new modules requires checking this constraint.

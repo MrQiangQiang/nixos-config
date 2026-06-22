@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -105,11 +112,11 @@ let
   # Used by tty_theme_sync for runtime palette changes.
   # Escape strings from palette.nix (single source).
   applyTtyPalette = mode: ''
-      if test "${mode}" = "light"
-          printf '${palette.tty.light}'
-      else
-          printf '${palette.tty.dark}'
-      end
+    if test "${mode}" = "light"
+        printf '${palette.tty.light}'
+    else
+        printf '${palette.tty.dark}'
+    end
   '';
 in
 lib.mkIf isDesktopEnabled {
@@ -137,14 +144,14 @@ lib.mkIf isDesktopEnabled {
     # `clear` is essential to force a full-screen redraw with the new palette.
     functions.tty_theme_sync = {
       body = ''
-          if test "$TERM" = "linux"
-              set -l _mode (cat ~/.cache/darkman/mode.txt 2>/dev/null; or echo dark)
-              if test "$_mode" != "$__tty_theme_mode"
-                  set -g __tty_theme_mode $_mode
-                  ${applyTtyPalette "$_mode"}
-                  clear
-              end
-          end
+        if test "$TERM" = "linux"
+            set -l _mode (cat ~/.cache/darkman/mode.txt 2>/dev/null; or echo dark)
+            if test "$_mode" != "$__tty_theme_mode"
+                set -g __tty_theme_mode $_mode
+                ${applyTtyPalette "$_mode"}
+                clear
+            end
+        end
       '';
       onEvent = "fish_prompt";
     };

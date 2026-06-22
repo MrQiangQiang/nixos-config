@@ -15,13 +15,12 @@
 { config, lib, ... }:
 let
   hasQmd = config.custom.qmd.enable or false;
-in {
+in
+{
   programs.mcp = {
     enable = true;
     servers.qmd = {
-      url = if hasQmd
-        then "http://localhost:8181/mcp"
-        else "https://desktop-1.tail0f7af0.ts.net/mcp";
+      url = if hasQmd then "http://localhost:8181/mcp" else "https://desktop-1.tail0f7af0.ts.net/mcp";
     };
   };
 }

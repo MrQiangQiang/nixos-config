@@ -22,6 +22,7 @@ in
   ];
 
   system.stateVersion = "26.11";
+  home-manager.users.fugui.home.stateVersion = "26.11";
 
   # ── Kernel ─────────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ in
 
   # ── Ollama (本地 LLM 推理，CUDA) ──────────────────────────
   # 配置在 modules/ollama.nix，通过 options 参数化
+  # 包含 KEEP_ALIVE=-1 永久驻留 + ollama-prewarm.service VRAM 预加载
   custom.ollama.enable = true;
 
   # ── Desktop ────────────────────────────────────────────────
@@ -83,34 +85,20 @@ in
 
   # ── User ───────────────────────────────────────────────────
 
-  users.users.fugui = {
-    isNormalUser = true;
-    homeMode = "750";
-    linger = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    openssh.authorizedKeys.keys = [
-      keys.users.fugui-github
-      keys.users.fugui
-      keys.users.fugui-desktop
-    ];
-  };
+  # homeMode 比 laptop 更严格(共享基础配置见 modules/users.nix)
+  users.users.fugui.homeMode = "750";
 
-  home-manager.users.fugui = {
-    imports = [ ../../home ];
-    custom.qmd.enable = true;
-  };
-
-  home-manager.backupFileExtension = "hm-bak";
+  # QMD 仅 desktop 启用(共享 home-manager 配置见 lib/mkHost.nix)
+  home-manager.users.fugui.custom.qmd.enable = true;
 
   # ── Remote deploy ──────────────────────────────────────────
-
-  security.sudo = {
-    wheelNeedsPassword = false;
-    execWheelOnly = true;
-  };
+  # 通过 root SSH 密钥登录实现远程部署(nixos-rebuild --target-host root@desktop-1),
+  # 替代旧的 wheelNeedsPassword=false(全 wheel 组免密 sudo = 完整 root 后门)。
+  # 仅允许密钥登录(ProhibitRootLogin),部署密钥来自 laptop-1 的 fugui 用户。
+  services.openssh.settings.PermitRootLogin = "prohibit-password";
+  users.users.root.openssh.authorizedKeys.keys = [
+    keys.users.fugui
+  ];
 
   # ── Filesystem ─────────────────────────────────────────────
 

@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -14,9 +21,9 @@ let
     progress-color = "over #${colors.pine}ff";
   };
 
-  makoToText = settings: lib.concatStringsSep "\n" (
-    lib.mapAttrsToList (k: v: "${k}=${toString v}") settings
-  ) + "\n";
+  makoToText =
+    settings:
+    lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "${k}=${toString v}") settings) + "\n";
 
   mkMakoUrgency = colors: ''
     [urgency=high]

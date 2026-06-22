@@ -9,20 +9,41 @@
 #
 # No darkman entry needed — bat follows the terminal, like fish/starship.
 # No cat alias — bat is for interactive viewing, cat is for scripting.
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
 
   mkBatThemeVars = c: {
-    inherit (c) base surface muted subtle text love gold rose pine foam iris;
+    inherit (c)
+      base
+      surface
+      muted
+      subtle
+      text
+      love
+      gold
+      rose
+      pine
+      foam
+      iris
+      ;
     highlight_med = c.highlight_med;
   };
 
   darkVars = mkBatThemeVars palette.dark // {
     name = if palette.dark_variant == "moon" then "Rosé Pine Moon" else "Rosé Pine";
   };
-  dawnVars = mkBatThemeVars palette.dawn // { name = "Rosé Pine Dawn"; };
+  dawnVars = mkBatThemeVars palette.dawn // {
+    name = "Rosé Pine Dawn";
+  };
 
   darkTheme = pkgs.replaceVars ./rose-pine-bat.tmTheme darkVars;
   dawnTheme = pkgs.replaceVars ./rose-pine-bat.tmTheme dawnVars;
@@ -34,8 +55,12 @@ lib.mkIf isDesktopEnabled {
   programs.bat = {
     enable = true;
     themes = {
-      ${darkThemeName} = { src = darkTheme; };
-      ${lightThemeName} = { src = dawnTheme; };
+      ${darkThemeName} = {
+        src = darkTheme;
+      };
+      ${lightThemeName} = {
+        src = dawnTheme;
+      };
     };
     config = {
       italic-text = "always";

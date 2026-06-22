@@ -56,6 +56,7 @@
           apps.disko = {
             type = "app";
             program = lib.getExe inputs'.disko.packages.disko;
+            meta.description = "Declarative disk partitioning — run `nix run .#disko` on a fresh host";
           };
 
           pre-commit.settings.hooks = {

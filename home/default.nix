@@ -1,4 +1,10 @@
-{ config, lib, pkgs, osConfig, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  ...
+}:
 
 let
   palette = import ./desktop/palette.nix { inherit osConfig; };
@@ -17,6 +23,4 @@ in
   _module.args.keybinds = keybinds;
 
   custom.trae-cn.enable = true;
-
-  home.stateVersion = "26.11";
 }

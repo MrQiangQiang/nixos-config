@@ -1,4 +1,11 @@
-{ config, lib, pkgs, osConfig, palette, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig,
+  palette,
+  ...
+}:
 let
   cfg = config.custom.trae-cn;
 
@@ -16,7 +23,8 @@ let
     "extensions.autoUpdate" = false;
     "extensions.autoCheckUpdates" = false;
     "terminal.integrated.fontFamily" = builtins.head osConfig.fonts.fontconfig.defaultFonts.monospace;
-    "editor.fontFamily" = "'${builtins.head osConfig.fonts.fontconfig.defaultFonts.monospace}', monospace";
+    "editor.fontFamily" =
+      "'${builtins.head osConfig.fonts.fontconfig.defaultFonts.monospace}', monospace";
   };
 
   traeSettingsRemove = [
@@ -40,28 +48,38 @@ let
 
   nixExtIds = [ "mvllow.rose-pine" ];
 
-  mkExtEntry = { id, dir, publisher, version ? "1.0.0" }: {
-    identifier = { id = id; uuid = ""; };
-    version = version;
-    relativeLocation = id;
-    location = {
-      "$mid" = 1;
-      fsPath = "${extDir}/${id}";
-      path = "${extDir}/${id}";
-      scheme = "file";
+  mkExtEntry =
+    {
+      id,
+      dir,
+      publisher,
+      version ? "1.0.0",
+    }:
+    {
+      identifier = {
+        id = id;
+        uuid = "";
+      };
+      version = version;
+      relativeLocation = id;
+      location = {
+        "$mid" = 1;
+        fsPath = "${extDir}/${id}";
+        path = "${extDir}/${id}";
+        scheme = "file";
+      };
+      metadata = {
+        id = "";
+        publisherId = "";
+        publisherDisplayName = publisher;
+        targetPlatform = "undefined";
+        isApplicationScoped = false;
+        updated = false;
+        isPreReleaseVersion = false;
+        installedTimestamp = 0;
+        preRelease = false;
+      };
     };
-    metadata = {
-      id = "";
-      publisherId = "";
-      publisherDisplayName = publisher;
-      targetPlatform = "undefined";
-      isApplicationScoped = false;
-      updated = false;
-      isPreReleaseVersion = false;
-      installedTimestamp = 0;
-      preRelease = false;
-    };
-  };
 
   nixExts = [
     (mkExtEntry {
@@ -80,10 +98,8 @@ let
   # Trae CN reads from ~/.trae-cn/mcp.json
   # Format: {"mcpServers": {name: {url|command, args?, env?, headers?}}}
   # Note: env {file=...;} submodules are opencode-specific, not supported by Trae CN.
-  traeMcpServers = lib.mapAttrs (_: server:
-    lib.filterAttrs (k: v:
-      k != "enabled" && v != null && v != [ ] && v != { }
-    ) server
+  traeMcpServers = lib.mapAttrs (
+    _: server: lib.filterAttrs (k: v: k != "enabled" && v != null && v != [ ] && v != { }) server
   ) config.programs.mcp.servers;
 
   traeMcpJson = (pkgs.formats.json { }).generate "trae-mcp" {
@@ -107,7 +123,10 @@ in
     };
     network = {
       defaultPolicy = lib.mkOption {
-        type = lib.types.enum [ "allow" "deny" ];
+        type = lib.types.enum [
+          "allow"
+          "deny"
+        ];
         default = "allow";
         description = "Default network policy";
       };
@@ -149,7 +168,9 @@ in
     home.activation.traeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p "$(dirname ${lib.escapeShellArg traeSettingsPath})"
       if [ -f ${lib.escapeShellArg traeSettingsPath} ]; then
-          merged=$(${lib.getExe pkgs.jq} -s '.[0] * .[1] | del(${lib.concatStringsSep ", " (map (k: ''."${k}"'') traeSettingsRemove)})' ${lib.escapeShellArg traeSettingsPath} ${traeSettingsJson})
+          merged=$(${lib.getExe pkgs.jq} -s '.[0] * .[1] | del(${
+            lib.concatStringsSep ", " (map (k: ''."${k}"'') traeSettingsRemove)
+          })' ${lib.escapeShellArg traeSettingsPath} ${traeSettingsJson})
           printf '%s\n' "$merged" > ${lib.escapeShellArg traeSettingsPath}
         else
           $DRY_RUN_CMD cp ${traeSettingsJson} ${lib.escapeShellArg traeSettingsPath}

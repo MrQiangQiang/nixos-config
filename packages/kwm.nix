@@ -11,7 +11,7 @@
   libxkbcommon,
   pixman,
   fcft,
-  libevdev
+  libevdev,
 }:
 
 let
