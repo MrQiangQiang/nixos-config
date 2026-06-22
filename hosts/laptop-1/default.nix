@@ -14,6 +14,7 @@
   ];
 
   system.stateVersion = "25.11";
+  home-manager.users.fugui.home.stateVersion = "25.11";
 
   # ── Laptop-specific config ────────────────────────────────
 

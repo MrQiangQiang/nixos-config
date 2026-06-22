@@ -55,6 +55,15 @@ home/              → user environment (shell, desktop, dev tools, agents)
 lib/mkHost.nix     → host constructor (single source for defaults)
 ```
 
+## Version management
+
+| What | Scope | Why |
+|------|-------|-----|
+| nixpkgs, home-manager packages | Shared (flake.lock) | Single source of truth, all hosts in sync |
+| `system.stateVersion` | Per-host | Records install-time NixOS release, never changes |
+| `home.stateVersion` | Per-host | Records install-time home-manager release, never changes |
+| `boot.kernelPackages` | Per-host | Hardware-dependent (e.g., laptop-1 default, desktop-1 latest) |
+
 ## Secrets
 
 `secrets/keys.nix` = single source of truth for all SSH public keys. `secrets/secrets.nix` declares which key encrypts which age file. `agenix -r` rekeys when adding a host.

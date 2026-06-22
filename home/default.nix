@@ -23,6 +23,4 @@ in
   _module.args.keybinds = keybinds;
 
   custom.trae-cn.enable = true;
-
-  home.stateVersion = "26.11";
 }

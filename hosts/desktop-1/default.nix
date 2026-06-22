@@ -21,6 +21,7 @@ in
   ];
 
   system.stateVersion = "26.11";
+  home-manager.users.fugui.home.stateVersion = "26.11";
 
   # ── Kernel ─────────────────────────────────────────────────
 
