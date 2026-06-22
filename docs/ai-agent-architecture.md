@@ -77,7 +77,7 @@ desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M, 256K context, 27.7GB VRAM)
 laptop-1:  opencode → http://desktop-1.tail0f7af0.ts.net:11434/v1 (Tailscale)
 ```
 
-VRAM 分配策略详见 `docs/desktop-1/vram-allocation.md`
+VRAM 分配策略详见 `docs/desktop-1/ollama.md`
 
 ## 为什么用 Ollama 而非 llama.cpp 直接
 
