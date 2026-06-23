@@ -50,6 +50,9 @@ in
     environment.systemPackages = [
       cfg.package
       pkgs.polkit_gnome
+      # xdg-open: Electron shell.openExternal() calls xdg-open (not portal).
+      # Without it, Obsidian/Slack/Discord can't open external links.
+      pkgs.xdg-utils
     ];
 
     programs.fish.enable = true;

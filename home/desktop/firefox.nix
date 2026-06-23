@@ -140,4 +140,10 @@ lib.mkIf isDesktopEnabled {
       };
     };
   };
+
+  # Default browser: xdg-open → gio → firefox. Co-located with firefox config.
+  xdg.mimeApps.defaultApplications = {
+    "x-scheme-handler/http" = [ "firefox.desktop" ];
+    "x-scheme-handler/https" = [ "firefox.desktop" ];
+  };
 }
