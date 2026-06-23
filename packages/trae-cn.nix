@@ -126,6 +126,14 @@ pkgs.buildFHSEnv {
   unsharePid = false;
   dieWithParent = false;
 
+  # 暴露宿主机完整 PAM 配置(含 systemd-run0/sudo/polkit-1)到 FHS 环境。
+  # buildFHSEnv 默认用 shadow 包的 pam.d(9 文件)遮蔽宿主机 pam.d(23 文件),
+  # 导致 run0 等依赖 PAM 的特权工具不可用。extraBwrapArgs 在最后执行,覆盖遮蔽。
+  # run0 用于 Trae IDE 终端(NoNewPrivs 环境)的特权提升,见 modules/desktop.nix。
+  extraBwrapArgs = [
+    "--ro-bind" "/etc/pam.d" "/etc/pam.d"
+  ];
+
   profile = ''
     if [ -n "''${WAYLAND_DISPLAY:-}" ]; then
       export XDG_SESSION_TYPE=wayland

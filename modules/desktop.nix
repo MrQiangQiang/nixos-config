@@ -95,6 +95,14 @@ in
     services.displayManager.sessionPackages = [ cfg.package ];
     security.polkit.enable = true;
     security.pam.services.waylock = { };
+    # Trae IDE 终端运行在 buildFHSEnv/bubblewrap 中,继承 NoNewPrivs 标志,
+    # 阻止 sudo 依赖的 SUID 执行。run0(systemd 256+)不依赖 SUID,
+    # 通过 D-Bus 请求 systemd(PID 1)启动特权服务,绕过此限制。
+    # 空属性集创建默认 PAM 服务(与 sudo 等效),解决 nixpkgs issue #361592
+    # (认证后 PAM session 设置失败:Operation not permitted)。
+    # polkit-gnome agent(见 home/desktop/polkit.nix)提供 GUI 密码提示。
+    # TTY/普通终端无 NoNewPrivs,sudo 已可用,无需 run0。
+    security.pam.services.systemd-run0 = { };
     xdg.portal = {
       enable = true;
       wlr.enable = true;
