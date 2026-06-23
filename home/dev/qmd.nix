@@ -74,6 +74,8 @@ in
         knowledge:
           path: ${knowledgeDir}
           pattern: "**/*.md"
+          # Auto git pull before index refresh (eliminates sync lag window)
+          update-cmd: "git -C ${knowledgeDir} pull --rebase --ff-only"
           context:
             "/raw/articles": "Source articles (blog posts, web clippings)"
             "/raw/papers": "Academic papers and research documents"
