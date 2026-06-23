@@ -171,6 +171,7 @@ in
     path = [
       pkgs.git
       pkgs.git-annex
+      pkgs.openssh
     ];
     script = ''
       [ -d .git ] || git init

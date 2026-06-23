@@ -58,7 +58,9 @@ in
 
   # annex 仓库: clone (如果不存在) + init + group (幂等, 每次 activation 都执行)
   # 单独 activation 而非加入 repos 列表, 因为需要 postClone hook (git annex init)
+  # git-annex 运行时需要 git 在 PATH 中
   home.activation.cloneAnnexRepo = lib.hm.dag.entryAfter [ "clonePersonalRepos" ] ''
+    export PATH="${pkgs.git}/bin:${pkgs.git-annex}/bin:$PATH"
     if [ ! -d '${home}/annex/.git' ]; then
       if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone 'fugui@desktop-1.tail0f7af0.ts.net:/data/annex' '${home}/annex'; then
         :
