@@ -24,6 +24,7 @@
 let
   home = config.home.homeDirectory;
   git = "${pkgs.git}/bin/git";
+  gitAnnex = "${pkgs.git-annex}/bin/git-annex";
   ssh = "${pkgs.openssh}/bin/ssh";
 
   repos = [
@@ -54,4 +55,22 @@ in
       '') repos
     )
   );
+
+  # annex 仓库: clone (如果不存在) + init + group (幂等, 每次 activation 都执行)
+  # 单独 activation 而非加入 repos 列表, 因为需要 postClone hook (git annex init)
+  home.activation.cloneAnnexRepo = lib.hm.dag.entryAfter [ "clonePersonalRepos" ] ''
+    if [ ! -d '${home}/annex/.git' ]; then
+      if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone 'fugui@desktop-1.tail0f7af0.ts.net:/data/annex' '${home}/annex'; then
+        :
+      else
+        echo "Warning: annex clone failed, run manually:" >&2
+        echo "  git clone fugui@desktop-1.tail0f7af0.ts.net:/data/annex ${home}/annex" >&2
+      fi
+    fi
+    # init + group 幂等, 每次 activation 都执行 (确保 group 被设置)
+    if [ -d '${home}/annex/.git' ]; then
+      cd '${home}/annex' && $DRY_RUN_CMD ${gitAnnex} init laptop-1 && $DRY_RUN_CMD ${gitAnnex} group here manual || \
+        echo "Warning: annex init/group failed, run manually:" >&2
+    fi
+  '';
 }

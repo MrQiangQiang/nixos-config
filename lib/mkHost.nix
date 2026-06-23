@@ -22,6 +22,7 @@ lib.nixosSystem {
     ../modules/ssh.nix
     ../modules/users.nix
     ../modules/analysis.nix
+    ../modules/git-annex.nix
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     {

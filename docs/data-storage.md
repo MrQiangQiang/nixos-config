@@ -11,7 +11,7 @@ desktop-1:
   ├── music/
   └── documents/
 
-  ~/annex → /data/annex           ← 软链接, 日常浏览用
+  GitHub: MrQiangQiang/annex      ← git remote (仅元数据备份, 不存内容)
 
 laptop-N:
   ~/annex/                        ← git clone (仅元数据 + symlinks, 无实际内容)
@@ -66,10 +66,18 @@ HDD 保护:
 - 备份方案 (如果需要): 参考 [data-protection.md](data-protection.md) 的已知缺口和未来选项
 - Joey Hess 本人对冷存储的做法: 设置 trusted，永不 drop (2022-06-28 forum)
 
-## 初始化步骤 (一次性)
+## 初始化 (已自动化)
+
+desktop-1 的 `/data/annex` 初始化由 `hosts/desktop-1/default.nix` 中的
+`systemd.services.git-annex-init` oneshot 自动完成(幂等,每次启动运行)。
+
+laptop-1 的 `~/annex` clone + init 由 `home/repos.nix` 的 activation 脚本自动完成
+(clone 后执行 `git annex init laptop-1 && git annex group here manual`)。
+
+以下为参考命令(手动恢复时用):
 
 ```bash
-# desktop-1
+# desktop-1 (由 systemd oneshot 自动执行)
 mkdir -p /data/annex
 cd /data/annex
 git init && git annex init "desktop-1"
@@ -77,8 +85,9 @@ git annex group here backup
 git annex required here "present"
 git annex numcopies 1
 git annex mincopies 1
+git remote add origin git@github.com:MrQiangQiang/annex.git
 
-# laptop-1
+# laptop-1 (由 repos.nix activation 自动执行)
 git clone fugui@desktop-1.tail0f7af0.ts.net:/data/annex ~/annex
 cd ~/annex
 git annex init "laptop-1"
@@ -87,7 +96,8 @@ git annex group here manual
 
 ## 源码真理
 
-- `modules/git-annex.nix` — 安装 git-annex (仅 desktop-1 import)
+- `modules/git-annex.nix` — 安装 git-annex (所有主机共享, mkHost.nix import)
+- `hosts/desktop-1/default.nix` — git-annex-init oneshot (幂等初始化 /data/annex)
 - `modules/disk-health.nix` — smartd 磁盘健康监测 (所有主机共享)
 - `hosts/desktop-1/disk-config.nix` — HDD disk.data (btrfs, /data/annex, nofail)
 - `hosts/desktop-1/default.nix` — autoScrub

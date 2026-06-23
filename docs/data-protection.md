@@ -45,6 +45,9 @@ btrfs 快照是 CoW(Copy on Write), 与原始数据在同一物理磁盘。磁�
 - 方案 B: restic + 云存储(异地备份, 增加密钥/定时/恢复测试复杂度)
 - 方案 C: git-annex 多 remote(HDD + 外置硬盘 + 云, 按需)
 
+GitHub 仓库 `MrQiangQiang/annex` 仅备份 git-annex branch(元数据:文件名、目录结构、位置日志),
+**不备份大文件内容**。价值:NVMe 系统盘故障时恢复元数据;HDD 故障时内容仍丢失。
+
 当前选择: 不补充, 接受二进制数据单副本风险。
 
 ## 数据完整性监控

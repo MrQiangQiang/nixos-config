@@ -17,11 +17,15 @@ desktop-1 (唯一来源, 7x24) ─── git/GitHub ─── laptop-1 (消费�
 
 单一 canonical 仓库: desktop-1 `/data/annex/` (HDD, btrfs)。详见 [data-storage.md](data-storage.md)。
 
+GitHub 仓库 `MrQiangQiang/annex` 仅作为**元数据备份**(master + git-annex branch),
+不存大文件内容(GitHub 不允许)。价值:NVMe 系统盘故障时恢复元数据;HDD 故障时内容仍丢失。
+
 ```
 laptop-1 ~/annex/
   remote: desktop-1 → fugui@desktop-1:/data/annex/
+  remote: origin    → git@github.com:MrQiangQiang/annex.git (元数据备份)
 
-git annex sync         # 同步位置元数据 (whereis)
+git annex sync         # 同步位置元数据 (whereis) + 推 GitHub
 git annex get <file>   # 从 desktop-1 HDD 拉取
 git annex drop <file>  # 用完释放 laptop-1 空间
 ```

@@ -16,7 +16,7 @@ Tailscale  → network (mesh VPN, MagicDNS)
 
 | Host | Kernel | Role |
 |------|--------|------|
-| laptop-1 | default (6.x LTS) | daily driver, AI management |
+| laptop-1 | default (6.18 LTS) | daily driver, AI management |
 | desktop-1 | latest (7.x) | heavy compute, Ollama, always-on data center |
 
 ## Topology
@@ -25,7 +25,8 @@ Tailscale  → network (mesh VPN, MagicDNS)
 desktop-1 (source of truth, 7x24) ─── Tailscale ─── laptop-1 (consumer)
     │  ~/nixos-config (git master)                  │  ~/nixos-config (git clone)
     │  ~/knowledge (git, qmd master)                │  ~/knowledge (git clone, Obsidian)
-    │  ~/annex → /data/annex (git-annex on HDD)     │  ~/annex (git-annex, manual)
+    │  /data/annex (git-annex canonical, HDD)       │  ~/annex (git-annex clone, manual)
+    │  GitHub: MrQiangQiang/annex (元数据备份)      │
     │  ~/.passage/store (git, age encrypted)        │  ~/.passage/store (git clone)
     │  repos.nix → home-manager activation          │  同 repos.nix
     │  qmd-mcp:8181 → Tailscale Serve:443           │  qmd via https://desktop-1...ts.net/mcp

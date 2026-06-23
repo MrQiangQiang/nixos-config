@@ -16,7 +16,6 @@ in
     ../../modules/proxy.nix
     ../../modules/im.nix
     ../../modules/tailscale.nix
-    ../../modules/git-annex.nix
     ../../modules/ollama.nix
     ./hardware-configuration.nix
   ];
@@ -148,6 +147,40 @@ in
       done
       echo "tailscale not online after 60s; will retry" >&2
       exit 1
+    '';
+  };
+
+  # ── git-annex canonical repo initialization ───────────────
+  # 幂等初始化 /data/annex 为 canonical git-annex 仓库。
+  # 所有命令幂等(官方 man page 确认),安全重复执行。
+  # ExecStartPre 的 `+` 前缀以 root 运行 chown(nofail 挂载点 tmpfiles 时序不可靠,
+  # 改用 ExecStartPre+ 是 nixpkgs 实证模式,见 wgautomesh/unifi-os-server 模块)。
+  # RequiresMountsFor 不依赖 disko 生成的具体挂载单元名,更稳健。
+  systemd.services.git-annex-init = {
+    description = "Initialize git-annex canonical repo at /data/annex";
+    wantedBy = [ "multi-user.target" ];
+    unitConfig.RequiresMountsFor = "/data/annex";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      User = "fugui";
+      Group = "users";
+      WorkingDirectory = "/data/annex";
+      ExecStartPre = [ "+${pkgs.coreutils}/bin/chown fugui:users /data/annex" ];
+    };
+    path = [
+      pkgs.git
+      pkgs.git-annex
+    ];
+    script = ''
+      [ -d .git ] || git init
+      git annex init "desktop-1"
+      git annex group here backup
+      git annex required here "present"
+      git annex numcopies 1
+      git annex mincopies 1
+      git remote get-url origin 2>/dev/null || \
+        git remote add origin git@github.com:MrQiangQiang/annex.git
     '';
   };
 }
