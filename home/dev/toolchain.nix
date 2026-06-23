@@ -75,8 +75,8 @@
   ];
 
   # Auto-sync tool installations on nixos-rebuild switch.
-  # $DRY_RUN_CMD is set by home-manager during 'activate' (not 'switch') for
-  # safety; real install happens only during the 'switch' phase.
+  # The `run` function is provided by home-manager activation scripts — it
+  # executes the command on live runs and just echoes it on dry runs.
   # mise install checks each tool version before installing — already-installed
   # tools are skipped, so this is fast on incremental changes.
   # Network failures are non-fatal: the || fallback ensures switch succeeds
@@ -84,6 +84,6 @@
   # PATH: rustup-init needs curl/wget, other tools may need git
   home.activation.miseInstall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="${lib.makeBinPath [ pkgs.curl pkgs.wget pkgs.git ]}:$PATH"
-    $DRY_RUN_CMD ${lib.getExe pkgs.mise} install --yes 2>&1 || echo "mise: some tools failed to install, run 'mise install' manually"
+    run ${lib.getExe pkgs.mise} install --yes 2>&1 || echo "mise: some tools failed to install, run 'mise install' manually"
   '';
 }

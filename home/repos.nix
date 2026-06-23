@@ -45,7 +45,7 @@ in
     builtins.concatStringsSep "\n" (
       map (repo: ''
         if [ ! -d '${repo.path}/.git' ]; then
-          if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone '${repo.url}' '${repo.path}'; then
+          if GIT_SSH_COMMAND='${ssh}' run ${git} clone '${repo.url}' '${repo.path}'; then
             :
           else
             echo "Warning: ${repo.name} clone failed, run manually:" >&2
@@ -62,7 +62,7 @@ in
   home.activation.cloneAnnexRepo = lib.hm.dag.entryAfter [ "clonePersonalRepos" ] ''
     export PATH="${pkgs.git}/bin:${pkgs.git-annex}/bin:$PATH"
     if [ ! -d '${home}/annex/.git' ]; then
-      if GIT_SSH_COMMAND='${ssh}' $DRY_RUN_CMD ${git} clone 'fugui@desktop-1.tail0f7af0.ts.net:/data/annex' '${home}/annex'; then
+      if GIT_SSH_COMMAND='${ssh}' run ${git} clone 'fugui@desktop-1.tail0f7af0.ts.net:/data/annex' '${home}/annex'; then
         :
       else
         echo "Warning: annex clone failed, run manually:" >&2
@@ -71,7 +71,7 @@ in
     fi
     # init + group 幂等, 每次 activation 都执行 (确保 group 被设置)
     if [ -d '${home}/annex/.git' ]; then
-      cd '${home}/annex' && $DRY_RUN_CMD ${gitAnnex} init laptop-1 && $DRY_RUN_CMD ${gitAnnex} group here manual || \
+      cd '${home}/annex' && run ${gitAnnex} init laptop-1 && run ${gitAnnex} group here manual || \
         echo "Warning: annex init/group failed, run manually:" >&2
     fi
   '';

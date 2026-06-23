@@ -173,17 +173,17 @@ in
           })' ${lib.escapeShellArg traeSettingsPath} ${traeSettingsJson})
           printf '%s\n' "$merged" > ${lib.escapeShellArg traeSettingsPath}
         else
-          $DRY_RUN_CMD cp ${traeSettingsJson} ${lib.escapeShellArg traeSettingsPath}
-          $DRY_RUN_CMD chmod u+w ${lib.escapeShellArg traeSettingsPath}
+          run cp ${traeSettingsJson} ${lib.escapeShellArg traeSettingsPath}
+          run chmod u+w ${lib.escapeShellArg traeSettingsPath}
         fi
     '';
 
     # extensions — writable merge (home.activation: preserves user-installed extensions)
     home.activation.traeExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD mkdir -p ${extDir}
+      run mkdir -p ${extDir}
 
       if [ -d "${rosePineExtDir}" ]; then
-        $DRY_RUN_CMD ln -snf ${rosePineExtDir} ${extDir}/mvllow.rose-pine
+        run ln -snf ${rosePineExtDir} ${extDir}/mvllow.rose-pine
       fi
 
       if [ -f ${extDir}/extensions.json ]; then
@@ -194,8 +194,8 @@ in
         ' ${extDir}/extensions.json)
         printf '%s\n' "$merged" > ${extDir}/extensions.json
       else
-        $DRY_RUN_CMD cp ${nixExtJson} ${extDir}/extensions.json
-        $DRY_RUN_CMD chmod u+w ${extDir}/extensions.json
+        run cp ${nixExtJson} ${extDir}/extensions.json
+        run chmod u+w ${extDir}/extensions.json
       fi
 
       if [ -f ${extDir}/.obsolete ]; then

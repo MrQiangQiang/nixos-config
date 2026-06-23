@@ -99,7 +99,7 @@ in
     # Knowledge directory structure (writable, created on activation)
     # Layout follows Karpathy LLM Wiki pattern: raw/ (immutable) + wiki/ (AI-generated)
     home.activation.qmdKnowledgeDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD mkdir -p \
+      run mkdir -p \
         ${knowledgeDir}/raw/articles \
         ${knowledgeDir}/raw/papers \
         ${knowledgeDir}/raw/notes \

@@ -43,8 +43,8 @@ in
   # SSH config 用 home.activation 直接写入文件，而非 home-manager 默认的 nix store 软链接。
   # 软链接属主为 nobody，SSH 9.x+ 会因 Bad owner 拒绝读取。
   home.activation.writeSshConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$HOME/.ssh"
-    $DRY_RUN_CMD cp -f ${pkgs.writeText "ssh-config" ''
+    run mkdir -p $VERBOSE_ARG "$HOME/.ssh"
+    run cp -f ${pkgs.writeText "ssh-config" ''
       Host *
         IdentitiesOnly yes
         AddKeysToAgent yes
@@ -62,7 +62,7 @@ in
         User git
         IdentityFile ~/.ssh/id_ed25519
     ''} "$HOME/.ssh/config"
-    $DRY_RUN_CMD chmod 600 "$HOME/.ssh/config"
+    run chmod 600 "$HOME/.ssh/config"
   '';
 
   programs.git = {

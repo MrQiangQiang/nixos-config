@@ -29,9 +29,9 @@ in
 
   home.activation.passageIdentities = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ -f "$HOME/.ssh/id_ed25519" ]; then
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$HOME/.passage"
-      $DRY_RUN_CMD cp "$HOME/.ssh/id_ed25519" "$HOME/.passage/identities"
-      $DRY_RUN_CMD chmod 600 "$HOME/.passage/identities"
+      run mkdir -p $VERBOSE_ARG "$HOME/.passage"
+      run cp "$HOME/.ssh/id_ed25519" "$HOME/.passage/identities"
+      run chmod 600 "$HOME/.passage/identities"
     fi
   '';
 }
