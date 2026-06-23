@@ -24,11 +24,13 @@ home/dev/opencode.nix        → enableMcpIntegration 消费
 ## qmd 知识库
 
 ```
-~/knowledge/                    独立 git 仓库 (Karpathy LLM Wiki 模式)
-├── raw/                        人类收集的源文档 (immutable, agent 只读)
-│   ├── articles/  papers/  notes/  transcripts/  assets/
-└── wiki/                       agent 编译的 wiki (agent 通过 filesystem MCP 写)
-    ├── index.md  log.md  concepts/  people/  projects/  tools/
+Collections:
+  ~/knowledge/                  个人知识库 (Karpathy LLM Wiki 模式)
+  ├── raw/                      人类收集的源文档 (immutable, agent 只读)
+  │   ├── articles/  papers/  notes/  transcripts/  assets/
+  └── wiki/                     agent 编译的 wiki (agent 通过 filesystem MCP 写)
+      ├── index.md  log.md  concepts/  people/  projects/  tools/
+  ~/nixos-config/docs/          项目文档 (架构决策, 主机配置)
 
 desktop-1: qmd-mcp systemd service (localhost:8181)
            qmd-refresh timer (5min)
@@ -45,6 +47,12 @@ laptop-1:  qmd MCP → https://desktop-1.tail0f7af0.ts.net/mcp (Tailscale Serve)
 - 4 个只读 MCP 工具 (query/get/multi_get/status), 职责单一
 - 仓库自带 Nix flake, x86_64-linux hash 已验证
 - CJK 支持: Qwen3-Embedding-0.6B (119 语言)
+
+## 为什么 qmd 搜索项目文档不搜索代码
+
+- 项目文档需要语义搜索 (如 "VRAM 分配策略是什么"), grep 只能精确匹配
+- 代码搜索用 grep/ripgrep (精确、快速、零 VRAM), qmd 专注语义搜索
+- 混合索引代码会降低搜索质量 (代码语义与文档语义混杂)
 
 ## 为什么不用 agentmemory / Cognee / Mem0
 

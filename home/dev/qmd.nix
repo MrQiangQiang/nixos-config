@@ -2,8 +2,11 @@
 #
 # Architecture:
 #   - qmd binary from flake input (inputs.qmd.packages.${system}.default)
-#   - Knowledge base at ~/knowledge/ — plain git repo, auto-cloned on activation.
-#     git@github.com:MrQiangQiang/knowledge.git (markdown files, Obsidian-compatible)
+#   - Collections:
+#     1. ~/knowledge/ — personal knowledge base (Karpathy LLM Wiki: raw/ + wiki/)
+#        git@github.com:MrQiangQiang/knowledge.git (markdown files, Obsidian-compatible)
+#     2. ~/nixos-config/docs/ — NixOS configuration documentation
+#        (architecture, decisions, host-specific docs)
 #   - Index DB at ~/.cache/qmd/index.sqlite (auto-managed)
 #   - Model cache at ~/.cache/qmd/models/ (auto-managed): Qwen3-Embedding-0.6B + Reranker + query-expansion
 #   - Config at ~/.config/qmd/index.yml (declarative, read-only symlink)
@@ -55,6 +58,7 @@ let
   embedModel = "hf:Qwen/Qwen3-Embedding-0.6B-GGUF/Qwen3-Embedding-0.6B-Q8_0.gguf";
 
   knowledgeDir = "${config.home.homeDirectory}/knowledge";
+  nixosConfigDir = "${config.home.homeDirectory}/nixos-config";
 in
 {
   options.custom.qmd = {
@@ -68,7 +72,7 @@ in
     # Changes to collections/contexts must go through this file.
     home.file.".config/qmd/index.yml".text = ''
       # QMD collections configuration (managed by NixOS)
-      global_context: "Personal knowledge base — raw sources and AI-generated wiki"
+      global_context: "Personal knowledge base and project documentation"
 
       collections:
         knowledge:
@@ -83,6 +87,13 @@ in
             "/raw/transcripts": "Audio/video transcripts"
             "/wiki": "AI-generated wiki pages (summaries, concepts, indexes)"
             "/": "Knowledge base root"
+        nixos-docs:
+          path: ${nixosConfigDir}/docs
+          pattern: "**/*.md"
+          update-cmd: "git -C ${nixosConfigDir} pull --rebase --ff-only"
+          context:
+            "/desktop-1": "desktop-1 host-specific documentation"
+            "/": "NixOS configuration architecture and decisions"
     '';
 
     # Knowledge directory structure (writable, created on activation)
