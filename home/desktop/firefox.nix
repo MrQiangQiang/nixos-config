@@ -118,6 +118,12 @@ lib.mkIf isDesktopEnabled {
         install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
         installation_mode = "normal_installed";
       };
+      # Obsidian Web Clipper — save web pages as markdown to raw/notes/
+      # AMO: https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/
+      "clipper@obsidian.md" = {
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/web-clipper-obsidian/latest.xpi";
+        installation_mode = "normal_installed";
+      };
     };
     profiles.default = {
       id = 0;
