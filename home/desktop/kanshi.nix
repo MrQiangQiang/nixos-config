@@ -1,10 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  osConfig,
-  ...
-}:
+{ config, lib, pkgs, osConfig, ... }:
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
@@ -22,12 +16,10 @@ lib.mkIf isDesktopEnabled {
     settings = [
       {
         profile.name = "laptop";
-        profile.outputs = [
-          {
-            criteria = "eDP-1";
-            status = "enable";
-          }
-        ];
+        profile.outputs = [{
+          criteria = "eDP-1";
+          status = "enable";
+        }];
       }
       {
         # 使用 EDID 描述（make model serial）而非输出名称，避免 GPU 驱动变化导致命名漂移。
@@ -39,14 +31,12 @@ lib.mkIf isDesktopEnabled {
         #   3. fnmatch "make model serial"（如 "Xiaomi Corporation Mi Monitor *"）
         # 使用 make+model 通配 serial，更换同型号显示器无需改配置。
         profile.name = "desktop";
-        profile.outputs = [
-          {
-            criteria = "Xiaomi Corporation Mi Monitor *";
-            mode = "3840x2160@60";
-            scale = 2.0;
-            status = "enable";
-          }
-        ];
+        profile.outputs = [{
+          criteria = "Xiaomi Corporation Mi Monitor *";
+          mode = "3840x2160@60";
+          scale = 2.0;
+          status = "enable";
+        }];
       }
     ];
   };
