@@ -16,13 +16,26 @@
 //   vault-level theme.css/snippets are NOT loaded. We inject Rose Pine CSS
 //   via webContents.insertCSS() and fix body class based on darkman mode.
 //   CSS file is deployed by home-manager to ~/.config/obsidian/starter.css.
+//
+// Sandbox vault theme deployment:
+//   The sandbox vault (~/.config/obsidian/Obsidian Sandbox/) is created on-demand
+//   by Obsidian (Help → Sandbox vault). Obsidian's p() function DELETES and
+//   RECREATES the directory from template if it's not in obsidian.json. This
+//   creates a timing problem for home-manager activation scripts (sandbox may
+//   not exist at switch time). We solve this by deploying theme files on every
+//   startup — robust against sandbox recreation.
+//   Theme files are deployed by home-manager to ~/.config/obsidian/rose-pine/
+//   (declarative via xdg.configFile) and copied to the sandbox vault here.
 const {app, nativeTheme} = require("electron");
 const fs = require("fs");
 const path = require("path");
 
-const DARKMAN_MODE = path.join(process.env.HOME || "/tmp", ".cache/darkman/mode.txt");
+const HOME = process.env.HOME || "/tmp";
+const DARKMAN_MODE = path.join(HOME, ".cache/darkman/mode.txt");
 const DARKMAN_DIR = path.dirname(DARKMAN_MODE);
-const STARTER_CSS_PATH = path.join(process.env.HOME || "/tmp", ".config/obsidian/starter.css");
+const STARTER_CSS_PATH = path.join(HOME, ".config/obsidian/starter.css");
+const ROSE_PINE_DIR = path.join(HOME, ".config/obsidian/rose-pine");
+const SANDBOX_VAULT_DIR = path.join(HOME, ".config/obsidian/Obsidian Sandbox");
 
 function readDarkmanMode() {
   try { return fs.readFileSync(DARKMAN_MODE, "utf-8").trim(); } catch(e) { return null; }
@@ -41,8 +54,62 @@ function syncTheme() {
   }
 }
 
+// Copy a file from src to dest, handling two Nix-specific issues:
+//   1. Source is a symlink to Nix store — copyFileSync may copy the symlink
+//      itself instead of following it. readFileSync follows symlinks.
+//   2. Previous copyFileSync may have preserved Nix store's 444 (read-only)
+//      permissions on the destination, causing EACCES on overwrite.
+//      rmSync(force) removes any stale read-only file; writeFileSync creates
+//      a fresh file with default 644 permissions.
+function copyThemeFile(src, dest) {
+  fs.rmSync(dest, {force: true});
+  fs.writeFileSync(dest, fs.readFileSync(src));
+}
+
+// Deploy Rose Pine theme to the sandbox vault on every startup.
+// The sandbox vault is created on-demand by Obsidian; if it doesn't exist yet,
+// skip (next startup after creation will deploy). Theme files are copied from
+// the stable location (~/.config/obsidian/rose-pine/, deployed by home-manager).
+function deploySandboxTheme() {
+  try {
+    // Sandbox vault may not exist yet (created on-demand by Obsidian)
+    if (!fs.existsSync(SANDBOX_VAULT_DIR)) return;
+    // Stable theme files may not exist yet (home-manager not switched)
+    if (!fs.existsSync(ROSE_PINE_DIR)) return;
+
+    // Deploy official Rose Pine theme (manifest.json + theme.css)
+    const themeDir = path.join(SANDBOX_VAULT_DIR, ".obsidian/themes/Rose Pine");
+    fs.mkdirSync(themeDir, {recursive: true});
+    copyThemeFile(path.join(ROSE_PINE_DIR, "manifest.json"), path.join(themeDir, "manifest.json"));
+    copyThemeFile(path.join(ROSE_PINE_DIR, "theme.css"), path.join(themeDir, "theme.css"));
+
+    // Deploy CSS snippet (palette.nix colors via replaceVars)
+    const snippetDir = path.join(SANDBOX_VAULT_DIR, ".obsidian/snippets");
+    fs.mkdirSync(snippetDir, {recursive: true});
+    copyThemeFile(path.join(ROSE_PINE_DIR, "snippet.css"), path.join(snippetDir, "rose-pine-obsidian.css"));
+
+    // Write appearance.json (merge with existing to preserve user customizations)
+    const appearancePath = path.join(SANDBOX_VAULT_DIR, ".obsidian/appearance.json");
+    fs.mkdirSync(path.dirname(appearancePath), {recursive: true});
+    let appearance = {};
+    try { appearance = JSON.parse(fs.readFileSync(appearancePath, "utf-8")); } catch(e) {}
+    appearance.theme = "system";
+    appearance.cssTheme = "Rose Pine";
+    appearance.enabledCssSnippets = ["rose-pine-obsidian", ...(appearance.enabledCssSnippets || [])]
+      .filter((v, i, a) => a.indexOf(v) === i);
+    fs.writeFileSync(appearancePath, JSON.stringify(appearance));
+  } catch(e) {
+    // Never crash Obsidian — theme deployment is best-effort
+    console.error("deploySandboxTheme failed:", e);
+  }
+}
+
 // Apply initial mode before app ready — ensures correct theme from startup
 syncTheme();
+
+// Deploy sandbox vault theme before app ready — ensures theme files exist
+// before Obsidian's main.js opens the sandbox vault window.
+deploySandboxTheme();
 
 // Disable XDG Portal color-scheme (broken on Linux, signals not reliably
 // delivered to Electron). Same fix as trae-cn bootstrap.

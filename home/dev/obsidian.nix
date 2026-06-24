@@ -19,6 +19,22 @@
 #        stays purple (h=258), affecting tags, focus rings, active-hover, etc.
 #   - appearance.json: theme="system" + cssTheme="Rose Pine" + snippet enabled.
 #     Merged with existing settings via jq (preserves user customizations).
+#
+# Theme deployment — TWO paths:
+#   1. Main vault (~/knowledge/): activation script deploys theme files directly
+#      to .obsidian/themes/ + .obsidian/snippets/ + appearance.json.
+#      Uses activation script (not home.file) because .obsidian/ is runtime-managed
+#      (workspace.json/cache change frequently; symlinking would break).
+#   2. Sandbox vault (~/.config/obsidian/Obsidian Sandbox/): bootstrap.cjs deploys
+#      theme on every app startup. The sandbox vault is created on-demand by
+#      Obsidian (Help → Sandbox vault) — Obsidian's p() function DELETES and
+#      RECREATES the directory from template if it's not in obsidian.json.
+#      This creates a timing problem for activation scripts (sandbox may not
+#      exist at switch time). bootstrap.cjs solves this by deploying on every
+#      startup — robust against sandbox recreation.
+#      Theme files are deployed to ~/.config/obsidian/rose-pine/ (stable location,
+#      declarative via xdg.configFile) and bootstrap.cjs copies from there.
+#
 #   - Vault at ~/knowledge/ — git-cloned on all hosts via repos.nix
 #   - Obsidian config (.obsidian/) — runtime-managed, NOT home-managed
 #     (workspace.json/cache change frequently; symlinking would break)
@@ -31,7 +47,11 @@
 # Web Clipper (browser extension) is configured in firefox.nix via policies.
 { pkgs, config, lib, palette, ... }:
 let
-  vaultPath = "${config.home.homeDirectory}/knowledge";
+  # Main vault — git-cloned on all hosts via repos.nix (always exists).
+  # Sandbox vault is NOT listed here — bootstrap.cjs handles it (see header).
+  vaults = [
+    "${config.home.homeDirectory}/knowledge"
+  ];
 
   # Official Rose Pine theme (manifest.json + theme.css).
   # No release tags — pinned to commit e2b47ad (v0.1.19).
@@ -83,37 +103,59 @@ in
 {
   home.packages = [ pkgs.obsidian ];
 
-  # Deploy Rose Pine theme + CSS snippet + appearance settings per-vault.
+  # Stable theme files for bootstrap.cjs sandbox vault deployment.
+  # bootstrap.cjs copies these to the sandbox vault's .obsidian/ on every
+  # startup (see packages/obsidian/bootstrap.cjs deploySandboxTheme).
+  # Declarative via xdg.configFile (symlinks to Nix store — always in sync).
+  xdg.configFile = {
+    "obsidian/rose-pine/manifest.json".source = "${rosePineTheme}/manifest.json";
+    "obsidian/rose-pine/theme.css".source = "${rosePineTheme}/theme.css";
+    "obsidian/rose-pine/snippet.css".source = rosePineSnippet;
+  };
+
+  # Deploy Rose Pine theme + CSS snippet + appearance settings to main vault.
   # Uses activation script (not home.file) because .obsidian/ is runtime-managed
   # — workspace.json/cache change frequently, symlinking would break.
+  # Sandbox vault is handled by bootstrap.cjs (see header comment).
   home.activation.obsidianTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    # Deploy official Rose Pine theme (manifest.json + theme.css)
-    THEME_DIR="${vaultPath}/.obsidian/themes/Rose Pine"
-    mkdir -p "$THEME_DIR"
-    cp -f ${rosePineTheme}/manifest.json "$THEME_DIR/"
-    cp -f ${rosePineTheme}/theme.css "$THEME_DIR/"
-
-    # Deploy CSS snippet (palette.nix colors via replaceVars)
-    SNIPPET_DIR="${vaultPath}/.obsidian/snippets"
-    mkdir -p "$SNIPPET_DIR"
-    cp -f ${rosePineSnippet} "$SNIPPET_DIR/rose-pine-obsidian.css"
-
     # Deploy starter screen CSS (global, pre-vault — bootstrap.cjs injects it)
     STARTER_DIR="${config.home.homeDirectory}/.config/obsidian"
     mkdir -p "$STARTER_DIR"
     cp -f ${rosePineStarterCSS} "$STARTER_DIR/starter.css"
 
-    # Update appearance.json — merge declared settings with existing
-    APPEARANCE="${vaultPath}/.obsidian/appearance.json"
-    mkdir -p "$(dirname "$APPEARANCE")"
-    existing=$(cat "$APPEARANCE" 2>/dev/null || echo "{}")
-    # Guard against empty/invalid JSON (file exists but empty, or corrupted)
-    echo "$existing" | ${pkgs.jq}/bin/jq empty 2>/dev/null || existing="{}"
-    echo "$existing" | ${pkgs.jq}/bin/jq -c \
-      --arg theme "system" \
-      --arg cssTheme "Rose Pine" \
-      --argjson snippets '["rose-pine-obsidian"]' \
-      '. + {theme: $theme, cssTheme: $cssTheme, enabledCssSnippets: ($snippets + (.enabledCssSnippets // []) | unique)}' \
-      > "$APPEARANCE"
+    # Per-vault theme deployment (function avoids duplication across vaults).
+    deploy_vault_theme() {
+      local vault_path="$1"
+      [ -d "$vault_path" ] || return 0
+
+      # Deploy official Rose Pine theme (manifest.json + theme.css)
+      local theme_dir="$vault_path/.obsidian/themes/Rose Pine"
+      mkdir -p "$theme_dir"
+      cp -f ${rosePineTheme}/manifest.json "$theme_dir/"
+      cp -f ${rosePineTheme}/theme.css "$theme_dir/"
+
+      # Deploy CSS snippet (palette.nix colors via replaceVars)
+      local snippet_dir="$vault_path/.obsidian/snippets"
+      mkdir -p "$snippet_dir"
+      cp -f ${rosePineSnippet} "$snippet_dir/rose-pine-obsidian.css"
+
+      # Update appearance.json — merge declared settings with existing
+      local appearance="$vault_path/.obsidian/appearance.json"
+      mkdir -p "$(dirname "$appearance")"
+      local existing
+      existing=$(cat "$appearance" 2>/dev/null || echo "{}")
+      # Guard against empty/invalid JSON (file exists but empty, or corrupted)
+      echo "$existing" | ${pkgs.jq}/bin/jq empty 2>/dev/null || existing="{}"
+      echo "$existing" | ${pkgs.jq}/bin/jq -c \
+        --arg theme "system" \
+        --arg cssTheme "Rose Pine" \
+        --argjson snippets '["rose-pine-obsidian"]' \
+        '. + {theme: $theme, cssTheme: $cssTheme, enabledCssSnippets: ($snippets + (.enabledCssSnippets // []) | unique)}' \
+        > "$appearance"
+    }
+
+    ${lib.concatMapStrings (v: ''
+      deploy_vault_theme "${v}"
+    '') vaults}
   '';
 }
