@@ -20,6 +20,16 @@ let
     highlight_med = "403d52";
     highlight_high = "524f67";
 
+    # Obsidian base accent HSL (rose) — overrides Obsidian default purple (h=258).
+    # Without this, --color-accent/--interactive-accent-hsl stay purple, affecting
+    # tags, focus rings, active-hover backgrounds, and dozens of other UI elements.
+    accent_h = "2";
+    accent_s = "55%";
+    accent_l = "83%";
+    # Obsidian highlight RGB (highlightHigh) — overrides Obsidian default yellow.
+    # Used by rgb()/rgba() in search highlights and other UI elements.
+    highlight_rgb = "82, 79, 103";
+
     # bright variants — lighter versions of regular colors (from official foot theme)
     bright_overlay = "47435d";
     bright_love = "ff98ba";
@@ -47,6 +57,12 @@ let
     highlight_low = "2a283e";
     highlight_med = "44415a";
     highlight_high = "56526e";
+
+    accent_h = "2";
+    accent_s = "66%";
+    accent_l = "75%";
+    highlight_rgb = "86, 82, 110";
+
     # bright variants — lighter versions of regular colors (from official foot theme)
     bright_overlay = "5c5776";
     bright_love = "ff98ba";
@@ -74,6 +90,12 @@ let
     highlight_low = "f4ede8";
     highlight_med = "dfdad9";
     highlight_high = "cecacd";
+
+    accent_h = "3";
+    accent_s = "53%";
+    accent_l = "67%";
+    highlight_rgb = "206, 202, 205";
+
     # bright variants — lighter versions of regular colors (from official foot theme)
     bright_overlay = "fffdf5";
     bright_love = "df8aa0";

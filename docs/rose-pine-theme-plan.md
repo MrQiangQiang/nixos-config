@@ -112,7 +112,8 @@ palette.nix（唯一来源）
 | **第零层 B** | replaceVars 模板 + OSC 11 启动检测 | yazi | Yazi: flavor.toml + tmtheme.xml 模板 + [flavor] dark/light。持久 TUI 进程，启动时检测一次，运行中实例不切换（hex 颜色不跟随终端调色板） |
 | 第一层 | Nix 生成配置 + ln -sf + signal/reload | kwm/mako/fuzzel/wob/foot/fcitx5 | Darkman 脚本 |
 | 第二层 | GTK 主题名（Select-only） | GTK3/GTK4 应用 | dconf write |
-| 第三层 | XDG Portal color-scheme | Firefox/Electron/Spotify | dconf write → Portal 广播 |
+| 第三层 | XDG Portal color-scheme | Firefox/Spotify/Electron（纯 Portal） | dconf write → Portal 广播 |
+| 第三层 B | bootstrap.cjs 注入（darkman → nativeTheme） | Obsidian / Trae CN | darkman mode 文件监听 → nativeTheme.themeSource |
 | 第四层 | Firefox userChrome.css + userContent.css | Firefox Chrome + about: 页面 | Portal prefers-color-scheme → @media 自动切换 |
 | 第五层 | Dark Reader (AMO 签名扩展) | Firefox 外部网页 | Portal prefers-color-scheme → automation=system |
 
@@ -179,6 +180,7 @@ Rose 语义 = 搜索匹配/选中状态/活跃强调。选中状态需要双重�
 **为什么 `initLua` 注册 `Linemode:size_and_mtime()`**：yazi 内置 linemode 只支持 `none`/`size`/`mtime`/`permissions`/`owner` 单一显示。自定义 linemode 通过 `init.lua` 在 `Linemode` 表上添加方法，`solo()` 运行时通过 `self[mode]` 动态查找。加载时序：stage_1 加载 `linemode.lua`（定义 `Linemode` 表），stage_2 加载 `init.lua`（扩展 `Linemode` 表），运行时 `solo()` 可正确找到自定义方法。
 
 | Trae CN | — | — | Rosé Pine 扩展 | Select-only |
+| Obsidian | Base/Surface/Overlay | Text | Rose/Highlight Med | Custom（官方主题 + replaceVars snippet） |
 
 Mako 背景 = Overlay（三级背景 = 浮层/弹窗/通知）。Fuzzel 背景 = Base（全屏启动器用主背景）。fcitx5 背景 = Overlay（浮层 = 输入法候选框）。
 
@@ -398,6 +400,26 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 ---
 
+## Obsidian 集成
+
+三层 CSS 覆盖 + bootstrap.cjs 注入（同 [Trae CN](#trae-cn-集成) 模式）。
+
+**bootstrap.cjs**：Linux 上 XDG Portal color-scheme 信号不可靠传递到 Electron（确认 v1.12.4，2026 年 3 月）。注入 app.asar：读 darkman mode → `nativeTheme.themeSource` → Obsidian 的 `nativeTheme.on("updated")` 接管。禁用 `PrefersColorSchemePortal`。
+
+**三层 CSS 覆盖**（snippet 通过 replaceVars 从 palette.nix 注入，列出所有变体类匹配官方特异性 0,2,0，snippets 在 theme.css 后加载 → 胜出）：
+
+| 层 | 覆盖 | 为什么 |
+|----|------|--------|
+| `--rp-*` 调色板 | 15 变量 × dark/light | dark_variant（main/moon）是编译时配置，官方主题分别硬编码 |
+| `--rp-accent` / `--rp-highlight` | @settings 默认值 | 官方 CSS fallback：accent=iris（紫），highlight=undefined。@settings 默认值需要 Style Settings 插件，我们未安装 |
+| `--accent-h/s/l` / `--text-highlight-bg-rgb` | Obsidian 基础 accent 变量 | 官方只覆盖衍生变量，不覆盖基础变量。Obsidian 默认紫色（h=258），影响标签/焦点环/active-hover 等数十个元素 |
+
+**对比度修复**：官方 `--text-on-accent: var(--rp-accent)`（粉）在 `--background-modifier-error: var(--rp-love)`（也粉）上不可见。6 个受影响元素覆盖 `--text-on-accent: var(--rp-base)`（moon 5.25:1 AA，dawn 4.09:1 AA 大文本）。
+
+**activation script 而非 home.file**：`.obsidian/` 运行时管理（workspace.json/cache 频繁变化），symlinking 会破坏。`cp -f` 部署 + `jq` 合并 appearance.json。
+
+---
+
 ## 文件结构
 
 ```
@@ -438,6 +460,10 @@ home/shell/
   rose-pine-bat.tmTheme ← Bat tmTheme 模板：@placeholder@ 占位符
   default.nix          ← imports + SSH/Git/Vim/基础包
 
+home/dev/
+  obsidian.nix         ← Obsidian：官方主题 + replaceVars snippet 部署 + appearance.json 合并
+  rose-pine-obsidian.css ← Obsidian CSS snippet 模板：@placeholder@ 占位符
+
 packages/
   kwm.nix              ← kwm 构建：-Dbackground=true + SIGUSR1 patch
   kwm/sigusr1-reload.patch ← 三处增强（含无条件 start_listening_status 重连）
@@ -446,6 +472,8 @@ packages/
   zig-post-configure.nix ← Zig fetchDeps 缓存注入（kwm/river/kwim 共享）
   trae-cn.nix          ← Trae CN 包：bootstrap + Wayland + 主题参数
   trae-cn/bootstrap.cjs ← Darkman 集成 + Wayland 检测
+  obsidian.nix          ← Obsidian 包覆盖：bootstrap.cjs 注入 app.asar
+  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接（同 trae-cn 模式）
 
 modules/desktop.nix    ← dark_variant + latitude/longitude + schemaDir + portal
 home/default.nix       ← palette 注入为 _module.args
@@ -465,6 +493,7 @@ home/default.nix       ← palette 注入为 _module.args
 | kwm/mako/fuzzel/wob/fcitx5/networkmanager-dmenu | ✅ 完全 | Darkman ln -sf + signal/reload |
 | GTK 应用 | ✅ 完全 | Select-only + dconf |
 | Firefox | ✅ 完全 | userChrome.css + userContent.css + Dark Reader，自动跟随 XDG Portal |
-| Electron/Spotify | ✅ dark/light | XDG Portal |
+| Spotify | ✅ dark/light | XDG Portal |
+| Obsidian | ✅ 完全 | 官方主题 + replaceVars snippet + bootstrap.cjs（Portal 损坏，darkman → nativeTheme） |
 | Qt 应用 | ⚠️ 近似 | platformTheme = gtk |
 | Trae CN 内部主题 | ✅ 完全 | bootstrap.cjs 监听 mode.txt |

@@ -1,0 +1,154 @@
+/* Rose Pine variable override — sourced from palette.nix via replaceVars
+ *
+ * Three layers of overrides (official theme.css has gaps):
+ *
+ * 1. --rp-* palette (15 vars × dark/light) — dark_variant resolution.
+ *    Official theme.css hardcodes main/moon/dawn in separate selectors.
+ *    We override to match palette.dark (main or moon per dark_variant).
+ *
+ * 2. --rp-accent, --rp-highlight — @settings variable defaults.
+ *    Official CSS fallback: --rp-accent=iris (purple), --rp-highlight=undefined.
+ *    @settings default (needs Style Settings plugin): accent=rose, highlight=High.
+ *    We set to @settings defaults so the theme works without the plugin.
+ *
+ * 3. --accent-h/s/l, --text-highlight-bg-rgb — Obsidian BASE accent vars.
+ *    Official theme.css only overrides DERIVED vars (--text-accent, etc.),
+ *    NOT the base --accent-h/s/l (Obsidian default: purple h=258).
+ *    Dozens of UI elements reference --color-accent / --interactive-accent-hsl
+ *    directly (tags, focus rings, active-hover, link decorations, checkboxes).
+ *    Also --text-highlight-bg-rgb (yellow 255,208,0) used by search highlights.
+ *
+ * Specificity: official theme.css uses .theme-dark.rose-norm / .theme-dark.rose-moon
+ * (0,2,0). We list all variant classes to match (0,2,0); snippets load AFTER
+ * theme.css → snippet wins. Style Settings plugin (if installed) uses inline
+ * styles (1,0,0) → plugin wins over our snippet.
+ */
+
+.theme-dark,
+.theme-dark.rose-norm,
+.theme-dark.rose-moon {
+  --rp-base: #@base_dark@;
+  --rp-surface: #@surface_dark@;
+  --rp-overlay: #@overlay_dark@;
+  --rp-muted: #@muted_dark@;
+  --rp-subtle: #@subtle_dark@;
+  --rp-text: #@text_dark@;
+  --rp-love: #@love_dark@;
+  --rp-gold: #@gold_dark@;
+  --rp-rose: #@rose_dark@;
+  --rp-pine: #@pine_dark@;
+  --rp-foam: #@foam_dark@;
+  --rp-iris: #@iris_dark@;
+  --rp-highlightLow: #@highlight_low_dark@;
+  --rp-highlightMed: #@highlight_med_dark@;
+  --rp-highlightHigh: #@highlight_high_dark@;
+}
+
+.theme-light,
+.theme-light.rose-dawn,
+.theme-light.rose-norm,
+.theme-light.rose-moon {
+  --rp-base: #@base_light@;
+  --rp-surface: #@surface_light@;
+  --rp-overlay: #@overlay_light@;
+  --rp-muted: #@muted_light@;
+  --rp-subtle: #@subtle_light@;
+  --rp-text: #@text_light@;
+  --rp-love: #@love_light@;
+  --rp-gold: #@gold_light@;
+  --rp-rose: #@rose_light@;
+  --rp-pine: #@pine_light@;
+  --rp-foam: #@foam_light@;
+  --rp-iris: #@iris_light@;
+  --rp-highlightLow: #@highlight_low_light@;
+  --rp-highlightMed: #@highlight_med_light@;
+  --rp-highlightHigh: #@highlight_high_light@;
+}
+
+/* Derived variable defaults — official theme.css defines these in .theme-dark /
+ * .theme-light (specificity 0,1,0):
+ *   --rp-accent: var(--rp-iris)   (line 1055 — CSS fallback, purple)
+ *   --rp-h1..h6: var(--rp-love/iris/...)  (lines 1049-1054 — correct, no override needed)
+ *
+ * But @settings default for accent is rp-accent-full → var(--rp-rose) (pink).
+ * Without Style Settings plugin, iris (purple) wins → wrong accent color.
+ * We override to rose to match @settings default and theme identity ("Rose Pine").
+ *
+ * --rp-highlight has NO CSS default in theme.css (only @settings comment).
+ * Without this override, --text-highlight-bg: var(--rp-highlight) fails →
+ * falls back to Obsidian's default yellow (#FFD000).
+ *
+ * Selector specificity (0,1,0) matches official .theme-dark; snippet loads
+ * AFTER theme.css → snippet wins. Variant classes (0,2,0) also win.
+ * If Style Settings plugin is installed later, its variable-select injection
+ * (inline style on <body>) has higher specificity (1,0,0) → plugin wins.
+ */
+.theme-dark,
+.theme-dark.rose-norm,
+.theme-dark.rose-moon,
+.theme-light,
+.theme-light.rose-dawn,
+.theme-light.rose-norm,
+.theme-light.rose-moon {
+  --rp-accent: var(--rp-rose);
+  --rp-highlight: var(--rp-highlightHigh);
+}
+
+/* Obsidian base accent override — official theme.css only overrides DERIVED
+ * variables (--text-accent, --interactive-accent, etc.) but NOT the base
+ * --accent-h/s/l. Obsidian defaults to purple (h=258 s=88% l=66%).
+ * Dozens of UI elements reference --color-accent / --interactive-accent-hsl
+ * directly (tags, focus rings, active-hover backgrounds, link decorations,
+ * checkbox backgrounds, SVG strokes). Without this override, all show purple.
+ * Also --text-highlight-bg-rgb defaults to yellow (255,208,0), used by
+ * rgb()/rgba() in search highlights and border highlights.
+ *
+ * Setting --accent-h/s/l automatically fixes all derived variables:
+ *   --color-accent-hsl, --color-accent, --color-accent-1, --color-accent-2,
+ *   --interactive-accent-hsl, --background-modifier-active-hover
+ */
+.theme-dark,
+.theme-dark.rose-norm,
+.theme-dark.rose-moon {
+  --accent-h: @accent_h_dark@;
+  --accent-s: @accent_s_dark@;
+  --accent-l: @accent_l_dark@;
+  --text-highlight-bg-rgb: @highlight_rgb_dark@;
+}
+
+.theme-light,
+.theme-light.rose-dawn,
+.theme-light.rose-norm,
+.theme-light.rose-moon {
+  --accent-h: @accent_h_light@;
+  --accent-s: @accent_s_light@;
+  --accent-l: @accent_l_light@;
+  --text-highlight-bg-rgb: @highlight_rgb_light@;
+}
+
+/* UI contrast fix — official theme sets --text-on-accent: var(--rp-accent) (pink),
+ * which works on --interactive-accent backgrounds (dark --rp-highlightLow) but is
+ * INVISIBLE on --background-modifier-error backgrounds (--rp-love, also pink/red).
+ * Override --text-on-accent to --rp-base (opposite lightness) on ALL error-background
+ * elements found in app.css (grep for background-modifier-error + text-on-accent):
+ *   - button.mod-warning: delete confirmation buttons
+ *   - .setting-hotkey.has-conflict: hotkey conflict indicators
+ *   - .setting-delete-hotkey:hover: delete hotkey button hover
+ *   - .changelog-item.mod-failed:before: failed changelog item marker
+ *   - .message.mod-error: error message banners
+ *   - .tooltip.mod-error: error tooltips
+ *
+ * moon: --rp-base=#232136 (dark) on --rp-love=#eb6f92 (pink) = 5.25:1 (AA pass)
+ * dawn: --rp-base=#faf4ed (light) on --rp-love=#b4637a (dark red) = 4.09:1 (AA large)
+ *
+ * Specificity: each selector matches its app.css counterpart (0,1,1 to 0,2,1);
+ * snippet loads after app.css → snippet wins for all.
+ */
+button.mod-warning,
+.setting-hotkey.has-conflict,
+.setting-delete-hotkey:hover,
+.changelog-item.mod-failed:before,
+.message.mod-error,
+.tooltip.mod-error {
+  --text-on-accent: var(--rp-base);
+}
