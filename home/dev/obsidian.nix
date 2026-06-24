@@ -59,6 +59,26 @@ let
 
   snippetVars = mkSnippetVars "dark" palette.dark // mkSnippetVars "light" palette.dawn;
   rosePineSnippet = pkgs.replaceVars ./rose-pine-obsidian.css snippetVars;
+
+  # Starter screen CSS (vault switcher + version info modal).
+  # starter.html hardcodes <body class="theme-dark"> and only loads app.css —
+  # vault-level theme.css/snippets are NOT loaded. bootstrap.cjs reads this
+  # file and injects via webContents.insertCSS() on the starter window.
+  # Deployed to ~/.config/obsidian/ (global, pre-vault) not vault-level.
+  #
+  # Separate var set (not snippetVars) because replaceVars requires every
+  # provided key to appear in the template — starter.css only uses base/
+  # surface/overlay/muted/subtle/text + accent_h/s/l, not the full palette.
+  mkStarterVars = suffix: c:
+    builtins.listToAttrs (builtins.map (name: {
+      name = "${name}_${suffix}";
+      value = c.${name};
+    }) [
+      "base" "surface" "overlay" "muted" "subtle" "text"
+      "accent_h" "accent_s" "accent_l"
+    ]);
+  starterVars = mkStarterVars "dark" palette.dark // mkStarterVars "light" palette.dawn;
+  rosePineStarterCSS = pkgs.replaceVars ./rose-pine-obsidian-starter.css starterVars;
 in
 {
   home.packages = [ pkgs.obsidian ];
@@ -77,6 +97,11 @@ in
     SNIPPET_DIR="${vaultPath}/.obsidian/snippets"
     mkdir -p "$SNIPPET_DIR"
     cp -f ${rosePineSnippet} "$SNIPPET_DIR/rose-pine-obsidian.css"
+
+    # Deploy starter screen CSS (global, pre-vault — bootstrap.cjs injects it)
+    STARTER_DIR="${config.home.homeDirectory}/.config/obsidian"
+    mkdir -p "$STARTER_DIR"
+    cp -f ${rosePineStarterCSS} "$STARTER_DIR/starter.css"
 
     # Update appearance.json — merge declared settings with existing
     APPEARANCE="${vaultPath}/.obsidian/appearance.json"

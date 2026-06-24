@@ -1,0 +1,57 @@
+/* Rose Pine starter screen theme — injected by bootstrap.cjs
+ *
+ * Problem: starter.html hardcodes <body class="theme-dark"> and only loads
+ * app.css (no vault-level theme.css or snippets). The starter screen
+ * (vault switcher + version info) always shows Obsidian's default dark
+ * theme (#1e1e1e), ignoring Rose Pine and system dark/light mode.
+ *
+ * Solution: bootstrap.cjs reads this file and injects via webContents.insertCSS()
+ * on the starter window. Also fixes body class (theme-dark → theme-light)
+ * based on darkman mode so the correct block below matches.
+ *
+ * Variable coverage:
+ *   --color-base-* (12 slots) → Rose Pine base/surface/overlay/muted/subtle/text
+ *   --accent-h/s/l → Rose Pine rose (overrides Obsidian default purple h=258)
+ *
+ * All derived vars (--background-primary, --text-muted, --interactive-accent,
+ * etc.) automatically follow via var() chains in app.css body block.
+ *
+ * Specificity: body.starter.theme-dark = (0,2,1) > app.css .theme-dark = (0,1,0).
+ * insertCSS with cssOrigin:'author' loads after app.css → wins.
+ */
+
+body.starter.theme-dark {
+  --color-base-00: #@base_dark@;
+  --color-base-05: #@base_dark@;
+  --color-base-10: #@surface_dark@;
+  --color-base-20: #@overlay_dark@;
+  --color-base-25: #@overlay_dark@;
+  --color-base-30: #@overlay_dark@;
+  --color-base-35: #@overlay_dark@;
+  --color-base-40: #@muted_dark@;
+  --color-base-50: #@muted_dark@;
+  --color-base-60: #@subtle_dark@;
+  --color-base-70: #@subtle_dark@;
+  --color-base-100: #@text_dark@;
+  --accent-h: @accent_h_dark@;
+  --accent-s: @accent_s_dark@;
+  --accent-l: @accent_l_dark@;
+}
+
+body.starter.theme-light {
+  --color-base-00: #@base_light@;
+  --color-base-05: #@base_light@;
+  --color-base-10: #@surface_light@;
+  --color-base-20: #@overlay_light@;
+  --color-base-25: #@overlay_light@;
+  --color-base-30: #@overlay_light@;
+  --color-base-35: #@overlay_light@;
+  --color-base-40: #@muted_light@;
+  --color-base-50: #@muted_light@;
+  --color-base-60: #@subtle_light@;
+  --color-base-70: #@subtle_light@;
+  --color-base-100: #@text_light@;
+  --accent-h: @accent_h_light@;
+  --accent-s: @accent_s_light@;
+  --accent-l: @accent_l_light@;
+}

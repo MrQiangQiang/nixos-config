@@ -418,6 +418,10 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 **activation script 而非 home.file**：`.obsidian/` 运行时管理（workspace.json/cache 频繁变化），symlinking 会破坏。`cp -f` 部署 + `jq` 合并 appearance.json。
 
+**Starter screen 修复（vault 切换器 + 版本信息弹窗）**：`starter.html` 硬编码 `<body class="theme-dark">` 且只加载 `app.css`（不加载 vault 级别 theme.css/snippets）。`main.js` 创建 starter window 时背景色硬编码 `#1e1e1e`，无 `insertCSS`/`nativeTheme`/主题类操作。结果：starter screen 永远是 Obsidian 默认 dark 主题，不跟随 Rose Pine 或系统 dark/light。
+
+修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`（覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l`，`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0）。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。
+
 ---
 
 ## 文件结构
@@ -461,8 +465,9 @@ home/shell/
   default.nix          ← imports + SSH/Git/Vim/基础包
 
 home/dev/
-  obsidian.nix         ← Obsidian：官方主题 + replaceVars snippet 部署 + appearance.json 合并
-  rose-pine-obsidian.css ← Obsidian CSS snippet 模板：@placeholder@ 占位符
+  obsidian.nix         ← Obsidian：官方主题 + replaceVars snippet 部署 + starter.css 部署 + appearance.json 合并
+  rose-pine-obsidian.css ← Obsidian CSS snippet 模板：@placeholder@ 占位符（vault 级别）
+  rose-pine-obsidian-starter.css ← Obsidian starter screen CSS 模板：@placeholder@ 占位符（全局，pre-vault）
 
 packages/
   kwm.nix              ← kwm 构建：-Dbackground=true + SIGUSR1 patch
@@ -473,7 +478,7 @@ packages/
   trae-cn.nix          ← Trae CN 包：bootstrap + Wayland + 主题参数
   trae-cn/bootstrap.cjs ← Darkman 集成 + Wayland 检测
   obsidian.nix          ← Obsidian 包覆盖：bootstrap.cjs 注入 app.asar
-  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接（同 trae-cn 模式）
+  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接 + starter screen CSS 注入（同 trae-cn 模式）
 
 modules/desktop.nix    ← dark_variant + latitude/longitude + schemaDir + portal
 home/default.nix       ← palette 注入为 _module.args
