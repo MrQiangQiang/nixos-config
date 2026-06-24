@@ -48,7 +48,7 @@ palette.nix（唯一来源）
 │  fuzzel.nix    → theme/fuzzel-config-{dark,light}.ini │
 │  wob.nix       → theme/wob-config-{dark,light}.ini   │
 │  fcitx5.nix    → theme/fcitx5-{dark,light}/ (theme.conf only, no PNG) │
-│  gtk.nix       → Select-only: rose-pine-gtk-theme + Papirus 图标主题 + gtk-im-module  │
+│  gtk.nix       → Select-only + CSS override: rose-pine-gtk-theme + Papirus + gtk-im-module + gtk/{dark,light}.css  │
 │  firefox.nix   → Custom: userChrome.css + userContent.css + Dark Reader              │
 │  swayidle.nix  → waylock-theme wrapper（运行时读模式） │
 │  starship.nix  → palette.ansi 语义→ANSI 映射 + Powerline + Nerd Font 图标（第零层，自动跟随 foot 16 色）│
@@ -162,7 +162,7 @@ Rose 语义 = 搜索匹配/选中状态/活跃强调。选中状态需要双重�
 | Foot | Base | Text | 16色严格映射 | Render-own |
 | Waylock | Base | Pine/Love | — | Render-own |
 | fcitx5 | Overlay | Subtle/Text | Highlight Med | Render-own |
-| GTK | — | — | rose-pine-gtk-theme + Papirus 图标主题 + gtk-im-module | Select-only |
+| GTK | — | — | rose-pine-gtk-theme + Papirus + gtk-im-module + CSS override (tooltip + 文件选择器按钮) | Select-only + CSS override |
 | Firefox | Base/Surface/Overlay | Text | Rose/Highlight Med | Custom |
 | Yazi | Base/Surface | Text | Pine/Foam/Rose/Love/Gold/Iris | Render-own (replaceVars) |
 | Bat | Base/Surface | Text | Pine/Foam/Rose/Gold/Iris/Love | Render-own (replaceVars) |
@@ -392,7 +392,7 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 ### 已知限制：运行时切换（Wayland/River）
 
-**NAC Tooltip**：部分按钮的悬停浮层受 `xul.css`（UA Sheet）的 `InfoBackground`/`InfoText` 系统颜色控制，`userChrome.css` 无法匹配。Wayland/River 上缺少 `gnome-settings-daemon` 桥接，`InfoBackground`/`InfoText` 运行时不更新。启动时的正确性由 `gtk-tooltip-*.css` 保障（darkman 切换时 symlink 到 `~/.config/gtk-3.0/gtk.css`）。
+**NAC Tooltip + 文件选择器按钮**：两个 GTK 层面问题由 `gtk/{dark,light}.css` 统一覆盖（darkman 切换时 symlink 到 `~/.config/gtk-3.0/gtk.css`）。NAC tooltip 受 `xul.css` 的 `InfoBackground`/`InfoText` 系统颜色控制，`userChrome.css` 无法匹配；文件选择器（xdg-desktop-portal-gtk）的 accept 按钮在 :disabled 状态下 Rose Pine GTK 主题 v2.2.0 的 `:disabled:disabled` hack 导致 ~1.5:1 对比度（近乎不可见），CSS override 用 `button.suggested-action:disabled:disabled` 选择器（特异性 0,3,1 > 主题 0,3,0）修复到 ~7:1。运行时切换在 Wayland 上不生效（无 GtkSettings bridge），启动时正确；xdg-desktop-portal-gtk 是持久 D-Bus 服务，首次部署后需重启或重新登录。
 
 **Tab 预览面板**：Shadow DOM 内 `::part(content)` 的 `var()` 在 `RecascadeSubtree` 时不重新求值。
 
@@ -418,6 +418,8 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 **activation script 而非 home.file**：`.obsidian/` 运行时管理（workspace.json/cache 频繁变化），symlinking 会破坏。`cp -f` 部署 + `jq` 合并 appearance.json。
 
+**双路径部署**：主 vault（`~/knowledge/`）由 activation script 部署（build-time）；sandbox vault（`~/.config/obsidian/Obsidian Sandbox/`）由 bootstrap.cjs 部署（runtime）。sandbox vault 由 Obsidian 按需创建（Help → Sandbox vault），Obsidian 的 `p()` 函数在 vault 未注册于 `obsidian.json` 时会**删除并重建**整个目录——activation script 在 `nixos-rebuild switch` 时可能因 sandbox 不存在而跳过。bootstrap.cjs 在每次启动时部署主题文件，对 sandbox 重建具有鲁棒性。稳定主题文件由 `xdg.configFile` 部署到 `~/.config/obsidian/rose-pine/`（Nix store symlink），bootstrap.cjs 的 `copyThemeFile` 用 `readFileSync` + `writeFileSync` 替代 `copyFileSync`——解决两个 Nix 特有问题：(1) 源文件是 Nix store symlink，`copyFileSync` 可能复制符号链接本身而非内容；(2) `copyFileSync` 保留源文件 444 只读权限，导致后续覆盖时 EACCES。`rmSync(force)` 清除旧只读文件，`writeFileSync` 创建默认 644 权限新文件。
+
 **Starter screen 修复（vault 切换器 + 版本信息弹窗 + Help 界面）**：`starter.html` 和 `help.html` 都硬编码 `<body class="theme-dark">` 且只加载 `app.css`（不加载 vault 级别 theme.css/snippets）。`main.js` 创建这些窗口时背景色硬编码 `#1e1e1e`，无 `insertCSS`/`nativeTheme`/主题类操作。结果：这些窗口永远是 Obsidian 默认 dark 主题，不跟随 Rose Pine 或系统 dark/light。
 
 修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 或 `help.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`。CSS 覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l` + `--text-on-accent`（覆盖 app.css 硬编码 `white`，改为 `var(--color-base-00)` 确保 dark/light 都有对比度），并修复 `.splash-brand-logo-text { color: white }` 硬编码为 `var(--text-normal)`。`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。
@@ -432,8 +434,6 @@ home/desktop/
   kwm/config.zon       ← KWM 模板：@placeholder@ 占位符
   firefox/userChrome.css ← Firefox Chrome UI 模板：@placeholder@ 占位符
   firefox/userContent.css ← Firefox about: 页面模板：@placeholder@ 占位符
-  firefox/gtk-tooltip-dark.css ← GTK tooltip dark（Firefox NAC tooltip）
-  firefox/gtk-tooltip-light.css ← GTK tooltip light
   firefox/dark-reader-settings.json ← Dark Reader 扩展配置
   filemanager/rose-pine-yazi-flavor.toml ← Yazi flavor 模板：@placeholder@ 占位符
   filemanager/rose-pine-yazi-tmtheme.xml ← Yazi 语法高亮模板：@placeholder@ 占位符
@@ -445,7 +445,9 @@ home/desktop/
   wob.nix              ← 生成 dark/light wob 配置 → theme/
   foot.nix             ← 生成 dark/light foot 配置 → theme/
   fcitx5.nix           ← 生成 dark/light fcitx5 主题 → theme/ (theme.conf only, no PNG)
-  gtk.nix              ← Select-only: 主题名 + 图标主题(Papirus) + gtk-im-module + dconf + Qt 跟随
+  gtk.nix              ← Select-only: 主题名 + 图标主题(Papirus) + gtk-im-module + dconf + Qt 跟随 + CSS override 部署
+  gtk/dark.css         ← GTK CSS override dark: tooltip 颜色 + 文件选择器按钮 :disabled 对比度
+  gtk/light.css        ← GTK CSS override light（Dawn 变体，同 dark）
   firefox.nix          ← Custom: replaceVars 生成 userChrome.css + userContent.css + Dark Reader policy
   filemanager.nix      ← Yazi: replaceVars flavor.toml + tmtheme.xml → programs.yazi.flavors + OSC 11
   darkman.nix          ← 运行时切换（唯一切换逻辑）：ln -sf + signal + dconf
@@ -465,7 +467,7 @@ home/shell/
   default.nix          ← imports + SSH/Git/Vim/基础包
 
 home/dev/
-  obsidian.nix         ← Obsidian：官方主题 + replaceVars snippet 部署 + starter.css 部署 + appearance.json 合并
+  obsidian.nix         ← Obsidian：双路径部署（主 vault activation script + sandbox 稳定文件 xdg.configFile）+ starter.css + appearance.json 合并
   rose-pine-obsidian.css ← Obsidian CSS snippet 模板：@placeholder@ 占位符（vault 级别）
   rose-pine-obsidian-starter.css ← Obsidian starter screen CSS 模板：@placeholder@ 占位符（全局，pre-vault）
 
@@ -478,7 +480,7 @@ packages/
   trae-cn.nix          ← Trae CN 包：bootstrap + Wayland + 主题参数
   trae-cn/bootstrap.cjs ← Darkman 集成 + Wayland 检测
   obsidian.nix          ← Obsidian 包覆盖：bootstrap.cjs 注入 app.asar
-  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接 + starter screen CSS 注入（同 trae-cn 模式）
+  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接 + starter/help screen CSS 注入 + sandbox vault 主题部署（同 trae-cn 模式）
 
 modules/desktop.nix    ← dark_variant + latitude/longitude + schemaDir + portal
 home/default.nix       ← palette 注入为 _module.args
@@ -499,6 +501,6 @@ home/default.nix       ← palette 注入为 _module.args
 | GTK 应用 | ✅ 完全 | Select-only + dconf |
 | Firefox | ✅ 完全 | userChrome.css + userContent.css + Dark Reader，自动跟随 XDG Portal |
 | Spotify | ✅ dark/light | XDG Portal |
-| Obsidian | ✅ 完全 | 官方主题 + replaceVars snippet + bootstrap.cjs（Portal 损坏，darkman → nativeTheme） |
+| Obsidian | ✅ 完全 | 官方主题 + replaceVars snippet + bootstrap.cjs（Portal 损坏，darkman → nativeTheme）+ sandbox vault 每次启动部署 |
 | Qt 应用 | ⚠️ 近似 | platformTheme = gtk |
 | Trae CN 内部主题 | ✅ 完全 | bootstrap.cjs 监听 mode.txt |
