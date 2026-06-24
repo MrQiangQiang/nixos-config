@@ -87,28 +87,9 @@ let
     dawn_base = l.base;
     dawn_text = l.text;
   };
-
-  # GTK tooltip CSS: overrides GTK theme tooltip colors for Firefox NAC tooltips.
-  # NAC tooltips use CSS system colors (InfoBackground/InfoText) from GTK,
-  # which userChrome.css cannot style. These files override GTK's tooltip widget
-  # colors. Runtime switching does NOT work on Wayland (no GtkSettings bridge
-  # from gsettings to GTK), but Firefox reads gtk.css at startup — correct.
-  gtkTooltipLight = pkgs.replaceVars ./firefox/gtk-tooltip-light.css {
-    dawn_overlay = "#${l.overlay}";
-    dawn_text = "#${l.text}";
-    dawn_highlight_med = "#${l.highlight_med}";
-  };
-  gtkTooltipDark = pkgs.replaceVars ./firefox/gtk-tooltip-dark.css {
-    dark_overlay = "#${d.overlay}";
-    dark_text = "#${d.text}";
-    dark_highlight_med = "#${d.highlight_med}";
-  };
 in
 lib.mkIf isDesktopEnabled {
   xdg.configFile."dark-reader/settings.json".source = darkReaderSettings;
-
-  xdg.configFile."theme/gtk-tooltip-light.css".source = gtkTooltipLight;
-  xdg.configFile."theme/gtk-tooltip-dark.css".source = gtkTooltipDark;
 
   programs.firefox = {
     enable = true;

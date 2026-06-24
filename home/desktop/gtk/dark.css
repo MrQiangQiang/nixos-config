@@ -1,0 +1,47 @@
+/* Rose Pine GTK CSS override — deployed to ~/.config/gtk-3.0/gtk.css
+ *
+ * Two fixes that the Rose Pine GTK theme (v2.2.0) doesn't handle correctly:
+ *
+ * 1. Tooltip colors: Firefox NAC tooltips use CSS system colors
+ *    (InfoBackground/InfoText) from GTK, which userChrome.css cannot style.
+ *    This overrides GTK's tooltip widget colors to Rose Pine values.
+ *
+ * 2. File picker accept button: when the file chooser dialog's Recent tab
+ *    has no selection, the accept button (Open/Select) enters :disabled
+ *    state. The theme's :disabled:disabled hack sets both background and
+ *    text to dark muted colors with ~1.5:1 contrast (near-invisible).
+ *    This overrides with palette colors that have adequate contrast (~7:1).
+ *
+ * Runtime switching does NOT work on Wayland (no GtkSettings bridge from
+ * gsettings to GTK), but startup is correct: GTK apps read gtk.css at startup.
+ * xdg-desktop-portal-gtk is a persistent D-Bus service — restart it (or
+ * re-login) after deploying for the file picker to pick up the new CSS.
+ */
+
+/* Fix 1: Tooltip colors — Firefox NAC tooltips use CSS system colors
+ * (InfoBackground/InfoText) from GTK, which userChrome.css cannot style. */
+tooltip {
+  background-color: @dark_overlay@;
+  color: @dark_text@;
+  border-color: @dark_highlight_med@;
+}
+
+/* Fix 2: File picker accept button (:disabled state)
+ *
+ * Rose Pine GTK theme v2.2.0 uses :disabled:disabled double pseudo-class hack
+ * (gtk-3.20/dist/gtk.css line 1846) for .suggested-action disabled state:
+ *   background: alpha(mix(#ebbcba,#191724,0.2),0.4) → ~#5c4c52 (dark muted)
+ *   color:      mix(#ebbcba,#191724,0.6)           → #6d595c (dark muted)
+ * Contrast: ~1.5:1 — nearly invisible.
+ *
+ * Override: button type selector adds (0,0,1) → (0,3,1) > theme (0,3,0).
+ * Descendant :disabled also overridden for label text color.
+ * Colors: highlight_med bg + text fg = ~7:1 contrast (AAA pass).
+ * Affects: xdg-desktop-portal-gtk file chooser (Obsidian, Trae CN, etc.). */
+button.suggested-action:disabled:disabled {
+  background-color: @dark_highlight_med@;
+  color: @dark_text@;
+}
+button.suggested-action:disabled:disabled :disabled {
+  color: @dark_text@;
+}

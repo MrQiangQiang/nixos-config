@@ -1,0 +1,19 @@
+/* Rose Pine Dawn GTK CSS override — deployed to ~/.config/gtk-3.0/gtk.css
+ * (same fixes as dark variant, with Dawn palette colors)
+ *
+ * See dark.css for detailed comments on both fixes.
+ */
+
+tooltip {
+  background-color: @dawn_overlay@;
+  color: @dawn_text@;
+  border-color: @dawn_highlight_med@;
+}
+
+button.suggested-action:disabled:disabled {
+  background-color: @dawn_highlight_med@;
+  color: @dawn_text@;
+}
+button.suggested-action:disabled:disabled :disabled {
+  color: @dawn_text@;
+}

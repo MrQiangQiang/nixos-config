@@ -74,13 +74,14 @@ let
       }) "${cfgHome}/foot/foot.ini"}
       ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
-      # GTK tooltip CSS for Firefox NAC tooltips. NAC tooltips use CSS system
-      # colors (InfoBackground/InfoText) from GTK — userChrome.css cannot style them.
-      # This symlink ensures gtk.css is correct at Firefox startup. Runtime switching
-      # does NOT work on Wayland (no GtkSettings bridge from gsettings to GTK).
+      # GTK CSS override (tooltip colors + file picker accept button contrast).
+      # Symlinked to ~/.config/gtk-3.0/gtk.css — GTK apps read it at startup.
+      # Runtime switching does NOT work on Wayland (no GtkSettings bridge from
+      # gsettings to GTK), but startup is correct. xdg-desktop-portal-gtk is a
+      # persistent D-Bus service — restart it (or re-login) after first deploy.
       ${link (theme {
-        dark = "theme/gtk-tooltip-dark.css";
-        light = "theme/gtk-tooltip-light.css";
+        dark = "theme/gtk-dark.css";
+        light = "theme/gtk-light.css";
       }) "${cfgHome}/gtk-3.0/gtk.css"}
 
       # System color-scheme. GTK applications (and Firefox content processes
