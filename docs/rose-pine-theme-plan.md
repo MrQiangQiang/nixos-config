@@ -418,9 +418,9 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 **activation script 而非 home.file**：`.obsidian/` 运行时管理（workspace.json/cache 频繁变化），symlinking 会破坏。`cp -f` 部署 + `jq` 合并 appearance.json。
 
-**Starter screen 修复（vault 切换器 + 版本信息弹窗）**：`starter.html` 硬编码 `<body class="theme-dark">` 且只加载 `app.css`（不加载 vault 级别 theme.css/snippets）。`main.js` 创建 starter window 时背景色硬编码 `#1e1e1e`，无 `insertCSS`/`nativeTheme`/主题类操作。结果：starter screen 永远是 Obsidian 默认 dark 主题，不跟随 Rose Pine 或系统 dark/light。
+**Starter screen 修复（vault 切换器 + 版本信息弹窗 + Help 界面）**：`starter.html` 和 `help.html` 都硬编码 `<body class="theme-dark">` 且只加载 `app.css`（不加载 vault 级别 theme.css/snippets）。`main.js` 创建这些窗口时背景色硬编码 `#1e1e1e`，无 `insertCSS`/`nativeTheme`/主题类操作。结果：这些窗口永远是 Obsidian 默认 dark 主题，不跟随 Rose Pine 或系统 dark/light。
 
-修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`（覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l`，`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0）。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。
+修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 或 `help.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`。CSS 覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l` + `--text-on-accent`（覆盖 app.css 硬编码 `white`，改为 `var(--color-base-00)` 确保 dark/light 都有对比度），并修复 `.splash-brand-logo-text { color: white }` 硬编码为 `var(--text-normal)`。`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。
 
 ---
 

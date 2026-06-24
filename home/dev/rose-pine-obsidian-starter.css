@@ -1,19 +1,25 @@
-/* Rose Pine starter screen theme — injected by bootstrap.cjs
+/* Rose Pine starter/help screen theme — injected by bootstrap.cjs
  *
- * Problem: starter.html hardcodes <body class="theme-dark"> and only loads
- * app.css (no vault-level theme.css or snippets). The starter screen
- * (vault switcher + version info) always shows Obsidian's default dark
- * theme (#1e1e1e), ignoring Rose Pine and system dark/light mode.
+ * Problem: starter.html and help.html hardcode <body class="theme-dark"> and
+ * only load app.css (no vault-level theme.css or snippets). The starter screen
+ * (vault switcher + version info) and help window always show Obsidian's
+ * default dark theme (#1e1e1e), ignoring Rose Pine and system dark/light mode.
  *
  * Solution: bootstrap.cjs reads this file and injects via webContents.insertCSS()
- * on the starter window. Also fixes body class (theme-dark → theme-light)
+ * on starter/help windows. Also fixes body class (theme-dark → theme-light)
  * based on darkman mode so the correct block below matches.
  *
  * Variable coverage:
  *   --color-base-* (12 slots) → Rose Pine base/surface/overlay/muted/subtle/text
  *   --accent-h/s/l → Rose Pine rose (overrides Obsidian default purple h=258)
+ *   --text-on-accent → base color (overrides hardcoded white — improves contrast
+ *     on accent backgrounds in light mode and on hover states)
  *
- * All derived vars (--background-primary, --text-muted, --interactive-accent,
+ * Hardcoded color fix:
+ *   .splash-brand-logo-text { color: white } → var(--text-normal)
+ *   (app.css line 17524, "Obsidian" brand name)
+ *
+ * All other derived vars (--background-primary, --text-muted, --interactive-accent,
  * etc.) automatically follow via var() chains in app.css body block.
  *
  * Specificity: body.starter.theme-dark = (0,2,1) > app.css .theme-dark = (0,1,0).
@@ -36,6 +42,7 @@ body.starter.theme-dark {
   --accent-h: @accent_h_dark@;
   --accent-s: @accent_s_dark@;
   --accent-l: @accent_l_dark@;
+  --text-on-accent: var(--color-base-00);
 }
 
 body.starter.theme-light {
@@ -54,4 +61,12 @@ body.starter.theme-light {
   --accent-h: @accent_h_light@;
   --accent-s: @accent_s_light@;
   --accent-l: @accent_l_light@;
+  --text-on-accent: var(--color-base-00);
+}
+
+/* Fix hardcoded "Obsidian" brand name color (app.css .splash-brand-logo-text).
+ * White is too bright for Rose Pine dark (use --text-normal = #e0def4 instead)
+ * and invisible on Rose Pine light base (#faf4ed). */
+body.starter .splash-brand-logo-text {
+  color: var(--text-normal);
 }

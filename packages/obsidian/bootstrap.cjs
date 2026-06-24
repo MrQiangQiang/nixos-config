@@ -49,14 +49,15 @@ syncTheme();
 try { app.commandLine.appendSwitch("disable-features", "PrefersColorSchemePortal"); } catch(e) {}
 
 // Starter screen theme injection.
-// Listens for any webContents creation, checks if it's the starter window
-// (URL contains starter.html), then fixes body class + injects Rose Pine CSS.
-// dom-ready fires after DOM parse but before paint — avoids flash of wrong theme.
+// Listens for any webContents creation, checks if it's a starter/help window
+// (URL contains starter.html or help.html — both hardcode <body class="theme-dark">
+// and only load app.css, no vault-level theme.css/snippets). Fixes body class
+// + injects Rose Pine CSS. dom-ready fires after DOM parse but before paint.
 app.on("web-contents-created", (event, webContents) => {
   webContents.on("dom-ready", () => {
     let url;
     try { url = webContents.getURL(); } catch(e) { return; }
-    if (!url || !url.includes("starter.html")) return;
+    if (!url || (!url.includes("starter.html") && !url.includes("help.html"))) return;
 
     const mode = readDarkmanMode();
     if (!mode) return;
