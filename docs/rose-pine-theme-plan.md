@@ -418,11 +418,11 @@ Firefox 在 Wayland 上默认使用 CSD，与 kwm 的 SSD 冲突。解决链：R
 
 **activation script 而非 home.file**：`.obsidian/` 运行时管理（workspace.json/cache 频繁变化），symlinking 会破坏。`cp -f` 部署 + `jq` 合并 appearance.json。
 
-**双路径部署**：主 vault（`~/knowledge/`）由 activation script 部署（build-time）；sandbox vault（`~/.config/obsidian/Obsidian Sandbox/`）由 bootstrap.cjs 部署（runtime）。sandbox vault 由 Obsidian 按需创建（Help → Sandbox vault），Obsidian 的 `p()` 函数在 vault 未注册于 `obsidian.json` 时会**删除并重建**整个目录——activation script 在 `nixos-rebuild switch` 时可能因 sandbox 不存在而跳过。bootstrap.cjs 在每次启动时部署主题文件，对 sandbox 重建具有鲁棒性。稳定主题文件由 `xdg.configFile` 部署到 `~/.config/obsidian/rose-pine/`（Nix store symlink），bootstrap.cjs 的 `copyThemeFile` 用 `readFileSync` + `writeFileSync` 替代 `copyFileSync`——解决两个 Nix 特有问题：(1) 源文件是 Nix store symlink，`copyFileSync` 可能复制符号链接本身而非内容；(2) `copyFileSync` 保留源文件 444 只读权限，导致后续覆盖时 EACCES。`rmSync(force)` 清除旧只读文件，`writeFileSync` 创建默认 644 权限新文件。
+**双路径部署**：主 vault（`~/knowledge/`）由 activation script 部署；sandbox vault（`~/.config/obsidian/Obsidian Sandbox/`）由包构建时注入。sandbox vault 由 Obsidian 按需创建（Help → Sandbox vault），Obsidian 的 `p()` 函数在 vault 未注册于 `obsidian.json` 时会**删除并重建**整个目录——activation script 在 `nixos-rebuild switch` 时可能因 sandbox 不存在而跳过，runtime 部署又有启动时序竞争。**根本解**：在 `pkgs.obsidian.overrideAttrs` 中 extract `obsidian.asar` → 将 `.obsidian/`（appearance.json + 主题文件 + snippet）注入 `sandbox/` 模板目录 → pack 回 asar。`p()` 的复制函数 `S()` 自然复制主题文件——无 runtime 部署、无时序竞争、单一来源（与主 vault 共用 `rosePineTheme`/`rosePineSnippet` derivation）。
 
 **Starter screen 修复（vault 切换器 + 版本信息弹窗 + Help 界面）**：`starter.html` 和 `help.html` 都硬编码 `<body class="theme-dark">` 且只加载 `app.css`（不加载 vault 级别 theme.css/snippets）。`main.js` 创建这些窗口时背景色硬编码 `#1e1e1e`，无 `insertCSS`/`nativeTheme`/主题类操作。结果：这些窗口永远是 Obsidian 默认 dark 主题，不跟随 Rose Pine 或系统 dark/light。
 
-修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 或 `help.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`。CSS 覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l` + `--text-on-accent`（覆盖 app.css 硬编码 `white`，改为 `var(--color-base-00)` 确保 dark/light 都有对比度），并修复 `.splash-brand-logo-text { color: white }` 硬编码为 `var(--text-normal)`。`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。
+修复：bootstrap.cjs 监听 `app.on("web-contents-created")`，检测 URL 含 `starter.html` 或 `help.html` 时：(1) `executeJavaScript` 修正 body class 为 darkman mode 对应的 `theme-dark`/`theme-light`；(2) `insertCSS` 注入 `~/.config/obsidian/starter.css`。CSS 覆盖 `--color-base-*` 12 槽 + `--accent-h/s/l` + `--text-on-accent`（覆盖 app.css 硬编码 `white`，改为 `var(--color-base-00)` 确保 dark/light 都有对比度），并修复 `.splash-brand-logo-text { color: white }` 硬编码为 `var(--text-normal)`。`body.starter.theme-dark` 特异性 0,2,1 > app.css `.theme-dark` 0,1,0。CSS 由 home-manager replaceVars 从 palette.nix 生成，部署到全局 `~/.config/obsidian/`（pre-vault，非 vault 级别）。`dom-ready` 事件触发注入（DOM 解析后、绘制前，避免闪烁）。**Live update**：starter.html/help.html 缺少 Obsidian renderer 的 `nativeTheme.on("updated")` 监听器，darkman 切换后已加载的窗口不会更新（与主 vault 窗口行为不同）。bootstrap.cjs 用 `Set` 追踪这些 webContents（`destroyed` 时清理），darkman watch handlers 调用 `updateStarterScreens()` 切换 body class——CSS 已含 dark/light 两个变体块（`body.starter.theme-dark` / `body.starter.theme-light`），切换 class 即可，无需重新注入 CSS。
 
 ---
 
@@ -467,7 +467,7 @@ home/shell/
   default.nix          ← imports + SSH/Git/Vim/基础包
 
 home/dev/
-  obsidian.nix         ← Obsidian：双路径部署（主 vault activation script + sandbox 稳定文件 xdg.configFile）+ starter.css + appearance.json 合并
+  obsidian.nix         ← Obsidian：双路径部署（主 vault activation script + sandbox 包构建时注入 obsidian.asar via overrideAttrs）+ starter.css + appearance.json 合并
   rose-pine-obsidian.css ← Obsidian CSS snippet 模板：@placeholder@ 占位符（vault 级别）
   rose-pine-obsidian-starter.css ← Obsidian starter screen CSS 模板：@placeholder@ 占位符（全局，pre-vault）
 
@@ -480,7 +480,7 @@ packages/
   trae-cn.nix          ← Trae CN 包：bootstrap + Wayland + 主题参数
   trae-cn/bootstrap.cjs ← Darkman 集成 + Wayland 检测
   obsidian.nix          ← Obsidian 包覆盖：bootstrap.cjs 注入 app.asar
-  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接 + starter/help screen CSS 注入 + sandbox vault 主题部署（同 trae-cn 模式）
+  obsidian/bootstrap.cjs ← Darkman → nativeTheme 桥接 + starter/help screen CSS 注入 + live update（同 trae-cn 模式）
 
 modules/desktop.nix    ← dark_variant + latitude/longitude + schemaDir + portal
 home/default.nix       ← palette 注入为 _module.args
@@ -501,6 +501,6 @@ home/default.nix       ← palette 注入为 _module.args
 | GTK 应用 | ✅ 完全 | Select-only + dconf |
 | Firefox | ✅ 完全 | userChrome.css + userContent.css + Dark Reader，自动跟随 XDG Portal |
 | Spotify | ✅ dark/light | XDG Portal |
-| Obsidian | ✅ 完全 | 官方主题 + replaceVars snippet + bootstrap.cjs（Portal 损坏，darkman → nativeTheme）+ sandbox vault 每次启动部署 |
+| Obsidian | ✅ 完全 | 官方主题 + replaceVars snippet + bootstrap.cjs（Portal 损坏，darkman → nativeTheme）+ sandbox vault 模板注入（包构建时）+ starter/help screen live update |
 | Qt 应用 | ⚠️ 近似 | platformTheme = gtk |
 | Trae CN 内部主题 | ✅ 完全 | bootstrap.cjs 监听 mode.txt |
