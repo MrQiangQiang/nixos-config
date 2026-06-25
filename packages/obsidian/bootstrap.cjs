@@ -12,10 +12,12 @@
 //      (calls updateTheme() which toggles .theme-dark/.theme-light on body)
 //
 // Starter screen fix (vault switcher + version info modal):
-//   starter.html hardcodes <body class="theme-dark"> and only loads app.css —
-//   vault-level theme.css/snippets are NOT loaded. We inject Rose Pine CSS
-//   via webContents.insertCSS() and fix body class based on darkman mode.
+//   starter.html and help.html hardcode <body class="theme-dark"> and only load
+//   app.css — vault-level theme.css/snippets are NOT loaded. We inject Rose Pine
+//   CSS via webContents.insertCSS() and fix body class based on darkman mode.
 //   CSS file is deployed by home-manager to ~/.config/obsidian/starter.css.
+//   Live updates: we track these webContents and toggle body class when darkman
+//   changes (these screens lack Obsidian's nativeTheme listener).
 //
 // Sandbox vault theme:
 //   The sandbox vault's .obsidian/ (theme files + appearance.json) is baked into
@@ -56,16 +58,23 @@ syncTheme();
 // delivered to Electron). Same fix as trae-cn bootstrap.
 try { app.commandLine.appendSwitch("disable-features", "PrefersColorSchemePortal"); } catch(e) {}
 
-// Starter screen theme injection.
-// Listens for any webContents creation, checks if it's a starter/help window
-// (URL contains starter.html or help.html — both hardcode <body class="theme-dark">
-// and only load app.css, no vault-level theme.css/snippets). Fixes body class
-// + injects Rose Pine CSS. dom-ready fires after DOM parse but before paint.
+// Starter/help screen theme injection + live update tracking.
+// starter.html and help.html hardcode <body class="theme-dark"> and only load
+// app.css (no vault-level theme.css/snippets). We fix body class + inject
+// Rose Pine CSS on dom-ready, and track the webContents so we can update
+// the body class when darkman mode changes (live theme switching).
+// CSS contains both dark/light variants — toggling body class is sufficient.
+const starterContents = new Set();
+
 app.on("web-contents-created", (event, webContents) => {
   webContents.on("dom-ready", () => {
     let url;
     try { url = webContents.getURL(); } catch(e) { return; }
     if (!url || (!url.includes("starter.html") && !url.includes("help.html"))) return;
+
+    // Track for live theme updates (cleaned up on destroyed)
+    starterContents.add(webContents);
+    webContents.once("destroyed", () => starterContents.delete(webContents));
 
     const mode = readDarkmanMode();
     if (!mode) return;
@@ -85,6 +94,25 @@ app.on("web-contents-created", (event, webContents) => {
   });
 });
 
+// Update body class on all open starter/help screens when darkman changes.
+// These screens lack Obsidian's renderer code (nativeTheme listeners), so we
+// must toggle their body class manually. CSS is already injected on dom-ready.
+function updateStarterScreens() {
+  const mode = readDarkmanMode();
+  if (!mode) return;
+  const themeClass = mode === "dark" ? "theme-dark" : "theme-light";
+  for (const wc of starterContents) {
+    try {
+      wc.executeJavaScript(
+        `document.body.classList.remove("theme-dark","theme-light");` +
+        `document.body.classList.add("${themeClass}");`
+      ).catch(() => {});
+    } catch(e) {
+      starterContents.delete(wc);
+    }
+  }
+}
+
 // Load the original Obsidian main.js
 require("./main.js");
 
@@ -99,12 +127,20 @@ nativeTheme.on("updated", () => {
 });
 
 // Watch darkman mode file for changes (fs.watch = responsive, fs.watchFile = fallback)
+// Both syncTheme() (for vault windows via nativeTheme) and updateStarterScreens()
+// (for help/starter windows via direct body class toggle) are called.
 try {
   fs.watch(DARKMAN_DIR, (eventType, filename) => {
-    if (filename === "mode.txt") syncTheme();
+    if (filename === "mode.txt") {
+      syncTheme();
+      updateStarterScreens();
+    }
   });
 } catch(e) {}
 
 fs.watchFile(DARKMAN_MODE, { interval: 1000 }, (curr, prev) => {
-  if (curr.mtimeMs !== prev.mtimeMs) syncTheme();
+  if (curr.mtimeMs !== prev.mtimeMs) {
+    syncTheme();
+    updateStarterScreens();
+  }
 });
