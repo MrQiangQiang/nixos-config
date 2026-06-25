@@ -25,15 +25,12 @@
 #      to .obsidian/themes/ + .obsidian/snippets/ + appearance.json.
 #      Uses activation script (not home.file) because .obsidian/ is runtime-managed
 #      (workspace.json/cache change frequently; symlinking would break).
-#   2. Sandbox vault (~/.config/obsidian/Obsidian Sandbox/): bootstrap.cjs deploys
-#      theme on every app startup. The sandbox vault is created on-demand by
-#      Obsidian (Help → Sandbox vault) — Obsidian's p() function DELETES and
-#      RECREATES the directory from template if it's not in obsidian.json.
-#      This creates a timing problem for activation scripts (sandbox may not
-#      exist at switch time). bootstrap.cjs solves this by deploying on every
-#      startup — robust against sandbox recreation.
-#      Theme files are deployed to ~/.config/obsidian/rose-pine/ (stable location,
-#      declarative via xdg.configFile) and bootstrap.cjs copies from there.
+#   2. Sandbox vault (~/.config/obsidian/Obsidian Sandbox/): theme files are baked
+#      into the sandbox template inside obsidian.asar at package build time via
+#      overrideAttrs below. Obsidian's p() function DELETES and RECREATES the
+#      sandbox directory from this template every time Help → Sandbox is clicked.
+#      Because the template includes .obsidian/ (appearance.json + theme + snippet),
+#      theme files are copied automatically — no runtime deployment, no race.
 #
 #   - Vault at ~/knowledge/ — git-cloned on all hosts via repos.nix
 #   - Obsidian config (.obsidian/) — runtime-managed, NOT home-managed
@@ -48,7 +45,8 @@
 { pkgs, config, lib, palette, ... }:
 let
   # Main vault — git-cloned on all hosts via repos.nix (always exists).
-  # Sandbox vault is NOT listed here — bootstrap.cjs handles it (see header).
+  # Sandbox vault is NOT listed here — its theme is baked into obsidian.asar
+  # at package build time (see overrideAttrs below).
   vaults = [
     "${config.home.homeDirectory}/knowledge"
   ];
@@ -101,22 +99,35 @@ let
   rosePineStarterCSS = pkgs.replaceVars ./rose-pine-obsidian-starter.css starterVars;
 in
 {
-  home.packages = [ pkgs.obsidian ];
-
-  # Stable theme files for bootstrap.cjs sandbox vault deployment.
-  # bootstrap.cjs copies these to the sandbox vault's .obsidian/ on every
-  # startup (see packages/obsidian/bootstrap.cjs deploySandboxTheme).
-  # Declarative via xdg.configFile (symlinks to Nix store — always in sync).
-  xdg.configFile = {
-    "obsidian/rose-pine/manifest.json".source = "${rosePineTheme}/manifest.json";
-    "obsidian/rose-pine/theme.css".source = "${rosePineTheme}/theme.css";
-    "obsidian/rose-pine/snippet.css".source = rosePineSnippet;
-  };
+  # Override pkgs.obsidian (already has bootstrap.cjs injected via overlay) to
+  # also bake Rose Pine theme files into the sandbox template inside obsidian.asar.
+  # This ensures the sandbox vault always has the correct theme, even though
+  # Obsidian's p() function deletes and recreates the directory on every open.
+  # Theme files come from the same rosePineTheme/rosePineSnippet sources used
+  # for the main vault — single source of truth, palette.nix colors included.
+  home.packages = [
+    (pkgs.obsidian.overrideAttrs (old: {
+      postInstall = (old.postInstall or "") + ''
+        cd $out/share/obsidian
+        asar extract obsidian.asar obs-src
+        mkdir -p 'obs-src/sandbox/.obsidian/themes/Rose Pine'
+        mkdir -p 'obs-src/sandbox/.obsidian/snippets'
+        cp ${rosePineTheme}/manifest.json 'obs-src/sandbox/.obsidian/themes/Rose Pine/'
+        cp ${rosePineTheme}/theme.css 'obs-src/sandbox/.obsidian/themes/Rose Pine/'
+        cp ${rosePineSnippet} 'obs-src/sandbox/.obsidian/snippets/rose-pine-obsidian.css'
+        echo '{"theme":"system","cssTheme":"Rose Pine","enabledCssSnippets":["rose-pine-obsidian"]}' \
+          > 'obs-src/sandbox/.obsidian/appearance.json'
+        rm -f obsidian.asar
+        asar pack obs-src obsidian.asar
+        rm -rf obs-src
+      '';
+    }))
+  ];
 
   # Deploy Rose Pine theme + CSS snippet + appearance settings to main vault.
   # Uses activation script (not home.file) because .obsidian/ is runtime-managed
   # — workspace.json/cache change frequently, symlinking would break.
-  # Sandbox vault is handled by bootstrap.cjs (see header comment).
+  # Sandbox vault is handled at package build time (see overrideAttrs above).
   home.activation.obsidianTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Deploy starter screen CSS (global, pre-vault — bootstrap.cjs injects it)
     STARTER_DIR="${config.home.homeDirectory}/.config/obsidian"
