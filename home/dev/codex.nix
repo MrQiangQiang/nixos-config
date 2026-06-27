@@ -110,20 +110,24 @@ in
     rules = shared.rules;
   };
 
-  # 种子化 config.toml 为可写真实文件（仅首次激活或手动 rm 后）
-  # 符号链接 → 删除；常规文件不存在 → install 复制种子
-  # 注意：Nix 配置变更后需 `rm ~/.codex/config.toml && home-manager switch` 方可传播
+  # checksum-controlled seed: Nix 种子内容变更时自动替换，不变时保留 Codex 运行时写入
   home.activation.seedCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     CONFIG_FILE="$HOME/.codex/config.toml"
+    CHECKSUM_FILE="$HOME/.codex/.config-seed-sha256"
 
     # 清除旧 hm 模块残留的符号链接
     if [ -L "$CONFIG_FILE" ]; then
       rm -f "$CONFIG_FILE"
+      rm -f "$CHECKSUM_FILE"
     fi
 
-    if [ ! -f "$CONFIG_FILE" ]; then
+    SEED_CHECKSUM=$(${pkgs.coreutils}/bin/sha256sum ${codexConfigSeed} | cut -d' ' -f1)
+    STORED_CHECKSUM=$(cat "$CHECKSUM_FILE" 2>/dev/null || echo "")
+
+    if [ ! -f "$CONFIG_FILE" ] || [ "$SEED_CHECKSUM" != "$STORED_CHECKSUM" ]; then
       mkdir -p "$(dirname "$CONFIG_FILE")"
       install -m644 ${codexConfigSeed} "$CONFIG_FILE"
+      echo "$SEED_CHECKSUM" > "$CHECKSUM_FILE"
     fi
   '';
 
