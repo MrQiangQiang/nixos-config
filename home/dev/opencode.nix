@@ -23,16 +23,20 @@ let
 
   # 从 api-providers.nix SSOT 自动生成 litellm 模型列表
   # modelMeta 包含 { cost, limit } 等元数据，逐字段传递给 OpenCode
-  litellmCloudModels = builtins.foldl' (acc: providerName:
-    let provider = apiProviders.${providerName};
+  litellmCloudModels = builtins.foldl' (
+    acc: providerName:
+    let
+      provider = apiProviders.${providerName};
     in
-    acc // lib.mapAttrs' (modelName: modelMeta:
+    acc
+    // lib.mapAttrs' (
+      modelName: modelMeta:
       lib.nameValuePair "${providerName}/${modelName}" {
         name = "${providerLabel.${providerName} or providerName}: ${modelName}";
-        cost = modelMeta.cost or {};  # mkModel 保证必有一致，or {} 仅防意外
+        cost = modelMeta.cost or { }; # mkModel 保证必有一致，or {} 仅防意外
       }
     ) provider.models
-  ) {} (builtins.attrNames apiProviders);
+  ) { } (builtins.attrNames apiProviders);
 in
 {
   programs.opencode = {

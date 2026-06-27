@@ -32,11 +32,11 @@ in
       };
     };
 
-    context = shared.combinedRules;  # → ~/.claude/CLAUDE.md
-    rules = shared.rules;           # → ~/.claude/rules/<name>.md
-    skills = shared.skills;         # → ~/.claude/skills/<name>/SKILL.md
-    commands = shared.commands;     # → ~/.claude/commands/<name>.md
-    agents = shared.agents;         # → ~/.claude/agents/<name>.md
+    context = shared.combinedRules; # → ~/.claude/CLAUDE.md
+    rules = shared.rules; # → ~/.claude/rules/<name>.md
+    skills = shared.skills; # → ~/.claude/skills/<name>/SKILL.md
+    commands = shared.commands; # → ~/.claude/commands/<name>.md
+    agents = shared.agents; # → ~/.claude/agents/<name>.md
   };
 
   # 跳过 OAuth 登录引导 — 仅首次创建
