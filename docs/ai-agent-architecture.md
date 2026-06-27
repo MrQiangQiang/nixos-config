@@ -21,24 +21,28 @@ home/dev/opencode.nix        → enableMcpIntegration 消费
 
 所有 MCP-capable agent 共享同一份配置, 改一处全生效。
 
+## 共享内容 SSOT
+
+```
+home/agents/shared.nix + shared/ → commands/skills/agents/rules（Markdown SSOT）
+    │
+    ▼  各 consumer 通过 home-manager 原生模块选项消费
+home/dev/opencode.nix     → context + commands + skills + agents
+home/dev/codex.nix        → context + skills + rules
+home/dev/claude-code.nix  → context + rules + commands + agents + skills
+```
+
+shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各自 import，Nix 求值缓存复用。
+空集时对所有工具零副作用（当前 shared/ 全部为 .gitkeep）。
+
+内容设计遵循 superpowers 原则："Skills name actions, not tools"——技能正文平台无关，
+工具特定映射放 references/。CLI 工具支持全局配置，IDE 工具 skills 保持项目级（符合工具设计）。
+
 ## qmd 知识库
 
-```
-Collections:
-  ~/knowledge/                  个人知识库 (Karpathy LLM Wiki 模式)
-  ├── raw/                      人类收集的源文档 (immutable, agent 只读)
-  │   ├── articles/  papers/  notes/  transcripts/  assets/
-  └── wiki/                     agent 编译的 wiki (agent 通过 filesystem MCP 写)
-      ├── index.md  log.md  concepts/  people/  projects/  tools/
-  ~/nixos-config/docs/          项目文档 (架构决策, 主机配置)
-
-desktop-1: qmd-mcp systemd service (localhost:8181)
-           qmd-refresh timer (5min)
-           Tailscale Serve proxy (tailscale serve --bg localhost:8181)
-           Qwen3-Embedding + Reranker + query-expansion (model inference)
-laptop-1:  qmd MCP → https://desktop-1.tail0f7af0.ts.net/mcp (Tailscale Serve)
-           URL forks in mcp-servers.nix via config.custom.qmd.enable
-```
+desktop-1 为唯一 qmd 索引节点（BM25 + 向量搜索 + LLM 重排序）。
+laptop-1 通过 Tailscale Serve 远程访问，URL 在 mcp-servers.nix 中按主机分叉。
+~/.knowledge/ 通过 repos.nix 在所有主机自动 clone，qmd 只索引不存储。
 
 ## 为什么用 qmd
 
@@ -56,10 +60,10 @@ laptop-1:  qmd MCP → https://desktop-1.tail0f7af0.ts.net/mcp (Tailscale Serve)
 
 ## 为什么不用 agentmemory / Cognee / Mem0
 
-- agentmemory: 39K LOC, 53 MCP 工具, 95% 信息丢失 (8000→400 字符截断), iii-engine Rust 二进制不在 crates.io
-- Cognee: 企业级复杂度 (Helm chart, 多云部署, 多 DB 后端), 所有操作需要 LLM API key
-- Mem0: Graph Memory 锁 Pro 层 ($249/mo)
-- AGENTS.md + git + qmd 已解决跨会话/跨项目/跨机需求, 符合低复杂度目标
+- agentmemory: 过度复杂（Rust 二进制不在 crates.io），信息截断严重
+- Cognee: 企业级复杂度（多云部署，多 DB 后端），所有操作需 LLM API key
+- Mem0: Graph Memory 锁 Pro 层（$249/mo）
+- AGENTS.md + git + qmd 已满足需求，符合低复杂度目标
 
 ## 为什么 qmd 是搜索引擎不是记忆系统
 
@@ -78,26 +82,24 @@ desktop-1 是唯一模型推理节点 (Qwen3-Embedding + Reranker + query-expans
 ## 本地 LLM 推理
 
 ```
-desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M, 256K context, 27.7GB VRAM)
+desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M)
            host=0.0.0.0 + firewall tailscale0:11434
            syncModels=true (nix 配置是模型清单唯一来源)
            KEEP_ALIVE=-1 + ollama-prewarm.service (永久驻留 VRAM)
-laptop-1:  opencode → http://desktop-1.tail0f7af0.ts.net:11434/v1 (Tailscale)
+laptop-1:  opencode → Ollama via Tailscale（host=0.0.0.0 + firewall tailscale0）
 ```
 
 VRAM 分配策略详见 `docs/desktop-1/ollama.md`
 
 ## 为什么用 Ollama 而非 llama.cpp 直接
 
-- Ollama = llama.cpp 封装 + 模型仓库 + REST API + CLI
-- 速度差异 <11%, VRAM 开销 +1.2GB (可接受)
-- agent 集成简单: OpenAI 兼容端点, opencode 一行配置
+- Ollama = llama.cpp 封装 + 模型仓库 + REST API + CLI，集成简单
+- OpenAI 兼容端点，agent 一行配置即可接入
 
 ## 为什么用 qwen3.6:27b-q4_K_M
 
-- 单卡 RTX 5090 32GB: 17GB 权重 + 10.7GB KV cache (q8_0) = 256K 上下文, 占 27.7GB VRAM
-- dense 27B > MoE 35B-A3B (编码场景, SWE-bench 68.9-72.5%)
-- 显式量化 tag: NixOS 可复现性, 不受 Ollama 默认变更影响
+- dense 27B 在编码场景优于同规模 MoE 模型，单卡可容纳
+- 显式量化 tag 保证 NixOS 可复现性
 
 ## 为什么用 syncModels
 
@@ -105,10 +107,102 @@ VRAM 分配策略详见 `docs/desktop-1/ollama.md`
 - 未声明模型自动移除, 防止漂移
 - 切换模型只需改一行 loadModels
 
-## 源码真理
+## CLI 工具模型路由（统一代理架构）
 
-- `home/agents/mcp-servers.nix` — MCP SSOT
-- `home/dev/qmd.nix` — qmd wrapper + MCP service + refresh timer
-- `home/dev/opencode.nix` — opencode + Ollama provider
-- `home/default.nix` — imports `./agents`
-- `flake.nix` — `qmd.url = "github:tobi/qmd"`
+```
+所有工具 → LiteLLM (localhost:4000) → opencode-go ($10/月, 13模型)
+                                      ├── DeepSeek API (按量)
+                                      ├── GLM Coding Plan (未来)
+                                      └── Ollama (本地, 免费)
+
+协议                                路由
+Anthropic Messages  ← Claude Code   /v1/messages
+OpenAI Chat         ← OpenCode     /v1/chat/completions
+OpenAI Responses    ← Codex        /v1/responses → 自动桥接 Chat
+```
+
+全部云端模型（api-providers.nix 维护精确数量）对所有工具可见，运行时按需切换。
+
+## API Provider SSOT + LiteLLM 代理
+
+```
+home/agents/api-providers.nix  → providers 注册表 + models 列表（唯一来源）
+    │
+    ▼  LiteLLM 读取 → 生成 config.yaml → model_list（静态列表，非 wildcard）
+home/dev/litellm.nix   → systemd user service (localhost:4000) + 密钥注入
+    │
+    ▼  所有 consumer 指向同一端点
+home/dev/opencode.nix     → provider: litellm（模型列表从 api-providers.nix 派生）+ ollama 后备
+home/dev/claude-code.nix  → ANTHROPIC_BASE_URL=localhost:4000
+home/dev/codex.nix        → model_provider: litellm + codex-oss 后备
+```
+
+修改 api-providers.nix → LiteLLM 配置自动更新 → 所有工具立即可用。
+
+### 为什么引入 LiteLLM 代理
+
+- OpenCode Go 套餐全部模型通过 OpenAI Chat 端点可用（已验证 MiniMax/Qwen 同样支持 Chat，Anthropic 端点仅备选）
+- Claude Code 无法直连 Chat-only 模型（需要 Anthropic→Chat 转换）
+- Codex 0.130+ 强制 Responses API，需要 Responses→Chat 转换
+- LiteLLM 单进程运行（不需要 Redis/PostgreSQL，仅 nixpkgs 1.89.0 基础包）
+- 配置从 Nix SSOT 自动生成，零手动维护
+
+### 为什么不用 cc-switch-cli
+
+- SQLite DB 配置（非声明式），API key 明文入库，与 agenix 冲突
+- 与 NixOS 声明式哲学根本冲突
+- LiteLLM 是 2026 NixOS 社区主流方案（NixOS Discourse 实际采用）
+
+### Go 套餐真实性价比
+
+Go 定价含 cache_read（编程 agent 80%+ token 为缓存读取，必须计入）。
+**全部 13 个 Go 模型均比同级直连 API 便宜**——Go 的 cache 价格远低于多数官方 API。
+具体价格见 api-providers.nix 注释（来源 opencode.ai/docs/zh-cn/go）。
+
+## 模型成本追踪
+
+```
+api-providers.nix (SSOT)
+  ├── mkModel { input, output, cache_read, cache_write } — 强制每个模型声明 cost
+  │   漏写 → Nix 编译失败（利用函数签名做编译时校验）
+  │
+  ├── opencode-go: Go 套餐官方定价 (opencode.ai/docs/zh-cn/go)
+  ├── deepseek:    DeepSeek 直连 API 定价 (api-docs.deepseek.com)
+  └── glm-coding-plan: 智谱官方定价 (未订阅，占位)
+       │
+       ▼ 两个 consumer 各自派生
+litellm.nix        — 生成 model_list + api_base（路由用）
+opencode.nix       — 生成 models { name, cost }（OpenCode UI spent 显示用）
+```
+
+### 三工具成本显示分工
+
+| 工具 | 成本显示 | 来源 |
+|---|---|---|
+| OpenCode | ✅ TUI spent（$X.XX） | opencode.json → model.cost（从 SSOT 派生） |
+| Claude Code | ❌ 仅显示 Anthropic 官方模型价 | 内置定价表，自定义 provider 显示 $0 |
+| Codex | ❌ 仅显示 OpenAI 官方模型价 | 内置定价表，自定义 provider 显示 $0 |
+
+**SSOT 在 LiteLLM**：`/spend/logs` + Admin UI 记录所有工具所有模型的真实成本。
+Claude Code/Codex 的本地 cost 显示 $0 是预期行为——它们的定价表只覆盖官方模型。
+
+### OpenCode auto-discovery 限制
+
+OpenCode 1.17.7 的 `@ai-sdk/openai-compatible` 不对 `/v1/models` 做 auto-discovery
+（`provider.ts:1403`：`models: existing?.models ?? {}`，自定义 provider 不在 models.dev 注册表 → 模型数=0 → provider 被删除）。
+因此 opencode.nix 必须显式列出全部模型（从 api-providers.nix 自动派生）。
+
+## 为什么 Claude Code 走代理而非 Anthropic 直连
+
+- 中国无法正常完成 Anthropic OAuth 登录
+- 通过 LiteLLM 代理可同时访问 Go 套餐全模型 + DeepSeek API + 本地 Ollama
+- 代理处理 Anthropic→Chat 格式转换，Claude Code 无感知
+- `hasCompletedOnboarding=true` 跳过 OAuth 登录引导
+
+## 为什么 Codex 走代理而非仅 --oss
+
+- 代理使 Codex 可访问 Go 套餐 13 个云模型（非仅本地）
+- LiteLLM 自动桥接 Responses→Chat 以支持 Chat-only 后端
+- 保留 `codex-oss` 别名作为代理不可用时的后备
+
+

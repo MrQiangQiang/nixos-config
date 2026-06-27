@@ -1,6 +1,6 @@
 # Firefox Rose Pine 主题 — 变量映射参考
 
-> 本文档是 `rose-pine-theme-plan.md` 的配套参考，记录所有 CSS 变量到 Rose Pine 调色板的映射。
+> 本文档是 `rose-pine-theme.md` 的配套参考，记录所有 CSS 变量到 Rose Pine 调色板的映射。
 > 架构决策和"为什么"在主文档中，本文档只记录"是什么"。
 
 ## userChrome.css — Chrome UI 变量映射

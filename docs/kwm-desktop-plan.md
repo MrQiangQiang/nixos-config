@@ -28,7 +28,7 @@ River 0.4.5 (合成器) ←river-window-management-v1→ KWM 0.3.0 (窗口管理
 │   ├── darkman 初始化主题
 │   ├── fcitx5 启动
 │   ├── kwm（阻塞式，退出后执行 restore_tty_palette）
-│   └── restore_tty_palette（TTY 调色板恢复，详见 rose-pine-theme-plan.md）
+│   └── restore_tty_palette（TTY 调色板恢复，详见 rose-pine-theme.md）
 │
 ├── kwm startup_cmds (KWM 启动时自动 spawn)
 │   └── wl-paste --watch cliphist store / polkit-gnome-authentication-agent-1
