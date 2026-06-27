@@ -4,8 +4,9 @@
 # 免登录：自定义 provider requires_openai_auth=false
 #
 # 模型命名（对应 LiteLLM model_name）：
-#   opencode-go/deepseek-v4-flash → Go 套餐（默认）
+#   deepseek/deepseek-v4-flash → DeepSeek API 直连（默认，支持 /v1/responses）
 #   ollama/qwen3.6:27b-q4_K_M → 本地 Ollama（codex-oss 备用）
+#   opencode-go/* → 禁止 Codex 使用（Go套餐仅 /v1/chat/completions，无 /v1/responses）
 #
 # 注意：Codex 0.130+ 强制 Responses API，
 #       LiteLLM 自动桥接 Responses→Chat 以支持 Go 套餐等 Chat-only 后端。
@@ -99,7 +100,7 @@ let
   );
 
   codexSettings = {
-    model = "opencode-go/deepseek-v4-flash";
+    model = "deepseek/deepseek-v4-flash";
     model_provider = "litellm";
     model_catalog_json = "${config.home.homeDirectory}/.codex/model-catalog.json";
     model_providers.litellm = {
