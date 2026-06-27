@@ -48,6 +48,9 @@ let
           api_base = apiBase;
           api_key = "os.environ/${envKey}";
         };
+        model_info = {
+          mode = "chat";
+        };
       }) provider.models
     ) api.providers
   );
