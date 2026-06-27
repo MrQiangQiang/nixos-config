@@ -63,6 +63,11 @@ in
 {
   options.custom.qmd = {
     enable = lib.mkEnableOption "QMD local search engine";
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 8181;
+      description = "QMD MCP HTTP server port";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -109,16 +114,16 @@ in
     '';
 
     # MCP HTTP server (foreground, managed by systemd)
-    # Endpoint: http://localhost:8181/mcp
+    # Endpoint: http://localhost:${toString cfg.port}/mcp
     # Models stay loaded in VRAM across requests (5 min idle timeout)
     # QMD_LLAMA_GPU=cuda: use CUDA GPU acceleration via node-llama-cpp prebuilt
     # binary. Requires /run/opengl-driver/lib in LD_LIBRARY_PATH (set in wrapper).
     systemd.user.services.qmd-mcp = {
       Unit = {
-        Description = "QMD MCP HTTP server (localhost:8181)";
+        Description = "QMD MCP HTTP server (localhost:${toString cfg.port})";
       };
       Service = {
-        ExecStart = "${qmdBin} mcp --http --port 8181";
+        ExecStart = "${qmdBin} mcp --http --port ${toString cfg.port}";
         Environment = [
           "QMD_EMBED_MODEL=${embedModel}"
           "QMD_LLAMA_GPU=cuda"

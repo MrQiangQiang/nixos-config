@@ -14,13 +14,17 @@
 # AGENTS.md: git-cloned with ~/knowledge/ repo (Karpathy pattern)
 { config, lib, ... }:
 let
-  hasQmd = config.custom.qmd.enable or false;
+  qmdPort = lib.attrByPath [ "custom" "qmd" "port" ] 8181 config;
 in
 {
   programs.mcp = {
     enable = true;
     servers.qmd = {
-      url = if hasQmd then "http://localhost:8181/mcp" else "https://desktop-1.tail0f7af0.ts.net/mcp";
+      url =
+        if config.custom.qmd.enable or false then
+          "http://localhost:${toString qmdPort}/mcp"
+        else
+          "https://desktop-1.tail0f7af0.ts.net/mcp";
     };
   };
 }

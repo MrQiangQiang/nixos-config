@@ -52,12 +52,9 @@ let
     ) api.providers
   );
 
-  # Ollama 本地模型（手动维护，运行时也可通过 ollama list 检查）
-  # 文档：https://ollama.com/library
-  # 检查：ollama list
-  ollamaModels = [
-    "qwen3.6:27b-q4_K_M"
-  ];
+  # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama.model）
+  ollamaModel = lib.attrByPath [ "custom" "ollama" "model" ] "qwen3.6:27b-q4_K_M" osConfig;
+  ollamaModels = [ ollamaModel ];
 
   # Ollama model_list entries
   ollamaModelList = map (m: {

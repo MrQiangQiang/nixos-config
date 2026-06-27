@@ -19,6 +19,9 @@ let
   shared = import ../agents/shared.nix { inherit lib; };
   apiProviders = (import ../agents/api-providers.nix { inherit lib; }).providers;
 
+  # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama）
+  ollamaModel = lib.attrByPath [ "custom" "ollama" "model" ] "qwen3.6:27b-q4_K_M" osConfig;
+
   # 模型选择 UI 显示前缀
   providerLabel = {
     opencode-go = "Go";
@@ -61,8 +64,8 @@ in
             apiKey = "litellm-local";
           };
           models = litellmCloudModels // {
-            # Ollama 本地模型（非 API provider，手动指定）
-            "ollama/qwen3.6:27b-q4_K_M".name = "Ollama: Qwen3.6 27B (Q4_K_M)";
+            # Ollama 本地模型（非 API provider，SSOT 从 osConfig 读取）
+            "ollama/${ollamaModel}".name = "Ollama: Qwen3.6 27B (Q4_K_M)";
           };
         };
 
@@ -71,7 +74,7 @@ in
           npm = "@ai-sdk/openai-compatible";
           name = "Ollama (local, direct)";
           options.baseURL = "http://localhost:11434/v1";
-          models."qwen3.6:27b-q4_K_M" = {
+          models."${ollamaModel}" = {
             name = "Qwen3.6 27B (Q4_K_M)";
             limit = {
               context = lib.attrByPath [ "custom" "ollama" "contextLength" ] 262144 osConfig;
