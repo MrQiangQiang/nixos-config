@@ -12,7 +12,10 @@
 #
 # 架构：hm 模块的 settings 选项通过 home.file 创建符号链接到只读 Nix store，
 #       Codex 需写入信任状态到 config.toml，故弃用 settings/enableMcpIntegration。
-#       config.toml 通过 home.activation 种子化为可写文件（seed-only 模式），
+#       config.toml 通过 home.activation always-overwrite 种子化（rebuild 即恢复 SSOT）。
+#       Codex 的 /model 内置于 OpenAI 硬编码目录，不读 LiteLLM /v1/models → 切换模型：
+#         临时：codex -m opencode-go/qwen3.7-max（CLI 参数）
+#         永久：编辑 codexSettings.model → rebuild
 #       MCP 合并手动复制模块逻辑；只有 context/skills/rules 走 hm 模块（只读，符号链接可接受）。
 #       共享内容从 ../agents/shared.nix SSOT 消费
 #
@@ -110,25 +113,19 @@ in
     rules = shared.rules;
   };
 
-  # checksum-controlled seed: Nix 种子内容变更时自动替换，不变时保留 Codex 运行时写入
+  # always-overwrite: rebuild 始终恢复 Nix SSOT。
+  # Codex 的 /model 会写入 config.toml 覆盖默认模型（并写入 OpenAI 模型名，LiteLLM 代理无此模型 → 损坏）。
+  # 始终用种子覆盖保证 rebuild 后配置正确。信任状态在一次确认后恢复（sqlite 持久化）。
   home.activation.seedCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     CONFIG_FILE="$HOME/.codex/config.toml"
-    CHECKSUM_FILE="$HOME/.codex/.config-seed-sha256"
 
     # 清除旧 hm 模块残留的符号链接
     if [ -L "$CONFIG_FILE" ]; then
       rm -f "$CONFIG_FILE"
-      rm -f "$CHECKSUM_FILE"
     fi
 
-    SEED_CHECKSUM=$(${pkgs.coreutils}/bin/sha256sum ${codexConfigSeed} | cut -d' ' -f1)
-    STORED_CHECKSUM=$(cat "$CHECKSUM_FILE" 2>/dev/null || echo "")
-
-    if [ ! -f "$CONFIG_FILE" ] || [ "$SEED_CHECKSUM" != "$STORED_CHECKSUM" ]; then
-      mkdir -p "$(dirname "$CONFIG_FILE")"
-      install -m644 ${codexConfigSeed} "$CONFIG_FILE"
-      echo "$SEED_CHECKSUM" > "$CHECKSUM_FILE"
-    fi
+    mkdir -p "$(dirname "$CONFIG_FILE")"
+    install -m644 ${codexConfigSeed} "$CONFIG_FILE"
   '';
 
   home.sessionVariables = {
