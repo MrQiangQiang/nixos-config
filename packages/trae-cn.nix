@@ -131,7 +131,9 @@ pkgs.buildFHSEnv {
   # 导致 run0 等依赖 PAM 的特权工具不可用。extraBwrapArgs 在最后执行,覆盖遮蔽。
   # run0 用于 Trae IDE 终端(NoNewPrivs 环境)的特权提升,见 modules/desktop.nix。
   extraBwrapArgs = [
-    "--ro-bind" "/etc/pam.d" "/etc/pam.d"
+    "--ro-bind"
+    "/etc/pam.d"
+    "/etc/pam.d"
   ];
 
   profile = ''

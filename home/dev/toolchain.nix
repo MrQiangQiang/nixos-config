@@ -83,7 +83,13 @@
   # even if a download fails (e.g. offline); run 'mise install' manually then.
   # PATH: rustup-init needs curl/wget, other tools may need git
   home.activation.miseInstall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    export PATH="${lib.makeBinPath [ pkgs.curl pkgs.wget pkgs.git ]}:$PATH"
+    export PATH="${
+      lib.makeBinPath [
+        pkgs.curl
+        pkgs.wget
+        pkgs.git
+      ]
+    }:$PATH"
     run ${lib.getExe pkgs.mise} install --yes 2>&1 || echo "mise: some tools failed to install, run 'mise install' manually"
   '';
 }

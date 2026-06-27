@@ -42,7 +42,13 @@
 #   - laptop-1: primary human browsing interface
 #
 # Web Clipper (browser extension) is configured in firefox.nix via policies.
-{ pkgs, config, lib, palette, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  palette,
+  ...
+}:
 let
   # Main vault — git-cloned on all hosts via repos.nix (always exists).
   # Sandbox vault is NOT listed here — its theme is baked into obsidian.asar
@@ -64,16 +70,36 @@ let
   # 15 variables × 2 variants (dark/light). dark_variant (main/moon) is
   # resolved at compile time via palette.dark — snippet always has the
   # correct dark variant, no runtime class switching needed.
-  mkSnippetVars = suffix: c:
-    builtins.listToAttrs (builtins.map (name: {
-      name = "${name}_${suffix}";
-      value = c.${name};
-    }) [
-      "base" "surface" "overlay" "muted" "subtle" "text"
-      "love" "gold" "rose" "pine" "foam" "iris"
-      "highlight_low" "highlight_med" "highlight_high"
-      "accent_h" "accent_s" "accent_l" "highlight_rgb"
-    ]);
+  mkSnippetVars =
+    suffix: c:
+    builtins.listToAttrs (
+      builtins.map
+        (name: {
+          name = "${name}_${suffix}";
+          value = c.${name};
+        })
+        [
+          "base"
+          "surface"
+          "overlay"
+          "muted"
+          "subtle"
+          "text"
+          "love"
+          "gold"
+          "rose"
+          "pine"
+          "foam"
+          "iris"
+          "highlight_low"
+          "highlight_med"
+          "highlight_high"
+          "accent_h"
+          "accent_s"
+          "accent_l"
+          "highlight_rgb"
+        ]
+    );
 
   snippetVars = mkSnippetVars "dark" palette.dark // mkSnippetVars "light" palette.dawn;
   rosePineSnippet = pkgs.replaceVars ./rose-pine-obsidian.css snippetVars;
@@ -87,14 +113,26 @@ let
   # Separate var set (not snippetVars) because replaceVars requires every
   # provided key to appear in the template — starter.css only uses base/
   # surface/overlay/muted/subtle/text + accent_h/s/l, not the full palette.
-  mkStarterVars = suffix: c:
-    builtins.listToAttrs (builtins.map (name: {
-      name = "${name}_${suffix}";
-      value = c.${name};
-    }) [
-      "base" "surface" "overlay" "muted" "subtle" "text"
-      "accent_h" "accent_s" "accent_l"
-    ]);
+  mkStarterVars =
+    suffix: c:
+    builtins.listToAttrs (
+      builtins.map
+        (name: {
+          name = "${name}_${suffix}";
+          value = c.${name};
+        })
+        [
+          "base"
+          "surface"
+          "overlay"
+          "muted"
+          "subtle"
+          "text"
+          "accent_h"
+          "accent_s"
+          "accent_l"
+        ]
+    );
   starterVars = mkStarterVars "dark" palette.dark // mkStarterVars "light" palette.dawn;
   rosePineStarterCSS = pkgs.replaceVars ./rose-pine-obsidian-starter.css starterVars;
 in

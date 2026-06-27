@@ -25,5 +25,16 @@
     openssl_1_1_unsecure = prev.openssl_1_1.overrideAttrs (old: {
       meta = builtins.removeAttrs old.meta [ "knownVulnerabilities" ];
     });
+
+    # ── AI 工具版本覆盖（当 nixpkgs 滞后时在此 override） ──
+    # 示例：opencode 升级到最新版
+    # opencode = prev.opencode.overrideAttrs (_: {
+    #   version = "1.17.11";
+    #   src = prev.fetchurl {
+    #     url = "https://registry.npmjs.org/opencode-ai/-/opencode-ai-1.17.11.tgz";
+    #     hash = "sha256-XXXX";  # nix build 会提示正确 hash
+    #   };
+    # });
+    # 同理可覆盖 codex、claude-code
   };
 }

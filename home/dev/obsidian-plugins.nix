@@ -23,7 +23,12 @@
 #
 # Future: a `update-obsidian-plugins.sh` script could automate steps 1-3
 #         using GitHub API (semi-automatic, not fully auto due to Nix hash locking).
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   # Vault definitions — each vault has a path and a list of plugins
   # Plugins are per-vault (Obsidian design: .obsidian/ is per-vault)
@@ -60,8 +65,15 @@ let
   fetchFile = url: sha256: pkgs.fetchurl { inherit url sha256; };
 
   # Assemble plugin directory from 3 release files
-  fetchPlugin = { id, owner, repo, version, hashes }:
-    pkgs.runCommand "obsidian-plugin-${id}-${version}" {} ''
+  fetchPlugin =
+    {
+      id,
+      owner,
+      repo,
+      version,
+      hashes,
+    }:
+    pkgs.runCommand "obsidian-plugin-${id}-${version}" { } ''
       mkdir $out
       cp ${fetchFile "https://github.com/${owner}/${repo}/releases/download/${version}/main.js" hashes.mainJs} $out/main.js
       cp ${fetchFile "https://github.com/${owner}/${repo}/releases/download/${version}/manifest.json" hashes.manifest} $out/manifest.json
@@ -69,7 +81,8 @@ let
     '';
 
   # Deploy plugins to a vault — returns bash script string
-  deployVaultPlugins = { path, plugins }:
+  deployVaultPlugins =
+    { path, plugins }:
     let
       pluginDirs = builtins.map (p: {
         id = p.id;
