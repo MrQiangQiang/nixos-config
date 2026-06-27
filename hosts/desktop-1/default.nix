@@ -111,7 +111,7 @@ in
   };
 
   # ── Tailscale Serve (QMD MCP) ──────────────────────────────
-  # Exposes qmd-mcp (localhost:8181) to tailnet via HTTPS.
+  # Exposes qmd-mcp to tailnet via HTTPS. Port from home-manager SSOT.
   # Requires HTTPS certificates enabled in Tailscale admin console:
   #   https://login.tailscale.com/admin/settings/general
   # (one-time per tailnet, not nixifiable — human auth required).
@@ -127,7 +127,7 @@ in
   # until tailscale comes up (mihomo/Tailscale boot ordering).
   # Ref: https://github.com/tailscale/tailscale/issues/11504
   systemd.services.tailscale-serve-qmd = {
-    description = "Tailscale Serve for QMD MCP (localhost:8181)";
+    description = "Tailscale Serve for QMD MCP (port SSOT: home/dev/qmd.nix → custom.qmd.port)";
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
     wantedBy = [ "multi-user.target" ];
