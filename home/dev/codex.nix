@@ -13,9 +13,8 @@
 # 架构：hm 模块的 settings 选项通过 home.file 创建符号链接到只读 Nix store，
 #       Codex 需写入信任状态到 config.toml，故弃用 settings/enableMcpIntegration。
 #       config.toml 通过 home.activation always-overwrite 种子化（rebuild 即恢复 SSOT）。
-#       Codex 的 /model 内置于 OpenAI 硬编码目录，不读 LiteLLM /v1/models → 切换模型：
-#         临时：codex -m opencode-go/qwen3.7-max（CLI 参数）
-#         永久：编辑 codexSettings.model → rebuild
+#       Codex 的 /model 改用 model_catalog_json 显示 LiteLLM 模型目录（替换 OpenAI 硬编码目录）。
+#       model-catalog.json 从 api-providers.nix SSOT + 官方文档验证的上下文窗口生成。
 #       MCP 合并手动复制模块逻辑；只有 context/skills/rules 走 hm 模块（只读，符号链接可接受）。
 #       共享内容从 ../agents/shared.nix SSOT 消费
 #
@@ -39,6 +38,7 @@
 }:
 let
   shared = import ../agents/shared.nix { inherit lib; };
+  catalog = import ../agents/codex-model-catalog.nix { inherit lib; };
 
   tomlFormat = pkgs.formats.toml { };
 
@@ -88,6 +88,7 @@ let
   codexSettings = {
     model = "opencode-go/deepseek-v4-flash";
     model_provider = "litellm";
+    model_catalog_json = "${config.home.homeDirectory}/.codex/model-catalog.json";
     model_providers.litellm = {
       name = "LiteLLM Proxy";
       base_url = "http://localhost:4000/v1";
@@ -127,6 +128,9 @@ in
     mkdir -p "$(dirname "$CONFIG_FILE")"
     install -m644 ${codexConfigSeed} "$CONFIG_FILE"
   '';
+
+  # Codex 模型目录 — 消除 metadata warning、启用并行工具调用和搜索
+  home.file.".codex/model-catalog.json".text = builtins.toJSON catalog.catalog;
 
   home.sessionVariables = {
     LITELLM_API_KEY = "litellm-local";
