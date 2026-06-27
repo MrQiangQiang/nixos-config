@@ -40,6 +40,7 @@ let
       limit = 10000;
     };
     supported_reasoning_levels = [ ];
+    experimental_supported_tools = [ ];
   };
 
   # Generate model entry: <provider>/<model> → ModelInfo
