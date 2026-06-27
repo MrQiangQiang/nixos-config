@@ -28,7 +28,7 @@ home/agents/shared.nix + shared/ → commands/skills/agents/rules（Markdown SSO
     │
     ▼  各 consumer 通过 home-manager 原生模块选项消费
 home/dev/opencode.nix     → context + commands + skills + agents
-home/dev/codex.nix        → context + skills + rules
+home/dev/codex.nix        → context + skills + rules（profiles/hooks/plugins 原生支持）
 home/dev/claude-code.nix  → context + rules + commands + agents + skills
 ```
 
@@ -37,6 +37,58 @@ shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各�
 
 内容设计遵循 superpowers 原则："Skills name actions, not tools"——技能正文平台无关，
 工具特定映射放 references/。CLI 工具支持全局配置，IDE 工具 skills 保持项目级（符合工具设计）。
+
+### agents 跨工具共享矩阵
+
+| 内容 | OpenCode | Claude Code | Codex |
+|------|:---:|:---:|:---:|
+| context (AGENTS.md) | ✅ | ✅ | ✅ |
+| rules | ❌ | ✅ | ✅ |
+| commands | ✅ | ✅ | ❌ |
+| skills | ✅ | ✅ | ✅ |
+| agents | ✅ | ✅ | ❌ |
+
+**agents 为何不给 Codex：**
+
+| | OpenCode / Claude Code | Codex |
+|---|---|---|
+| 格式 | Markdown + YAML frontmatter | TOML `[agents.<name>]` |
+| 内容 | 完整 system prompt 指令 | `description` + `config_file`（指向独立 TOML 配置层） |
+| config_file | 不存在此概念 | **必填**——提供 model/reasoning/sandbox 覆盖 |
+
+`config_file` 是语义鸿沟：Codex agent 的核心不是 system prompt，而是
+独立配置层（model/reasoning/sandbox 设置）。shared.agents 的 markdown
+指令在 Codex agent 模型中无处安放。
+
+**禁止尝试**从 shared.agents 生成 Codex agents（只能提取 description，
+config_file 无法自动派生，强行转化破坏 SSOT）。
+
+Codex agents 在 `codex.nix` 中通过 `settings.agents` 直接 TOML 定义。
+
+### rules 为何不给 OpenCode
+
+| | Codex / Claude Code | OpenCode |
+|---|---|---|
+| 格式 | `.rules` 文件（`~/.codex/rules/`、`~/.claude/rules/`） | 不存在此概念 |
+| 用途 | 持久化行为规则（如 prefix_rule allow-list） | 所有行为指导统一在 `AGENTS.md`（context） |
+
+OpenCode 源码确认：`session/instruction.ts:61` 仅加载 `AGENTS.md`，无 `rules/` 目录读取逻辑。
+权限规则走独立 permission system，不是 `.rules` 文件。
+hm 模块 `mkRenamedOptionModule rules → context` 如实反映此设计。
+
+**工具本身不支持，非 hm 限制。**
+
+### commands 为何不给 Codex
+
+| | OpenCode / Claude Code | Codex |
+|---|---|---|
+| 格式 | `commands/<name>.md` 自定义斜杠命令 | 不存在此概念 |
+| 用途 | 用户定义 `/mycommand` 快捷操作 | 内置斜杠命令硬编码在 TUI 二进制中 |
+
+Codex 源码确认：`SlashCommand` 是 Rust 枚举，`config_toml.rs` 无 `commands` 键。
+Codex 用 `skills`、`hooks`、`plugins` 做扩展，不用自定义斜杠命令。
+
+**工具本身不支持，非 hm 限制。**
 
 ## qmd 知识库
 
@@ -134,7 +186,7 @@ home/dev/litellm.nix   → systemd user service (localhost:4000) + 密钥注入
     ▼  所有 consumer 指向同一端点
 home/dev/opencode.nix     → provider: litellm（模型列表从 api-providers.nix 派生）+ ollama 后备
 home/dev/claude-code.nix  → ANTHROPIC_BASE_URL=localhost:4000
-home/dev/codex.nix        → model_provider: litellm + codex-oss 后备
+home/dev/codex.nix        → model_provider: litellm（settings.profiles 预留备用）+ codex-oss 后备
 ```
 
 修改 api-providers.nix → LiteLLM 配置自动更新 → 所有工具立即可用。
