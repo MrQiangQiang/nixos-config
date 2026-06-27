@@ -32,13 +32,21 @@
 #              直接通过 settings.agents 定义（格式：description + config_file + nickname_candidates）
 {
   config,
+  osConfig,
   lib,
   pkgs,
   ...
 }:
 let
   shared = import ../agents/shared.nix { inherit lib; };
-  catalog = import ../agents/codex-model-catalog.nix { inherit lib; };
+  catalog = import ../agents/codex-model-catalog.nix {
+    inherit lib;
+    ollamaContextLength = lib.attrByPath [
+      "custom"
+      "ollama"
+      "contextLength"
+    ] 262144 osConfig;
+  };
 
   tomlFormat = pkgs.formats.toml { };
 

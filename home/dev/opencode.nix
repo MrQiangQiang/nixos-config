@@ -9,7 +9,12 @@
 # 因此必须在此显式列出所有模型。
 #
 # 运行时切换模型：在 OpenCode 中 /model 即可选择
-{ lib, ... }:
+{
+  config,
+  osConfig,
+  lib,
+  ...
+}:
 let
   shared = import ../agents/shared.nix { inherit lib; };
   apiProviders = (import ../agents/api-providers.nix { inherit lib; }).providers;
@@ -69,7 +74,7 @@ in
           models."qwen3.6:27b-q4_K_M" = {
             name = "Qwen3.6 27B (Q4_K_M)";
             limit = {
-              context = 262144;
+              context = lib.attrByPath [ "custom" "ollama" "contextLength" ] 262144 osConfig;
               output = 8192;
             };
           };

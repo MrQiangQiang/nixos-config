@@ -11,6 +11,7 @@
 
 {
   lib,
+  ollamaContextLength ? 262144,
   ...
 }:
 let
@@ -59,10 +60,10 @@ let
     ) api.providers
   );
 
-  # Ollama local models (manual — local models are dynamic, not in api-providers.nix)
+  # Ollama local models (SSOT: modules/ollama.nix → osConfig.custom.ollama.contextLength)
   ollamaEntries = [
     (
-      (common 262144)
+      (common ollamaContextLength)
       // {
         slug = "ollama/qwen3.6:27b-q4_K_M";
         display_name = "Qwen 3.6 27B (Ollama local)";
