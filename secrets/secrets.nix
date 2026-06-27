@@ -12,4 +12,14 @@ in
     keys.hosts.desktop-1
     keys.users.fugui
   ];
+  "deepseek-key.age".publicKeys = [
+    keys.hosts.laptop-1
+    keys.hosts.desktop-1
+    keys.users.fugui
+  ];
+  "glm-coding-plan-key.age".publicKeys = [
+    keys.hosts.laptop-1
+    keys.hosts.desktop-1
+    keys.users.fugui
+  ];
 }

@@ -34,16 +34,16 @@ in
     services.ollama = {
       enable = true;
       package = pkgs.ollama-cuda;
-      user = "ollama";  # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
+      user = "ollama"; # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
       group = "ollama";
-      host = "0.0.0.0";  # 靠防火墙收口到 tailscale0
-      loadModels = [ cfg.model ];  # 显式锁定量化（NixOS 可复现性）
-      syncModels = true;  # 强制声明==实际，移除未声明模型
+      host = "0.0.0.0"; # 靠防火墙收口到 tailscale0
+      loadModels = [ cfg.model ]; # 显式锁定量化（NixOS 可复现性）
+      syncModels = true; # 强制声明==实际，移除未声明模型
       environmentVariables = {
-        OLLAMA_FLASH_ATTENTION = "1";       # KV 量化的前置条件
+        OLLAMA_FLASH_ATTENTION = "1"; # KV 量化的前置条件
         OLLAMA_MAX_LOADED_MODELS = "1";
         CUDA_VISIBLE_DEVICES = cfg.gpuDevice;
-        OLLAMA_ORIGINS = "*";  # tailnet 内可信
+        OLLAMA_ORIGINS = "*"; # tailnet 内可信
 
         # ── 上下文窗口与 KV cache 量化 ──
         # 256K 全 GPU：ollama 永久驻留（27.7GB），qmd 只用剩余 4.3GB
@@ -51,8 +51,8 @@ in
         # KEEP_ALIVE=-1：模型永不卸载，杜绝 qmd 抢占 VRAM 后 ollama 降级
         # 注意：loadModels 只下载模型到磁盘，VRAM 预加载由 ollama-prewarm.service 完成
         OLLAMA_CONTEXT_LENGTH = toString cfg.contextLength;
-        OLLAMA_KV_CACHE_TYPE = "q8_0";      # 8-bit KV，质量不降低（实测略高于 FP16）
-        OLLAMA_KEEP_ALIVE = "-1";           # 永久驻留 VRAM，专用 LLM 服务器标准配置
+        OLLAMA_KV_CACHE_TYPE = "q8_0"; # 8-bit KV，质量不降低（实测略高于 FP16）
+        OLLAMA_KEEP_ALIVE = "-1"; # 永久驻留 VRAM，专用 LLM 服务器标准配置
       };
     };
 
