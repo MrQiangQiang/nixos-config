@@ -47,9 +47,7 @@ let
           model = "openai/${modelName}";
           api_base = apiBase;
           api_key = "os.environ/${envKey}";
-        };
-        model_info = {
-          mode = "chat";
+          use_chat_completions_api = true;
         };
       }) provider.models
     ) api.providers
