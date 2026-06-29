@@ -1,8 +1,6 @@
 # OpenCode — SST/Anomaly 的终端 AI 编码 agent
 #
-# 主路径：通过 LiteLLM 代理 (localhost:4000) 访问所有后端模型
-# 后备路径：Ollama 直连（代理不可用时仍可用）
-#
+# 统一入口：通过 LiteLLM 代理 (localhost:4000) 访问所有后端模型
 # 模型列表从 api-providers.nix (SSOT) 自动派生，无需手动同步。
 # OpenCode 不对 @ai-sdk/openai-compatible 做 /v1/models auto-discovery
 # （provider.ts:1403: models 无显式条目 → 模型数=0 → provider 被删除），
@@ -30,7 +28,10 @@ let
   };
 
   # 从 api-providers.nix SSOT 自动生成 litellm 模型列表
-  # modelMeta 包含 { cost, limit } 等元数据，逐字段传递给 OpenCode
+  # modelMeta 包含 { cost, reasoning, reasoningEfforts, ... } 等元数据，逐字段传递给 OpenCode
+  # reasoning — OpenCode variant 选择器的门控（transform.ts:666），来自 SSOT reasoning 字段
+  #   设为 true 的模型：deepseek-v4-*, glm-5.2, minimax-m3, mimo-v2.5*
+  #   设为 false 的模型：qwen*（无 reasoning_effort API）、kimi*（始终/仅 toggle）、glm-5.1、minimax-m2.7
   litellmCloudModels = builtins.foldl' (
     acc: providerName:
     let
@@ -42,6 +43,7 @@ let
       lib.nameValuePair "${providerName}/${modelName}" {
         name = "${providerLabel.${providerName} or providerName}: ${modelName}";
         cost = modelMeta.cost or { }; # mkModel 保证必有一致，or {} 仅防意外
+        reasoning = modelMeta.reasoning or false; # SSOT: 控制 variant 选择器显隐
       }
     ) provider.models
   ) { } (builtins.attrNames apiProviders);
@@ -58,7 +60,7 @@ in
         # 显式列出全部模型（OpenCode 不做 auto-discovery，见 provider.ts:1403）
         "litellm" = {
           npm = "@ai-sdk/openai-compatible";
-          name = "LiteLLM Proxy (all backends)";
+          name = "LiteLLM Proxy";
           options = {
             baseURL = "http://localhost:4000/v1";
             apiKey = "litellm-local";
@@ -66,20 +68,6 @@ in
           models = litellmCloudModels // {
             # Ollama 本地模型（非 API provider，SSOT 从 osConfig 读取）
             "ollama/${ollamaModel}".name = "Ollama: Qwen3.6 27B (Q4_K_M)";
-          };
-        };
-
-        # Ollama 直连 — 代理不可用时的后备
-        "ollama" = {
-          npm = "@ai-sdk/openai-compatible";
-          name = "Ollama (local, direct)";
-          options.baseURL = "http://localhost:11434/v1";
-          models."${ollamaModel}" = {
-            name = "Qwen3.6 27B (Q4_K_M)";
-            limit = {
-              context = lib.attrByPath [ "custom" "ollama" "contextLength" ] 262144 osConfig;
-              output = 8192;
-            };
           };
         };
       };
