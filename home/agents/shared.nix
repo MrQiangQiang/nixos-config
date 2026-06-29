@@ -31,7 +31,7 @@ let
   commandMeta = { };
   skillMeta = { };
   agentMeta = { };
-  ruleNames = [ ];
+  ruleNames = [ "guidelines" ];
   referenceNames = [ ];
 
   ## 构建各工具消费的 attrset
