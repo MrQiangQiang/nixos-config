@@ -18,9 +18,11 @@
   nix.optimise.automatic = true;
 
   # ── Temporary directory cleanup ──
-  # Age field cleans files older than the specified duration.
+  # mM: prefix forces mtime-only aging. Default uses max(atime,mtime,ctime),
+  # but ext4+relatime refreshes atime every 24h on any access (including
+  # systemd-tmpfiles-clean's own traversal), so atime-based 10d never triggers.
   systemd.tmpfiles.rules = [
-    "d /tmp 1777 root root 10d -"
+    "d /tmp 1777 root root mM:10d -"
     "d /var/tmp 1777 root root 30d -"
   ];
 

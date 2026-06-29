@@ -30,5 +30,6 @@
     ./polkit.nix
     ./media-keys.nix
     ./keybind-help.nix
+    ./tmp-cleanup.nix
   ];
 }
