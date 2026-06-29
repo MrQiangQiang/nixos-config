@@ -17,7 +17,8 @@
 #   deepseek-v4-*   https://api-docs.deepseek.com/quick_start/pricing        → 1,000,000
 #   qwen3.7-*       https://www.alibabacloud.com/help/en/model-studio/       → 1,000,000
 #   qwen3.6-plus    https://www.alibabacloud.com/help/en/model-studio/       → 1,000,000
-#   glm-5.*         https://www.alibabacloud.com/help/en/model-studio/       →   198,000
+#   glm-5.2         https://bigmodel.cn/glm-coding                                         → 1,000,000
+#   glm-5.1         https://docs.bigmodel.cn/                                              →   200,000
 #   kimi-k2.*       https://platform.moonshot.cn/docs/                       →   256,000
 #   minimax-m3      https://platform.minimaxi.com/docs/                      → 1,000,000
 #   minimax-m2.7    https://platform.minimaxi.com/docs/                      →   204,800
@@ -26,8 +27,21 @@
 { lib }:
 
 let
-  ## 模型构造器 — 强制每个模型声明 cost，可选 contextWindow
+  ## 模型构造器 — 强制每个模型声明 cost，可选 contextWindow/extra_body
   ## 价格单位：$/1M tokens，上下文窗口单位：tokens
+  ## extra_body: LiteLLM 透传字段（绕过适配层，源码：llm_http_handler.py:448-449）
+  ##   用途：禁用 DeepSeek V4 思考模式等适配层 bug 场景
+  ##
+  ## reasoning: 是否支持 reasoning（OpenCode variant 选择器的门控，transform.ts:666）
+  ## reasoningEfforts: 模型支持的可控 effort 列表（null=无 effort 控制能力）
+  ##   Codex 据此生成 supported_reasoning_levels
+  ##   来源（2026-06-29 官方文档验证）：
+  ##     deepseek-v4: https://api-docs.deepseek.com/guides/thinking_mode → high, max
+  ##     kimi-k2.7-code: https://platform.kimi.com/docs/guide/use-kimi-k2-thinking-model → 始终思考，无 effort 参数
+  ##     kimi-k2.6: 同上 → toggle only (enabled/disabled)，无 effort 粒度
+  ##     qwen3.*: 无 reasoning_effort API 端点（opencode transform.ts:711 明确排除）
+  ##     minimax-m3: thinking adaptive toggle（opencode transform.ts:672-679 显式处理）
+  ##     glm-5.2: opencode transform.ts:690-694 显式处理 high/max
   mkModel =
     {
       input,
@@ -35,6 +49,9 @@ let
       cache_read ? 0,
       cache_write ? 0,
       contextWindow ? null,
+      extra_body ? null,
+      reasoning ? false,
+      reasoningEfforts ? null,
     }:
     {
       cost = {
@@ -45,7 +62,12 @@ let
           cache_write
           ;
       };
-      inherit contextWindow;
+      inherit
+        contextWindow
+        extra_body
+        reasoning
+        reasoningEfforts
+        ;
     };
 
   ## Provider 注册表
@@ -63,43 +85,71 @@ let
           input = 1.40;
           output = 4.40;
           cache_read = 0.26;
-          contextWindow = 198000;
+          contextWindow = 1000000; # 官方宣传 1M 上下文（bigmodel.cn/glm-coding）
+          reasoning = true;
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
         };
         "glm-5.1" = mkModel {
           input = 1.40;
           output = 4.40;
           cache_read = 0.26;
-          contextWindow = 198000;
+          contextWindow = 200000;
+          # 无 reasoning_effort API（opencode transform.ts:708 排除）
         };
         "kimi-k2.7-code" = mkModel {
           input = 0.95;
           output = 4.00;
           cache_read = 0.19;
           contextWindow = 256000;
+          # 始终思考，无 effort 参数（kimi-k2.7-code 不支持 reasoning_effort）
         };
         "kimi-k2.6" = mkModel {
           input = 0.95;
           output = 4.00;
           cache_read = 0.16;
           contextWindow = 256000;
+          # 仅 thinking toggle (enabled/disabled)，无 effort 粒度
         };
         "mimo-v2.5" = mkModel {
           input = 0.14;
           output = 0.28;
           cache_read = 0.0028;
           contextWindow = 1000000;
+          reasoning = true;
+          reasoningEfforts = [
+            "low"
+            "medium"
+            "high"
+          ];
         };
         "mimo-v2.5-pro" = mkModel {
           input = 1.74;
           output = 3.48;
           cache_read = 0.0145;
           contextWindow = 1000000;
+          reasoning = true;
+          reasoningEfforts = [
+            "low"
+            "medium"
+            "high"
+          ];
         };
         "minimax-m3" = mkModel {
           input = 0.30;
           output = 1.20;
           cache_read = 0.06;
           contextWindow = 1000000;
+          reasoning = true;
+          # MiniMax-M3 通过 thinking type 控制：disabled=关 / adaptive=开
+          # opencode transform.ts:672-679 显式处理为 none/thinking
+          # Codex 映射：none=thinking disabled, medium=thinking adaptive
+          reasoningEfforts = [
+            "none"
+            "medium"
+          ];
         };
         "minimax-m2.7" = mkModel {
           input = 0.30;
@@ -107,6 +157,7 @@ let
           cache_read = 0.06;
           cache_write = 0.375;
           contextWindow = 204800;
+          # 无 reasoning_effort API（opencode transform.ts:707 排除）
         };
         "qwen3.7-max" = mkModel {
           input = 2.50;
@@ -114,6 +165,7 @@ let
           cache_read = 0.50;
           cache_write = 3.125;
           contextWindow = 1000000;
+          # 无 reasoning_effort API（opencode transform.ts:711 排除）
         };
         "qwen3.7-plus" = mkModel {
           input = 0.40;
@@ -121,6 +173,7 @@ let
           cache_read = 0.04;
           cache_write = 0.50;
           contextWindow = 1000000;
+          # 无 reasoning_effort API（opencode transform.ts:711 排除）
         };
         "qwen3.6-plus" = mkModel {
           input = 0.50;
@@ -128,18 +181,46 @@ let
           cache_read = 0.05;
           cache_write = 0.625;
           contextWindow = 1000000;
+          # 无 reasoning_effort API（opencode transform.ts:711 排除）
         };
         "deepseek-v4-pro" = mkModel {
           input = 1.74;
           output = 3.48;
           cache_read = 0.0145;
           contextWindow = 1000000;
+          reasoning = true;
+          # DeepSeek V4 reasoning_effort（官方文档 26-06-29）：
+          #   high: 默认值（regular requests），max: 最高 effort（Agent 请求自动触发）
+          #   low/medium 静默映射→high, xhigh→max
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
+          # DeepSeek V4 思考模式参数（官方文档 26-06-29）：
+          #   - thinking 默认 enabled，reasoning_content 与 content 同级返回
+          #   - Agent 请求（Claude Code/OpenCode/Codex）自动 effort=max
+          #   - effort=max 时简单问题也消耗 400+ token 思考
+          #   - 客户端 max_tokens 较小（200-500）时 reasoning 耗尽 → content 为空
+          # 方案：保留 thinking=enabled（不阉割模型能力），
+          #       通过 reasoning_effort=high 覆盖 Agent 自动 max，
+          #       降为普通请求默认值（与直连 API 普通请求一致）。
+          # LiteLLM 1.89.0 适配层 bug：reasoning_effort 被 pop 丢弃
+          # (transformation.py:49-63)，必须用 extra_body 绕过。
+          extra_body.thinking.type = "enabled";
+          extra_body.reasoning_effort = "high";
         };
         "deepseek-v4-flash" = mkModel {
           input = 0.14;
           output = 0.28;
           cache_read = 0.0028;
           contextWindow = 1000000;
+          reasoning = true;
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
+          extra_body.thinking.type = "enabled";
+          extra_body.reasoning_effort = "high";
         };
       };
     };
@@ -155,12 +236,28 @@ let
         "deepseek-v4-pro" = mkModel {
           input = 0.435;
           output = 0.87;
+          cache_read = 0.003625; # 官方文档 cache hit 价格
           contextWindow = 1000000;
+          reasoning = true;
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
+          extra_body.thinking.type = "enabled";
+          extra_body.reasoning_effort = "high";
         };
         "deepseek-v4-flash" = mkModel {
           input = 0.14;
           output = 0.28;
+          cache_read = 0.0028; # 官方文档 cache hit 价格
           contextWindow = 1000000;
+          reasoning = true;
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
+          extra_body.thinking.type = "enabled";
+          extra_body.reasoning_effort = "high";
         };
       };
     };
@@ -176,7 +273,12 @@ let
         "glm-5.2" = mkModel {
           input = 1.40;
           output = 4.40;
-          contextWindow = 198000;
+          contextWindow = 1000000; # 官方宣传 1M 上下文
+          reasoning = true;
+          reasoningEfforts = [
+            "high"
+            "max"
+          ];
         };
       };
     };
