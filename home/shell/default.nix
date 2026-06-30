@@ -22,6 +22,12 @@ in
     ./bat.nix
     ./helix.nix
     ./passage.nix
+    ./fzf.nix
+    ./zoxide.nix
+    ./ripgrep.nix
+    ./eza.nix
+    ./tealdeer.nix
+    ./lazygit.nix
   ];
 
   systemd.user.services.ssh-add-key = {
@@ -108,5 +114,7 @@ in
     fastfetch
     htop
     jq
+    fd
+    jd-diff-patch
   ];
 }
