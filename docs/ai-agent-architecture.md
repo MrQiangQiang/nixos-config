@@ -29,12 +29,12 @@ Trae CN 是 VSCode fork, MCP 配置读取 `~/.config/Trae CN/User/mcp.json` (Use
 ## 共享内容 SSOT
 
 ```
-home/agents/shared.nix + shared/ → commands/skills/agents/rules（Markdown SSOT）
+home/agents/shared.nix + shared/ → commands/skills/agents/context（Markdown SSOT）
     │
     ▼  各 consumer 通过 home-manager 原生模块选项消费
 home/dev/opencode.nix     → context + commands + skills + agents
-home/dev/codex.nix        → context + skills（rules 通过 combinedRules 合并进 context）
-home/dev/claude-code.nix  → context + rules + commands + agents + skills
+home/dev/codex.nix        → context + skills（shared.context 通过 combinedContext 合并进 context）
+home/dev/claude-code.nix  → context + commands + agents + skills
 ```
 
 shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各自 import，Nix 求值缓存复用。
@@ -47,12 +47,13 @@ shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各�
 
 | 内容 | OpenCode | Claude Code | Codex | Trae CN |
 |------|:---:|:---:|:---:|:---:|
-| context (AGENTS.md) | ✅ | ✅ | ✅ | ✅ |
-| rules | ❌ | ✅ | ❌ | ✅ |
+| context | ✅ | ✅ | ✅ | ✅ |
 | commands | ✅ | ✅ | ❌ | ✅ |
 | skills | ✅ | ✅ | ✅ | ✅ |
 | agents | ✅ | ✅ | ❌ | ✅ (Beta) |
 | hooks | ❌ | ✅ | ✅ | ✅ |
+
+项目级 rules（条件加载）不通过 nix 共享，在项目仓库中管理（详见下文 "context vs rules"）。
 
 hooks 虽然三工具支持（OpenCode 除外），但事件数差异 6 倍（Claude ~30 / Codex 10 / Trae 6）、
 配置格式三种互不兼容（JSON-in-settings / TOML-inline / versioned-hooks.json）、
@@ -77,31 +78,44 @@ markdown 正文可放入 config_file 的 developer_instructions 字段，但无�
 
 Codex agents 在 `codex.nix` 中通过 `settings.agents` 直接 TOML 定义。
 
-### rules 为何不给 OpenCode 和 Codex
+### context vs rules：概念边界
 
-**OpenCode**（无 rules 概念）：
+**context（常驻上下文）**：全局，始终加载，通过 nix SSOT 共享。
 
-| | Claude Code / Trae | OpenCode |
-|---|---|---|
-| 格式 | `.md` 行为指导（`~/.claude/rules/<name>.md`、`~/.trae-cn/user_rules/<name>.md`） | 不存在此概念 |
-| 用途 | 持久化行为规则（markdown） | 所有行为指导统一在 `AGENTS.md`（context） |
+| 工具 | 载体 | nix 消费方式 |
+|------|------|-------------|
+| OpenCode / Codex | `AGENTS.md` | hm `context` 选项 |
+| Claude Code | `~/.claude/CLAUDE.md` | hm `context` 选项 |
+| Trae | `~/.trae-cn/user_rules/<name>.md` | `home.file` symlink |
 
-OpenCode 源码确认：`session/instruction.ts:61` 仅加载 `AGENTS.md`，无 `rules/` 目录读取逻辑。
-权限规则走独立 permission system，不是 `.rules` 文件。
-hm 模块 `mkRenamedOptionModule rules → context` 如实反映此设计。
+**rules（项目级规则，条件加载）**：per-project，在项目仓库中管理，不通过 nix 共享。
 
-**Codex**（.rules 是 Starlark 执行策略，非行为指导）：
+| 工具 | 路径 | frontmatter | 生效模式 |
+|------|------|------------|---------|
+| Claude Code | `<project>/.claude/rules/*.md` | `paths` | 2 种：无 paths 始终加载 / 有 paths 按 glob 匹配 |
+| Trae | `<project>/.trae/rules/*.md` | `alwaysApply`/`globs`/`description`/`scene` | 4 种：始终 / 指定文件 / 智能匹配 / 手动触发 |
 
-| | Claude Code / Trae | Codex |
-|---|---|---|
-| 格式 | `.md` 行为指导 | `.rules` 文件（Starlark 语法） |
-| 用途 | 持久化行为规则 | 命令审批 allow/deny（`prefix_rule()` 等） |
+**为何项目级 rules 不通过 nix 共享**：
+1. 项目级 rules 是项目特定的（代码风格、技术栈约定），不同项目需要不同的 rules
+2. nix home-manager 管理用户级配置（`~/`），项目级配置在项目仓库中管理
+3. 项目级 rules 应纳入版本控制，与项目代码一起 review
 
-Codex 的 `.rules` 是 Starlark 语法的执行策略文件（`codex-rs/core/src/exec_policy.rs:49-51`），
-不是行为指导 markdown。把 markdown 塞进 `.rules` 会产生 Starlark 解析错误。
-行为指导统一走 `context` (AGENTS.md)，shared.rules 通过 `combinedRules` 合并进 context。
+**各工具全局 rules 的特殊说明**：
 
-**两者均为工具本身不支持（非 hm 限制）。**
+**Claude Code** 支持 `~/.claude/rules/`（用户级 rules），无 `paths` frontmatter 时与 CLAUDE.md 完全等价
+（官方："Rules without `paths` frontmatter are loaded at launch with the same priority as `.claude/CLAUDE.md`"）。
+当前架构不使用 hm `rules` 选项——guidelines.md 无 `paths`，通过 `context` 选项写入 CLAUDE.md 即可，
+避免同一份内容在 context window 中出现两次。
+
+**Trae** 的 `~/.trae-cn/user_rules/` 源码层面解析 frontmatter，但 `ruleScopeRoot` 机制使 globs 对项目文件不生效。
+官方定位为常驻上下文（语言风格、交互偏好），非项目级条件加载规则。
+
+**Codex** 的 `.rules` 是 Starlark 语法的执行策略文件（`codex-rs/core/src/exec_policy.rs:49-51`），
+非行为指导 markdown。hm 模块的 `rules` 选项写入 `~/.codex/rules/<name>.rules`，
+与 Claude Code/Trae 的 markdown rules 完全不同，不可共享。
+
+**OpenCode** 无 rules 概念。源码确认 `session/instruction.ts:61` 仅加载 `AGENTS.md`，
+无 `rules/` 目录读取逻辑。hm 模块 `mkRenamedOptionModule rules → context` 如实反映此设计。
 
 ### commands 为何不给 Codex
 

@@ -32,8 +32,7 @@ in
       };
     };
 
-    context = shared.combinedRules; # → ~/.claude/CLAUDE.md
-    rules = shared.rules; # → ~/.claude/rules/<name>.md
+    context = shared.combinedContext; # → ~/.claude/CLAUDE.md（常驻上下文，单一入口）
     skills = shared.skills; # → ~/.claude/skills/<name>/SKILL.md
     commands = shared.commands; # → ~/.claude/commands/<name>.md
     agents = shared.agents; # → ~/.claude/agents/<name>.md

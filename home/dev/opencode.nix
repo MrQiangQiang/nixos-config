@@ -88,7 +88,7 @@ in
     };
     tui.theme = "system";
 
-    context = shared.combinedRules;
+    context = shared.combinedContext;
     commands = shared.commands;
     skills = shared.skills;
     agents = shared.agents;

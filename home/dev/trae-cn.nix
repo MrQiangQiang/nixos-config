@@ -154,26 +154,29 @@ in
     home.packages = [ traePkg ];
 
     # sandbox — read-only security policy (home.file: Nix store symlink)
-    # rules — symlink from shared.nix SSOT (read-only, same as Claude Code rules)
-    #         Trae CN reads ~/.trae-cn/user_rules/<name>.md (any .md file in this dir)
-    #         UI-written rules (rule-<timestamp>.md) are preserved; nix-managed are read-only
+    # context — symlink from shared.nix SSOT (read-only)
+    #           Trae CN reads ~/.trae-cn/user_rules/<name>.md (any .md file in this dir)
+    #           全局 user_rules 是常驻上下文（非项目级 rules），UI 写入的 rule-<timestamp>.md 保留
     home.file = lib.mkMerge [
-      { ".trae-cn/sandbox.json".text = builtins.toJSON {
-        filesystem = {
-          readWrite = cfg.sandbox.extraReadWrite;
-          readOnly = cfg.sandbox.extraReadOnly;
+      {
+        ".trae-cn/sandbox.json".text = builtins.toJSON {
+          filesystem = {
+            readWrite = cfg.sandbox.extraReadWrite;
+            readOnly = cfg.sandbox.extraReadOnly;
+          };
+          network = {
+            default = cfg.network.defaultPolicy;
+            allow = cfg.network.extraAllow;
+            deny = cfg.network.extraDeny;
+          };
         };
-        network = {
-          default = cfg.network.defaultPolicy;
-          allow = cfg.network.extraAllow;
-          deny = cfg.network.extraDeny;
-        };
-      }; }
+      }
       (lib.mapAttrs' (
-        name: content: lib.nameValuePair ".trae-cn/user_rules/${name}.md" {
+        name: content:
+        lib.nameValuePair ".trae-cn/user_rules/${name}.md" {
           source = pkgs.writeText "${name}.md" content;
         }
-      ) shared.rules)
+      ) shared.context)
     ];
 
     # MCP — writable merge (home.activation: preserves IDE runtime writes from UI)
