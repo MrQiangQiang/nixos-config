@@ -3,34 +3,25 @@
 ## 核心架构
 
 ```
-desktop-1 (唯一来源, 7x24) ─── git/GitHub ─── laptop-1 (消费者)
-    │                                              │
-    │  git push/pull (文本数据)                     │  git push/pull
-    │  git-annex sync (大文件元数据)                │  git-annex get/drop (按需)
-    │  Tailscale Serve (qmd MCP,见 multi-machine.md)
-    │                                              │
-    │  repos.nix → clone: knowledge, secrets       │  同 repos.nix
-    │              (home-manager activation)        │
+desktop-1 (canonical, 7x24) ─── git ─── GitHub (远程备份: 文本 + annex 元数据)
+    │
+    │  SSH/Tailscale (annex 内容按需拉取 + 元数据 sync)
+    │
+    └── 非 desktop-1 主机 (laptop-N, desktop-2..N, 消费者)
 ```
+
+两条链路职责分离:
+- desktop-1 ↔ GitHub: git push/pull,desktop-1 是唯一对 GitHub 读写的主机
+- desktop-1 ↔ 非 desktop-1 主机: annex 内容(get/drop) + 元数据(sync),via Tailscale SSH
 
 ## git-annex 跨机同步
 
 单一 canonical 仓库: desktop-1 `/data/annex/` (HDD, btrfs)。详见 [data-storage.md](data-storage.md)。
 
-GitHub 仓库 `MrQiangQiang/annex` 仅作为**元数据备份**(master + git-annex branch),
+GitHub 仓库 `MrQiangQiang/annex` 仅作为**元数据备份**(main + git-annex branch),
 不存大文件内容(GitHub 不允许)。价值:NVMe 系统盘故障时恢复元数据;HDD 故障时内容仍丢失。
 
-```
-laptop-1 ~/annex/
-  remote: desktop-1 → fugui@desktop-1:/data/annex/
-  remote: origin    → git@github.com:MrQiangQiang/annex.git (元数据备份)
-
-git annex sync         # 同步位置元数据 (whereis) + 推 GitHub
-git annex get <file>   # 从 desktop-1 HDD 拉取
-git annex drop <file>  # 用完释放 laptop-1 空间
-```
-
-laptop-1 是 `group=manual`(用户控制 get/drop),不自动保留内容。
+非 desktop-1 主机不直连 GitHub:元数据通过 desktop-1 中转,内容只能从 desktop-1 拉取。
 
 ## 数据分类与同步方式
 
@@ -50,15 +41,6 @@ laptop-1 是 `group=manual`(用户控制 get/drop),不自动保留内容。
 - Syncthing 的 `.sync-conflict` 文件比 git merge 更难处理
 - age 加密设计上就允许密文落在不可信介质 (GitHub) 上, 不需要 Syncthing 实时同步
 - 一个工具比两个简单 (不需要 .stignore 排除 .git/)
-
-## 跨机工作流
-
-```
-laptop-1:  git pull → 工作 → git push
-desktop-1: git pull (或直接编辑) → git push
-冲突:      git merge (markdown 文本合并好)
-审查:      git diff 强制人类审查 agent 修改
-```
 
 ## 唯一来源验证
 
