@@ -1,23 +1,24 @@
-# lazygit — terminal git UI (static dark theme; running instances don't switch)
+# lazygit — terminal git UI (Layer 0: ANSI auto-follows terminal palette)
 #
 # Theme from official rose-pine/lazygit (commit acc968a, 2025-11-05).
-# Hex colors mapped to palette.dark fields (auto-resolves main/moon via dark_variant).
+# Uses ANSI color names via palette.ansi so colors auto-follow darkman:
+#   foot terminal sets ANSI 16-color palette based on dark/dawn mode.
+#   lazygit reads ANSI names → foot resolves to Rose Pine hex → auto-switches.
+#   This is the same layer as starship/fish (ANSI auto-follow, no darkman entry).
 #
-# Runtime switching limitation (same as yazi):
-#   lazygit is a persistent TUI — running instances do NOT switch on darkman toggle.
-#   New instances inherit the static dark theme below.
-# This is acceptable: git operations are short-session.
+# Two colors keep static hex (no ANSI slot in palette.ansi):
+#   - inactiveBorderColor (muted): medium gray, readable on both dark/light bg
+#   - cherryPickedCommitFgColor (surface): dark text on rose bg, readable on both
 #
-# No darkman entry — would conflict with home-manager's config.yml symlink.
-# To support switching, would need to drop programs.lazygit.settings and use
-# xdg.configFile + darkman link (like kwm/foot). Not worth the complexity for a
-# short-session TUI — static dark matches the official repo's pick-once model.
+# Runtime switching: new lazygit processes correct after darkman toggle.
+# Running instances may not redraw (persistent TUI, like yazi).
 {
   palette,
   ...
 }:
 
 let
+  a = palette.ansi;
   c = palette.dark;
 in
 {
@@ -26,26 +27,26 @@ in
     settings = {
       gui.theme = {
         activeBorderColor = [
-          "#${c.pine}"
+          a.pine
           "bold"
         ];
         inactiveBorderColor = [ "#${c.muted}" ];
         searchingActiveBorderColor = [
-          "#${c.rose}"
+          a.rose
           "bold"
         ];
-        optionsTextColor = [ "#${c.foam}" ];
-        selectedLineBgColor = [ "#${c.pine}" ];
+        optionsTextColor = [ a.foam ];
+        selectedLineBgColor = [ a.pine ];
         inactiveViewSelectedLineBgColor = [
-          "#${c.overlay}"
+          a.overlay
           "bold"
         ];
         cherryPickedCommitFgColor = [ "#${c.surface}" ];
-        cherryPickedCommitBgColor = [ "#${c.rose}" ];
-        markedBaseCommitFgColor = [ "#${c.foam}" ];
-        markedBaseCommitBgColor = [ "#${c.gold}" ];
-        unstagedChangesColor = [ "#${c.love}" ];
-        defaultFgColor = [ "#${c.text}" ];
+        cherryPickedCommitBgColor = [ a.rose ];
+        markedBaseCommitFgColor = [ a.foam ];
+        markedBaseCommitBgColor = [ a.gold ];
+        unstagedChangesColor = [ a.love ];
+        defaultFgColor = [ "default" ];
       };
     };
   };

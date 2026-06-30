@@ -38,7 +38,7 @@ palette.nix（唯一来源：三套色值）
 | 层 | 传播方式 | 应用 |
 |----|----------|------|
 | 编译时 | Nix replaceVars → theme/ + darkman ln -sf + signal | kwm/mako/fuzzel/wob/foot/fcitx5/GTK |
-| 终端色 | ANSI 16 色自动跟随（无需 darkman） | starship（palette.ansi 语义→ANSI）、fish（Auto theme + OSC 11） |
+| 终端色 | ANSI 16 色自动跟随（无需 darkman） | starship（palette.ansi 语义→ANSI）、fish（Auto theme + OSC 11）、lazygit（palette.ansi，持久 TUI 新实例生效） |
 | 新进程 | OSC 11 启动时检测（无需 darkman） | bat（每次调用是新进程，天然动态切换） |
 | shell hook | fish_prompt 设 env var，新进程读取（无 OSC 11 支持） | fzf（FZF_DEFAULT_OPTS，bash 静态 dark） |
 | Portal | XDG color-scheme（darkman → gsettings → Portal） | Firefox（CSS `light-dark()`）、Spotify、GTK |
@@ -54,7 +54,7 @@ palette.nix（唯一来源：三套色值）
 - **bat**: 新进程每次调用检测 OSC 11，darkman toggle 后下一次自动正确
 - **yazi**: 启动时 OSC 11 检测（持久 TUI，运行中不切换；文件管理器为短会话，可接受）
 - **fzf**: 无 OSC 11 支持；fish_prompt hook 读 mode.txt 设 FZF_DEFAULT_OPTS，下次调用生效（bash 静态 dark，bash 是 login shell 立即 exec fish）
-- **lazygit**: 持久 TUI 静态 dark——HM `config.yml` symlink 与 darkman `ln -sf` 冲突，且短会话 TUI 新实例不切换可接受（官方 Rose Pine 亦是 pick-once 模型）
+- **lazygit**: 用 `palette.ansi` ANSI 名（非 hex），foot 终端解析为 Rose Pine 色值，darkman 切换后新实例自动正确。两个无 ANSI 槽位的颜色（muted/surface）保留 hex——中灰色，深浅背景均可读
 - **firefox**: CSS `light-dark()` + XDG Portal 自动跟随，无需额外条目
 
 ## TTY 主题架构
@@ -129,7 +129,7 @@ NixOS Firefox 编译时 `MOZ_REQUIRE_SIGNING=true`，所有未签名扩展被拒
 | fzf | ✅ 完全 | fish_prompt hook 设 FZF_DEFAULT_OPTS，下次调用生效 |
 | Firefox | ✅ 完全 | CSS light-dark() + Dark Reader |
 | yazi | ⚠️ 启动时 | OSC 11 启动检测；运行中不切换 |
-| lazygit | ⚠️ 静态 dark | 持久 TUI 运行中不切换；新实例静态 dark（HM symlink 冲突 darkman） |
+| lazygit | ⚠️ 新实例 | ANSI 自动跟随；持久 TUI 运行中可能不重绘，新实例正确 |
 | Qt 应用 | ⚠️ 近似 | `platformTheme = gtk` |
 | Obsidian/Trae CN | ✅ 完全 | bootstrap.cjs 监听 darkman mode.txt |
 
