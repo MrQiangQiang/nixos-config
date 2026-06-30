@@ -95,10 +95,10 @@ Codex agents 在 `codex.nix` 中通过 `settings.agents` 直接 TOML 定义。
 | Claude Code | `<project>/.claude/rules/*.md` | `paths` | 2 种：无 paths 始终加载 / 有 paths 按 glob 匹配 |
 | Trae | `<project>/.trae/rules/*.md` | `alwaysApply`/`globs`/`description`/`scene` | 4 种：始终 / 指定文件 / 智能匹配 / 手动触发 |
 
-**为何项目级 rules 不通过 nix 共享**：
-1. 项目级 rules 是项目特定的（代码风格、技术栈约定），不同项目需要不同的 rules
+**为何项目级内容（rules/commands/skills/agents）不通过 nix 共享**：
+1. 项目级内容是项目特定的（代码风格、技术栈约定），不同项目需要不同的配置
 2. nix home-manager 管理用户级配置（`~/`），项目级配置在项目仓库中管理
-3. 项目级 rules 应纳入版本控制，与项目代码一起 review
+3. 项目级内容应纳入版本控制，与项目代码一起 review
 
 **各工具全局 rules 的特殊说明**：
 
