@@ -95,7 +95,9 @@ let
 
   # ── MCP (from SSOT) ──
   # Transform programs.mcp.servers to Trae CN mcp.json format.
-  # Trae CN reads from ~/.trae-cn/mcp.json
+  # Trae CN reads from ~/.config/Trae CN/User/mcp.json (VSCode User settings dir,
+  # determined by product.json nameLong="Trae CN"). ~/.trae-cn/ is the data dir
+  # (extensions/mcps state/sandbox), not the User settings dir.
   # Format: {"mcpServers": {name: {url|command, args?, env?, headers?}}}
   # Note: env {file=...;} submodules are opencode-specific, not supported by Trae CN.
   traeMcpServers = lib.mapAttrs (
@@ -105,6 +107,11 @@ let
   traeMcpJson = (pkgs.formats.json { }).generate "trae-mcp" {
     mcpServers = traeMcpServers;
   };
+
+  traeMcpPath = "${config.home.homeDirectory}/.config/Trae CN/User/mcp.json";
+
+  # ── Shared content (from SSOT) ──
+  shared = import ../agents/shared.nix { inherit lib; };
 in
 {
   options.custom.trae-cn = {
@@ -147,22 +154,42 @@ in
     home.packages = [ traePkg ];
 
     # sandbox — read-only security policy (home.file: Nix store symlink)
-    home.file.".trae-cn/sandbox.json".text = builtins.toJSON {
-      filesystem = {
-        readWrite = cfg.sandbox.extraReadWrite;
-        readOnly = cfg.sandbox.extraReadOnly;
-      };
-      network = {
-        default = cfg.network.defaultPolicy;
-        allow = cfg.network.extraAllow;
-        deny = cfg.network.extraDeny;
-      };
-    };
+    # rules — symlink from shared.nix SSOT (read-only, same as Claude Code rules)
+    #         Trae CN reads ~/.trae-cn/user_rules/<name>.md (any .md file in this dir)
+    #         UI-written rules (rule-<timestamp>.md) are preserved; nix-managed are read-only
+    home.file = lib.mkMerge [
+      { ".trae-cn/sandbox.json".text = builtins.toJSON {
+        filesystem = {
+          readWrite = cfg.sandbox.extraReadWrite;
+          readOnly = cfg.sandbox.extraReadOnly;
+        };
+        network = {
+          default = cfg.network.defaultPolicy;
+          allow = cfg.network.extraAllow;
+          deny = cfg.network.extraDeny;
+        };
+      }; }
+      (lib.mapAttrs' (
+        name: content: lib.nameValuePair ".trae-cn/user_rules/${name}.md" {
+          source = pkgs.writeText "${name}.md" content;
+        }
+      ) shared.rules)
+    ];
 
-    # MCP servers — read-only symlink (Nix store)
+    # MCP — writable merge (home.activation: preserves IDE runtime writes from UI)
     # Source: programs.mcp.servers (SSOT in home/agents/mcp-servers.nix)
     # To add/modify MCP servers, edit home/agents/mcp-servers.nix (not this file)
-    home.file.".trae-cn/mcp.json".source = traeMcpJson;
+    # nix SSOT servers deep-merged into IDE-written mcp.json (nix side authoritative on conflict)
+    home.activation.traeMcp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$(dirname ${lib.escapeShellArg traeMcpPath})"
+      if [ -f ${lib.escapeShellArg traeMcpPath} ]; then
+        merged=$(${lib.getExe pkgs.jq} -s '.[0] * .[1]' ${lib.escapeShellArg traeMcpPath} ${traeMcpJson})
+        printf '%s\n' "$merged" > ${lib.escapeShellArg traeMcpPath}
+      else
+        run cp ${traeMcpJson} ${lib.escapeShellArg traeMcpPath}
+        run chmod u+w ${lib.escapeShellArg traeMcpPath}
+      fi
+    '';
 
     # settings — writable merge (home.activation: preserves IDE runtime writes)
     home.activation.traeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

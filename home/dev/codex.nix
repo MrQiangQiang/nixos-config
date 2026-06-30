@@ -27,7 +27,9 @@
 #   ✅ hooks               → ~/.codex/hooks.json
 #   ✅ plugins, marketplaces
 #   ✅ skills              → ~/.codex/skills/
-#   ✅ rules               → ~/.codex/rules/<name>.rules
+#   ⚠️ rules — hm 模块有此选项（→ ~/.codex/rules/<name>.rules），但 Codex 的 .rules 是
+#              Starlark 执行策略（命令审批 allow/deny），非行为指导 markdown。
+#              行为指导统一走 context (AGENTS.md)，shared.rules 通过 combinedRules 合并进 context。
 #   ❌ agents — hm 未暴露专用选项，语义与 OpenCode agents 不同（TOML 角色定义 vs markdown 指令），
 #              直接通过 settings.agents 定义（格式：description + config_file + nickname_candidates）
 {
@@ -124,7 +126,6 @@ in
     # MCP 合并手动处理（见上方），config.toml 通过 home.activation 种子化（见下方）。
     context = shared.combinedRules;
     skills = shared.skills;
-    rules = shared.rules;
   };
 
   # always-overwrite: rebuild 始终恢复 Nix SSOT。

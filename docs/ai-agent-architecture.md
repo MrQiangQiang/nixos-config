@@ -15,11 +15,16 @@ home/agents/mcp-servers.nix  → programs.mcp.servers (唯一来源)
     │
     ▼  home-manager programs.mcp 模块 (26.05 标准)
     │
-home/dev/trae-cn.nix         → traeMcpServers 过滤消费
+home/dev/trae-cn.nix         → traeMcpServers 过滤消费 (writable merge)
 home/dev/opencode.nix        → enableMcpIntegration 消费
+home/dev/codex.nix           → 手动 transform (filterMcpServer) 消费
 ```
 
 所有 MCP-capable agent 共享同一份配置, 改一处全生效。
+
+Trae CN 是 VSCode fork, MCP 配置读取 `~/.config/Trae CN/User/mcp.json` (User settings dir,
+由 product.json nameLong 决定), 非 `~/.trae-cn/mcp.json` (数据目录, 由 dataFolderName 决定)。
+用 home.activation writable merge 保留 IDE 运行时写入能力 (UI 添加的 MCP 服务器)。
 
 ## 共享内容 SSOT
 
@@ -28,7 +33,7 @@ home/agents/shared.nix + shared/ → commands/skills/agents/rules（Markdown SSO
     │
     ▼  各 consumer 通过 home-manager 原生模块选项消费
 home/dev/opencode.nix     → context + commands + skills + agents
-home/dev/codex.nix        → context + skills + rules（profiles/hooks/plugins 原生支持）
+home/dev/codex.nix        → context + skills（rules 通过 combinedRules 合并进 context）
 home/dev/claude-code.nix  → context + rules + commands + agents + skills
 ```
 
@@ -40,43 +45,63 @@ shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各�
 
 ### agents 跨工具共享矩阵
 
-| 内容 | OpenCode | Claude Code | Codex |
-|------|:---:|:---:|:---:|
-| context (AGENTS.md) | ✅ | ✅ | ✅ |
-| rules | ❌ | ✅ | ✅ |
-| commands | ✅ | ✅ | ❌ |
-| skills | ✅ | ✅ | ✅ |
-| agents | ✅ | ✅ | ❌ |
+| 内容 | OpenCode | Claude Code | Codex | Trae CN |
+|------|:---:|:---:|:---:|:---:|
+| context (AGENTS.md) | ✅ | ✅ | ✅ | ✅ |
+| rules | ❌ | ✅ | ❌ | ✅ |
+| commands | ✅ | ✅ | ❌ | ✅ |
+| skills | ✅ | ✅ | ✅ | ✅ |
+| agents | ✅ | ✅ | ❌ | ✅ (Beta) |
+| hooks | ❌ | ✅ | ✅ | ✅ |
+
+hooks 虽然三工具支持（OpenCode 除外），但事件数差异 6 倍（Claude ~30 / Codex 10 / Trae 6）、
+配置格式三种互不兼容（JSON-in-settings / TOML-inline / versioned-hooks.json）、
+hm 模块支持不对称（仅 claude-code 有专用 hooks 选项）。
+hooks **不入共享 SSOT**，各工具独立配置。运行时已有兼容机制（Trae 导入 Claude hooks、
+Codex hooks.json 解析 Claude 格式）。
 
 **agents 为何不给 Codex：**
 
 | | OpenCode / Claude Code | Codex |
 |---|---|---|
-| 格式 | Markdown + YAML frontmatter | TOML `[agents.<name>]` |
-| 内容 | 完整 system prompt 指令 | `description` + `config_file`（指向独立 TOML 配置层） |
-| config_file | 不存在此概念 | **必填**——提供 model/reasoning/sandbox 覆盖 |
+| 格式 | Markdown + YAML frontmatter | TOML `[agents.<name>]` + 独立 config_file |
+| 内容 | 单层：完整 system prompt 指令 | 双层：description + config_file（含 developer_instructions 等配置） |
+| config_file | 不存在此概念 | **可选**（`Option<AbsolutePathBuf>`），含 model/reasoning/sandbox/developer_instructions |
 
-`config_file` 是语义鸿沟：Codex agent 的核心不是 system prompt，而是
-独立配置层（model/reasoning/sandbox 设置）。shared.agents 的 markdown
-指令在 Codex agent 模型中无处安放。
+Codex agents 是双层 TOML 结构：`[agents.<name>]` 表声明角色元数据（description + config_file），
+config_file 指向独立 TOML 文件承载配置（model/reasoning_effort/developer_instructions 等）。
+shared.agents 是单层 markdown（YAML frontmatter + 正文指令），与 Codex 双层结构不可逆转换——
+markdown 正文可放入 config_file 的 developer_instructions 字段，但无法反向从 TOML 生成 markdown。
 
-**禁止尝试**从 shared.agents 生成 Codex agents（只能提取 description，
-config_file 无法自动派生，强行转化破坏 SSOT）。
+**禁止尝试**从 shared.agents 自动派生 Codex agents（双层→单层不可逆，破坏 SSOT 单向性）。
 
 Codex agents 在 `codex.nix` 中通过 `settings.agents` 直接 TOML 定义。
 
-### rules 为何不给 OpenCode
+### rules 为何不给 OpenCode 和 Codex
 
-| | Codex / Claude Code | OpenCode |
+**OpenCode**（无 rules 概念）：
+
+| | Claude Code / Trae | OpenCode |
 |---|---|---|
-| 格式 | `.rules` 文件（`~/.codex/rules/`、`~/.claude/rules/`） | 不存在此概念 |
-| 用途 | 持久化行为规则（如 prefix_rule allow-list） | 所有行为指导统一在 `AGENTS.md`（context） |
+| 格式 | `.md` 行为指导（`~/.claude/rules/<name>.md`、`~/.trae-cn/user_rules/<name>.md`） | 不存在此概念 |
+| 用途 | 持久化行为规则（markdown） | 所有行为指导统一在 `AGENTS.md`（context） |
 
 OpenCode 源码确认：`session/instruction.ts:61` 仅加载 `AGENTS.md`，无 `rules/` 目录读取逻辑。
 权限规则走独立 permission system，不是 `.rules` 文件。
 hm 模块 `mkRenamedOptionModule rules → context` 如实反映此设计。
 
-**工具本身不支持，非 hm 限制。**
+**Codex**（.rules 是 Starlark 执行策略，非行为指导）：
+
+| | Claude Code / Trae | Codex |
+|---|---|---|
+| 格式 | `.md` 行为指导 | `.rules` 文件（Starlark 语法） |
+| 用途 | 持久化行为规则 | 命令审批 allow/deny（`prefix_rule()` 等） |
+
+Codex 的 `.rules` 是 Starlark 语法的执行策略文件（`codex-rs/core/src/exec_policy.rs:49-51`），
+不是行为指导 markdown。把 markdown 塞进 `.rules` 会产生 Starlark 解析错误。
+行为指导统一走 `context` (AGENTS.md)，shared.rules 通过 `combinedRules` 合并进 context。
+
+**两者均为工具本身不支持（非 hm 限制）。**
 
 ### commands 为何不给 Codex
 

@@ -7,7 +7,7 @@ let
   ## 路径相对于此文件（Nix 路径字面量特性）
   readContent = type: name: builtins.readFile (./shared + "/${type}/${name}.md");
 
-  ## YAML frontmatter 生成器（来自 ai-nixCfg，支持 list/attrs）
+  ## YAML frontmatter 生成器（来自 ai-nixCfg，支持 list/attrs，自动过滤 null/空值）
   mkFrontmatter =
     attrs:
     let
@@ -19,32 +19,38 @@ let
           "\n${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: val: "  ${k}: ${val}") v)}"
         else
           v;
-      lines = lib.mapAttrsToList (k: v: "${k}: ${formatValue v}") attrs;
+      filtered = lib.filterAttrs (_: v: v != null && v != "" && v != [ ] && v != { }) attrs;
+      lines = lib.mapAttrsToList (k: v: "${k}: ${formatValue v}") filtered;
     in
     "---\n${lib.concatStringsSep "\n" lines}\n---\n";
 
   ## 内容元数据（当前为空，添加内容时在此注册）
-  ## 示例：
-  ##   commandMeta.commit = { description = "Create git commit"; };
-  ##   skillMeta.nix-flakes = { name = "nix-flakes"; description = "Use when working with Nix flake inputs or outputs"; };
-  ##   agentMeta.code-reviewer = { name = "code-reviewer"; description = "Reviews code changes"; };
+  ## 跨工具字段示例（参考 ai-nixCfg agentMeta 模式）：
+  ##   commandMeta.commit = { description = "Create git commit"; argument-hint = "[msg]"; };
+  ##   skillMeta.nix-flakes = { description = "Use when working with Nix flake inputs or outputs"; };
+  ##   agentMeta.code-reviewer = {
+  ##     description = "Reviews code changes";
+  ##     model = "sonnet";              # Claude Code 必需（inherit/sonnet/opus/haiku）
+  ##     tools = [ "Read" "Grep" ];     # 可选
+  ##     color = "green";               # Claude Code 可选
+  ##   };
   commandMeta = { };
   skillMeta = { };
   agentMeta = { };
   ruleNames = [ "guidelines" ];
   referenceNames = [ ];
 
-  ## 构建各工具消费的 attrset
+  ## 构建各工具消费的 attrset（name 由 key 自动注入，所有 meta 字段透传到 frontmatter）
   commands = lib.mapAttrs (
-    name: meta: mkFrontmatter { inherit (meta) description; } + readContent "commands" name
+    name: meta: mkFrontmatter meta + readContent "commands" name
   ) commandMeta;
 
   skills = lib.mapAttrs (
-    name: meta: mkFrontmatter { inherit (meta) name description; } + readContent "skills" name
+    name: meta: mkFrontmatter (meta // { inherit name; }) + readContent "skills" name
   ) skillMeta;
 
   agents = lib.mapAttrs (
-    name: meta: mkFrontmatter { inherit (meta) name description; } + readContent "agents" name
+    name: meta: mkFrontmatter (meta // { inherit name; }) + readContent "agents" name
   ) agentMeta;
 
   rules = builtins.listToAttrs (
