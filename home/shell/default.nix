@@ -82,6 +82,8 @@ in
         name = "fugui";
         email = "chenzhiqiang0125@gmail.com";
       };
+      # 所有主机统一 main 为默认分支 (git-annex sync 要求分支名一致)
+      init.defaultBranch = "main";
       # 直接输出 UTF-8 文件名,不转义为八进制 (\344\270\216)。
       # 仅影响 status/diff/log 的显示,不影响 commit/clone/checkout。
       # 默认 true 是 2005 年兼容老终端的保守策略,2026 年现代终端均原生 UTF-8。
