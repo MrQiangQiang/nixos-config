@@ -193,7 +193,10 @@ in
   # annex-ignore=true 阻止 git-annex sync 走 GitHub, 但手动 git push 不受影响
   systemd.services.git-annex-backup-github = {
     description = "Backup git-annex metadata to GitHub";
-    after = [ "network-online.target" "git-annex-init.service" ];
+    after = [
+      "network-online.target"
+      "git-annex-init.service"
+    ];
     wants = [ "network-online.target" ];
     serviceConfig = {
       Type = "oneshot";
@@ -201,7 +204,10 @@ in
       Group = "users";
       WorkingDirectory = "/data/annex";
     };
-    path = [ pkgs.git pkgs.openssh ];
+    path = [
+      pkgs.git
+      pkgs.openssh
+    ];
     script = "git push origin git-annex main";
   };
 

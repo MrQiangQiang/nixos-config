@@ -15,6 +15,7 @@ in
     ./agents
     ./desktop
     ./dev
+    ./git-annex.nix
     ./repos.nix
     ./shell
   ];
