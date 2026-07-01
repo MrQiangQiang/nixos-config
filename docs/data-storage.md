@@ -66,12 +66,19 @@ HDD 保护:
 - 备份方案 (如果需要): 参考 [data-protection.md](data-protection.md) 的已知缺口和未来选项
 - Joey Hess 本人对冷存储的做法: 设置 trusted，永不 drop (2022-06-28 forum)
 
-## 初始化 (已自动化)
+## 自动化架构
 
-desktop-1 的 `/data/annex` 初始化由 `hosts/desktop-1/default.nix` 中的
-`systemd.services.git-annex-init` oneshot 自动完成(幂等,每次启动运行)。
+三个 git-annex 操作分属系统层和用户层:
 
-laptop-1 的 `~/annex` clone + init 由 `home/repos.nix` 的 activation 脚本自动完成
+| 操作 | 层级 | 主机 | WHY |
+|------|------|------|-----|
+| init | system | desktop-1 | 需要 root chown /data/annex (nofail 挂载时序不可靠) |
+| sync | user | 非 desktop-1 | 用户操作 ~/annex,无需 root;system service 的 `systemctl start` 触发 polkit `auth_admin_keep`,非交互环境 25s 超时 |
+| backup | system | desktop-1 | 依赖 init.service;user manager 与 system manager 完全隔离,user service 无法声明 `After=system-service` |
+
+`linger=true` (modules/users.nix) 确保 user timer 在未登录时仍运行。
+
+laptop-1 的 `~/annex` clone + init 由 `home/repos.nix` activation 脚本自动完成
 (clone 后执行 `git annex init laptop-1 && git annex group here manual`)。
 
 以下为参考命令(手动恢复时用):
@@ -97,9 +104,10 @@ git annex group here manual
 ## 源码真理
 
 - `modules/git-annex.nix` — 安装 git-annex (所有主机共享, mkHost.nix import)
-- `hosts/desktop-1/default.nix` — git-annex-init oneshot (幂等初始化 /data/annex)
+- `home/git-annex.nix` — sync user service + timer (非 desktop-1)
+- `hosts/desktop-1/default.nix` — init oneshot + backup service + timer + autoScrub (desktop-1)
+- `home/repos.nix` — laptop-1 activation clone + init + group
 - `modules/disk-health.nix` — smartd 磁盘健康监测 (所有主机共享)
 - `hosts/desktop-1/disk-config.nix` — HDD disk.data (btrfs, /data/annex, nofail)
-- `hosts/desktop-1/default.nix` — autoScrub
 - `docs/data-sync.md` — 跨主机同步
 - `docs/data-protection.md` — 数据保护
