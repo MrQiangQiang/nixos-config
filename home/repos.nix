@@ -57,11 +57,12 @@ in
     )
   );
 
-  # annex 仓库: clone (如果不存在) + init + group (幂等, 每次 activation 都执行)
+  # annex 仓库: clone (如果不存在) + init + group (仅第一次) + sync (每次)
   # 单独 activation 而非加入 repos 列表, 因为需要 postClone hook (git annex init)
   # git-annex 运行时需要 git 在 PATH 中
   # 仅非 desktop-1 主机执行: desktop-1 自身是 canonical 仓库 (/data/annex), 无需 clone 自己。
   # init description 用主机名 (osConfig.networking.hostName) 而非硬编码, 支持未来新增主机。
+  # init/group 仅第一次 (实验验证非幂等, 每次产生 1 commit 垃圾); sync 幂等 (无变化零 commit)。
   home.activation.cloneAnnexRepo = lib.hm.dag.entryAfter [ "clonePersonalRepos" ] (
     lib.optionalString (osConfig.networking.hostName != "desktop-1") ''
       export PATH="${pkgs.git}/bin:${pkgs.git-annex}/bin:$PATH"
@@ -73,10 +74,16 @@ in
           echo "  git clone fugui@desktop-1.tail0f7af0.ts.net:/data/annex ${home}/annex" >&2
         fi
       fi
-      # init + group 幂等, 每次 activation 都执行 (确保 group 被设置)
       if [ -d '${home}/annex/.git' ]; then
-        cd '${home}/annex' && run ${gitAnnex} init '${osConfig.networking.hostName}' && run ${gitAnnex} group here manual || \
-          echo "Warning: annex init/group failed, run manually:" >&2
+        cd '${home}/annex'
+        # init + group 仅第一次 (避免垃圾 commit)
+        if ! git config --get annex.uuid >/dev/null 2>&1; then
+          run ${gitAnnex} init '${osConfig.networking.hostName}' && run ${gitAnnex} group here manual || \
+            echo "Warning: annex init/group failed, run manually:" >&2
+        fi
+        # sync 总是跑 (幂等, 上报 UUID + 拉取 desktop-1 新元数据)
+        run ${gitAnnex} sync --no-content || \
+          echo "Warning: annex sync failed, run manually: git annex sync --no-content" >&2
       fi
     ''
   );

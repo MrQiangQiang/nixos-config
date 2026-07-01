@@ -174,13 +174,43 @@ in
     ];
     script = ''
       [ -d .git ] || git init
-      git annex init "desktop-1"
-      git annex group here backup
-      git annex required here "present"
+      # init/group/required 仅第一次 (实验验证非幂等, 每次产生垃圾 commit)
+      if ! git config --get annex.uuid >/dev/null 2>&1; then
+        git annex init "desktop-1"
+        git annex group here backup
+        git annex required here "present"
+      fi
+      # numcopies/mincopies 是 git config, 幂等
       git annex numcopies 1
       git annex mincopies 1
       git remote get-url origin 2>/dev/null || \
         git remote add origin git@github.com:MrQiangQiang/annex.git
     '';
+  };
+
+  # ── git-annex GitHub backup ───────────────────────────────
+  # 每天备份 git-annex + main 分支到 GitHub (元数据异地备份)
+  # annex-ignore=true 阻止 git-annex sync 走 GitHub, 但手动 git push 不受影响
+  systemd.services.git-annex-backup-github = {
+    description = "Backup git-annex metadata to GitHub";
+    after = [ "network-online.target" "git-annex-init.service" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "fugui";
+      Group = "users";
+      WorkingDirectory = "/data/annex";
+    };
+    path = [ pkgs.git pkgs.openssh ];
+    script = "git push origin git-annex main";
+  };
+
+  systemd.timers.git-annex-backup-github = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      RandomizedDelaySec = "30min";
+    };
   };
 }
