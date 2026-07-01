@@ -23,6 +23,10 @@ lib.nixosSystem {
     ../modules/users.nix
     ../modules/analysis.nix
     ../modules/git-annex.nix
+    # ollama.nix: options 全局可见（nixpkgs module-list.nix 模式），
+    # config 由 lib.mkIf cfg.enable 按需激活。home-manager 层直接读
+    # osConfig.custom.ollama.* 无需 fallback，消除 SSOT 值重复。
+    ../modules/ollama.nix
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     {

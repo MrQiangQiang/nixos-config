@@ -12,8 +12,8 @@ ollama.service (system service, starts first)
   User=ollama (static, not DynamicUser)
   host=0.0.0.0:11434  →  firewall收口到 tailscale0
   GPU: RTX 5090 (32GB VRAM)
-  ├── ollama qwen3.6:27b-q4_K_M  27.7GB  (权重 17GB + KV cache 10.7GB, 256K context)
-  └── qmd (embed + rerank + generate)  ~2.2GB  (剩余 4.3GB 中的部分)
+  ├── ollama qwen3.6:27b-q4_K_M  27.7GB  (权重 17GB + KV cache 10.7GB, context 由 custom.ollama.contextLength 控制)
+  └── qmd (embed + rerank + generate)  ~2.2GB  (剩余 VRAM 中的部分)
 
 ollama-prewarm.service (after ollama.service)
   → 发送推理请求触发 VRAM 加载 (loadModels 只下载不加载)
@@ -28,10 +28,10 @@ ollama-prewarm.service (after ollama.service)
 | `host = "0.0.0.0"` | 监听所有接口,靠 `firewall.interfaces.tailscale0` 收口到 tailnet |
 | `OLLAMA_KEEP_ALIVE=-1` | 模型永不卸载，杜绝 qmd 抢占 VRAM 后 ollama 降级。专用 LLM 服务器标准配置 |
 | `ollama-prewarm.service` | `loadModels` 只下载模型到磁盘，不加载到 VRAM。本服务在 ollama 启动后发送推理请求触发 VRAM 加载 |
-| `OLLAMA_CONTEXT_LENGTH=262144` | qwen3.6 原生 256K 上下文。ollama 按 `OLLAMA_CONTEXT_LENGTH` 预分配 KV cache（非实际使用量） |
+| `OLLAMA_CONTEXT_LENGTH` | 由 `custom.ollama.contextLength` 选项控制（默认模型原生上限）。ollama 按此值预分配 KV cache（非实际使用量） |
 | `OLLAMA_FLASH_ATTENTION=1` | KV cache 量化的前置条件。Flash Attention 减少内存访问，提升推理速度 |
 | `OLLAMA_KV_CACHE_TYPE=q8_0` | 8-bit KV cache，质量不降低（实测略高于 FP16），VRAM 占用减半 |
-| `OLLAMA_MAX_LOADED_MODELS = "1"` | 32GB VRAM 只够一个 27B Q4_K_M + 256K KV cache |
+| `OLLAMA_MAX_LOADED_MODELS = "1"` | 32GB VRAM 只够一个 27B Q4_K_M + 全 context KV cache |
 | `CUDA_VISIBLE_DEVICES = "0"` | 只使用 dGPU(PCI:1@0:0:0),iGPU 留给桌面 |
 | `OLLAMA_ORIGINS = "*"` | tailnet 内可信,允许跨域访问(MCP 集成) |
 | ollama 先于 qmd 启动 | systemd 默认：系统服务（ollama）先于用户服务（qmd-mcp）。ollama 先占坑 VRAM，qmd 只能用剩余 |
@@ -47,7 +47,7 @@ ollama 服务启动即创建 CUDA context（GPU 功耗 ~20W → ~50-90W DVFS 跳
 
 ## Source of truth
 
-- `modules/ollama.nix` — ollama 模块（options + prewarm service）
+- `modules/ollama.nix` — ollama 模块（options + prewarm service，`custom.ollama.contextLength` SSOT）
 - `hosts/desktop-1/default.nix` — `custom.ollama.enable = true`
 - `home/dev/qmd.nix` — `QMD_LLAMA_GPU=cuda`
-- `home/dev/opencode.nix` — `context = 262144`
+- `home/dev/codex.nix` — 读 `osConfig.custom.ollama.contextLength` 传入 catalog

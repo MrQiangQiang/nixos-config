@@ -19,7 +19,7 @@ in
 
     contextLength = lib.mkOption {
       type = lib.types.int;
-      default = 262144;
+      default = 256000;
       description = "Context window size (tokens)";
     };
 
@@ -46,7 +46,6 @@ in
         OLLAMA_ORIGINS = "*"; # tailnet 内可信
 
         # ── 上下文窗口与 KV cache 量化 ──
-        # 256K 全 GPU：ollama 永久驻留（27.7GB），qmd 只用剩余 4.3GB
         # ollama 按 OLLAMA_CONTEXT_LENGTH 预分配 KV cache（非实际使用量）
         # KEEP_ALIVE=-1：模型永不卸载，杜绝 qmd 抢占 VRAM 后 ollama 降级
         # 注意：loadModels 只下载模型到磁盘，VRAM 预加载由 ollama-prewarm.service 完成
@@ -59,7 +58,7 @@ in
     # ── Ollama VRAM 预加载 ─────────────────────────────────────
     # loadModels 只下载模型到磁盘，不加载到 VRAM。
     # 本服务在 ollama 服务启动后发送推理请求，将模型加载到 VRAM 并永久驻留。
-    # 保证 ollama 256K 模型始终占坑，qmd 只能使用剩余 VRAM。
+    # 保证 ollama 模型始终占坑，qmd 只能使用剩余 VRAM。
     systemd.services.ollama-prewarm = {
       description = "Preload ${cfg.model} into VRAM";
       after = [ "ollama.service" ];

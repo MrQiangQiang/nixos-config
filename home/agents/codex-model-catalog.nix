@@ -30,8 +30,8 @@
 
 {
   lib,
-  ollamaContextLength ? 262144,
-  ollamaModel ? "qwen3.6:27b-q4_K_M",
+  ollamaContextLength,
+  ollamaModel,
   ...
 }:
 let
@@ -123,7 +123,7 @@ let
     ) api.providers
   );
 
-  # Ollama local models (SSOT: modules/ollama.nix → passed as ollamaModel param)
+  # Ollama local models (SSOT: modules/ollama.nix → osConfig.custom.ollama.* → 必填参数)
   ollamaEntries = [
     (
       (common ollamaContextLength)

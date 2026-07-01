@@ -60,7 +60,7 @@ let
   );
 
   # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama.model）
-  ollamaModel = lib.attrByPath [ "custom" "ollama" "model" ] "qwen3.6:27b-q4_K_M" osConfig;
+  ollamaModel = osConfig.custom.ollama.model;
   ollamaModels = [ ollamaModel ];
 
   # Ollama model_list entries

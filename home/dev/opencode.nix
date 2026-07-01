@@ -26,8 +26,8 @@ let
   shared = import ../agents/shared.nix { inherit lib; };
   apiProviders = (import ../agents/api-providers.nix { inherit lib; }).providers;
 
-  # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama）
-  ollamaModel = lib.attrByPath [ "custom" "ollama" "model" ] "qwen3.6:27b-q4_K_M" osConfig;
+  # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama.model）
+  ollamaModel = osConfig.custom.ollama.model;
 
   # 模型选择 UI 显示前缀
   providerLabel = {

@@ -43,16 +43,8 @@ let
   shared = import ../agents/shared.nix { inherit lib; };
   catalog = import ../agents/codex-model-catalog.nix {
     inherit lib;
-    ollamaContextLength = lib.attrByPath [
-      "custom"
-      "ollama"
-      "contextLength"
-    ] 262144 osConfig;
-    ollamaModel = lib.attrByPath [
-      "custom"
-      "ollama"
-      "model"
-    ] "qwen3.6:27b-q4_K_M" osConfig;
+    ollamaContextLength = osConfig.custom.ollama.contextLength;
+    ollamaModel = osConfig.custom.ollama.model;
   };
 
   tomlFormat = pkgs.formats.toml { };
@@ -151,7 +143,5 @@ in
   };
 
   # codex-oss: 备用路径直连本地 Ollama（代理不可用时）
-  home.shellAliases.codex-oss = "codex --oss -m ${
-    lib.attrByPath [ "custom" "ollama" "model" ] "qwen3.6:27b-q4_K_M" osConfig
-  }";
+  home.shellAliases.codex-oss = "codex --oss -m ${osConfig.custom.ollama.model}";
 }

@@ -16,7 +16,6 @@ in
     ../../modules/proxy.nix
     ../../modules/im.nix
     ../../modules/tailscale.nix
-    ../../modules/ollama.nix
     ./hardware-configuration.nix
   ];
 
@@ -73,7 +72,7 @@ in
   # iGPU OpenCL via Mesa rusticl (built-in, hardware.graphics.enable = true)
 
   # ── Ollama (本地 LLM 推理，CUDA) ──────────────────────────
-  # 配置在 modules/ollama.nix，通过 options 参数化
+  # 模块由 lib/mkHost.nix 共享导入（options 全局可见），此处仅启用服务。
   # 包含 KEEP_ALIVE=-1 永久驻留 + ollama-prewarm.service VRAM 预加载
   custom.ollama.enable = true;
 
