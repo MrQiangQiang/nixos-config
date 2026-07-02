@@ -34,6 +34,32 @@ in
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # ── WiFi: MT7925 roaming crash workaround ─────────────────
+  # mt7925e 驱动在 v7.1.x 仍有未修复的 list corruption bug，由
+  # band-steering roaming（2.4GHz ↔ 5GHz AP 切换）触发：
+  #   list_add corruption → kernel BUG → reboot → probe failed error -5
+  # Zac Bowling 的 patch 0002/0012 已合并到 v7.1，但 crash 仍存在
+  # （另一个未修复的 bug，见 crash-analysis Pattern 3 / Hung Task）。
+  # 锁定 5GHz 单频段 = 锁定单一 AP = 消除 roaming 触发。
+  # 移除条件：mt7925 驱动 roaming 路径修复进入 stable 内核。
+  # Ref: https://zbowling.github.io/mt7925/issues/crash-analysis/
+  systemd.services.wifi-mt7925-roaming-workaround = {
+    description = "MT7925 roaming crash workaround: lock WiFi to 5GHz";
+    after = [ "NetworkManager.service" ];
+    wants = [ "NetworkManager.service" ];
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.networkmanager ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      for conn in $(nmcli -t -f NAME,TYPE con show 2>/dev/null | grep ':802-11-wireless' | cut -d: -f1); do
+        nmcli connection modify "$conn" 802-11-wireless.band a 2>/dev/null || true
+      done
+    '';
+  };
+
   # ── GPU: NVIDIA + AMD iGPU (PRIME Offload) ────────────────
   # 必须声明 videoDrivers，否则 hardware.nvidia 模块不激活，
   # GSP 固件不会安装到 /lib/firmware/nvidia/，导致 RmInitAdapter failed。
