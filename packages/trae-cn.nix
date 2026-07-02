@@ -7,11 +7,11 @@
 }:
 let
   pname = "trae-cn";
-  version = "2.3.46696";
+  version = "2.3.49398";
 
   src = pkgs.fetchurl {
     url = "https://lf-cdn.trae.com.cn/obj/trae-com-cn/pkg/app/releases/stable/${version}/linux/Trae_CN-linux-x64.tar.gz";
-    hash = "sha256-CmWHfw06qvOyPBZAZB8+5d/278WtYm12v+0PbLRoJkQ=";
+    hash = "sha256-vANMHGNTO99b/JHlnv2eFrV50QQAXbVaQFTkEnZHFPw=";
   };
 
   runtimeLibs = with pkgs; [
