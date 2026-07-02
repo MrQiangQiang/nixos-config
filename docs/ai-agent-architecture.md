@@ -177,7 +177,7 @@ desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M)
            host=0.0.0.0 + firewall tailscale0:11434
            syncModels=true (nix 配置是模型清单唯一来源)
            KEEP_ALIVE=-1 + ollama-prewarm.service (永久驻留 VRAM)
-laptop-1:  opencode → Ollama via Tailscale（host=0.0.0.0 + firewall tailscale0）
+laptop-1:  opencode → LiteLLM (localhost:4000) → Ollama via Tailscale (desktop-1:11434)
 ```
 
 VRAM 分配策略详见 `docs/desktop-1/ollama.md`
