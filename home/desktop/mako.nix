@@ -45,6 +45,11 @@ lib.mkIf isDesktopEnabled {
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
+      # Reload (not Restart) to keep D-Bus registration intact across config changes
+      X-Reload-Triggers = [
+        "${config.xdg.configFile."theme/mako-config-dark".source}"
+        "${config.xdg.configFile."theme/mako-config-light".source}"
+      ];
     };
     Service = {
       Type = "dbus";

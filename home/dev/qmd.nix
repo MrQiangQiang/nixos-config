@@ -121,6 +121,8 @@ in
     systemd.user.services.qmd-mcp = {
       Unit = {
         Description = "QMD MCP HTTP server (localhost:${toString cfg.port})";
+        # Restart to apply config changes
+        X-Restart-Triggers = [ "${config.home.file.".config/qmd/index.yml".source}" ];
       };
       Service = {
         ExecStart = "${qmdBin} mcp --http --port ${toString cfg.port}";

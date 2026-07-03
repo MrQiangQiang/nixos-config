@@ -53,6 +53,11 @@ lib.mkIf isDesktopEnabled {
       After = [ "graphical-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
       StartLimitIntervalSec = 0;
+      # Restart (wob lacks ExecReload) to apply config changes
+      X-Restart-Triggers = [
+        "${config.xdg.configFile."theme/wob-config-dark.ini".source}"
+        "${config.xdg.configFile."theme/wob-config-light.ini".source}"
+      ];
     };
     Service = {
       ExecStartPre = "-${pkgs.coreutils}/bin/rm -f %t/wob.sock";

@@ -144,6 +144,8 @@ in
     Unit = {
       Description = "LiteLLM proxy — LLM gateway (localhost:4000)";
       After = [ "network.target" ];
+      # Restart to apply config.yaml changes
+      X-Restart-Triggers = [ "${litellmConfigDir}/config.yaml" ];
     };
     Service = {
       ExecStart = "${pkgs.litellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port 4000";
