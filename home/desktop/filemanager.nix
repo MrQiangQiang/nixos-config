@@ -132,6 +132,38 @@ lib.mkIf isDesktopEnabled {
             desc = "zathura";
           }
         ];
+        mpd_play = [
+          {
+            run = ''(export MPD_HOST="${config.services.mpd.dataDir}/socket"; mpc clear; mpc add "$@"; mpc play)'';
+            orphan = true;
+            desc = "Play in MPD";
+          }
+        ];
+        play = [
+          {
+            run = ''mpv "$@"'';
+            orphan = true;
+            desc = "mpv";
+          }
+        ];
+      };
+      open = {
+        rules = [
+          {
+            mime = "audio/*";
+            use = [
+              "mpd_play"
+              "reveal"
+            ];
+          }
+          {
+            mime = "video/*";
+            use = [
+              "play"
+              "reveal"
+            ];
+          }
+        ];
       };
     };
     flavors = {

@@ -29,6 +29,7 @@
     ./fcitx5.nix
     ./polkit.nix
     ./media-keys.nix
+    ./media.nix
     ./keybind-help.nix
     ./tmp-cleanup.nix
   ];
