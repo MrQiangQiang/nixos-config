@@ -23,6 +23,10 @@
       url = "github:tobi/qmd";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agent-lx-music = {
+      url = "github:Xuepoo/agent-lx-music";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
