@@ -15,10 +15,11 @@
 
 编译在目标主机执行。无 `home-manager` CLI,用 `nixos-rebuild switch`。
 
-远程部署(已 commit + push 后):
+远程部署(已 commit + push 后):fugui 拉 git(有 GitHub 密钥),root 执行 rebuild(密钥登录,有权切换 system profile)。
 
 ```bash
-ssh <目标主机> 'cd ~/nixos-config && git pull && nixos-rebuild switch --flake .#<目标主机>'
+ssh fugui@<目标主机> 'cd ~/nixos-config && git pull' && \
+ssh root@<目标主机> 'cd /home/fugui/nixos-config && nixos-rebuild switch --flake .#<目标主机>'
 ```
 
 ## 必须询问
