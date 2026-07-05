@@ -1,0 +1,77 @@
+diff --git a/crates/lux-cli/src/cmd/download.rs b/crates/lux-cli/src/cmd/download.rs
+index c54d476..93eff2e 100644
+--- a/crates/lux-cli/src/cmd/download.rs
++++ b/crates/lux-cli/src/cmd/download.rs
+@@ -528,12 +528,25 @@ async fn execute_download_with_quality(
+         None
+     };
+ 
+-    // Fetch Cover Art APIC
++    // Fetch Cover Art APIC (validate HTTP status + magic bytes)
+     let cover_bytes = if config.download.embed_cover {
+         if let Some(song_cache) = db::get_song_from_cache(&task.song_id, &task.source)? {
+             if let Some(ref pic_url) = song_cache.pic_url {
+                 if let Ok(pic_res) = client.get(pic_url).send().await {
+-                    pic_res.bytes().await.ok().map(|b| b.to_vec())
++                    if pic_res.status().is_success() {
++                        if let Ok(bytes) = pic_res.bytes().await {
++                            let data = bytes.to_vec();
++                            if detect_image_mime(&data).is_some() {
++                                Some(data)
++                            } else {
++                                None
++                            }
++                        } else {
++                            None
++                        }
++                    } else {
++                        None
++                    }
+                 } else {
+                     None
+                 }
+@@ -566,7 +579,8 @@ async fn execute_download_with_quality(
+             }
+ 
+             if let Some(ref cov) = cover_bytes {
+-                tag.add_picture("image/jpeg", FlacPictureType::CoverFront, cov.clone());
++                let mime = detect_image_mime(cov).unwrap_or("image/jpeg");
++                tag.add_picture(mime, FlacPictureType::CoverFront, cov.clone());
+             }
+ 
+             tag.save()?;
+@@ -596,7 +610,7 @@ async fn execute_download_with_quality(
+ 
+             if let Some(ref cov) = cover_bytes {
+                 let pic = Id3Picture {
+-                    mime_type: "image/jpeg".to_string(),
++                    mime_type: detect_image_mime(cov).unwrap_or("image/jpeg").to_string(),
+                     picture_type: Id3PictureType::CoverFront,
+                     description: "Cover".to_string(),
+                     data: cov.clone(),
+@@ -693,6 +707,25 @@ pub fn get_fallback_qualities(initial: lux_core::types::Quality) -> Vec<lux_core
+     qualities_to_try
+ }
+ 
++/// Detect image MIME type from magic bytes.
++/// Returns None if data doesn't match any known image format.
++fn detect_image_mime(data: &[u8]) -> Option<&'static str> {
++    if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
++        Some("image/jpeg")
++    } else if data.starts_with(&[0x89, 0x50, 0x4E, 0x47]) {
++        Some("image/png")
++    } else if data.starts_with(&[0x52, 0x49, 0x46, 0x46])
++        && data.len() >= 12
++        && &data[8..12] == b"WEBP"
++    {
++        Some("image/webp")
++    } else if data.starts_with(&[0x47, 0x49, 0x46, 0x38]) {
++        Some("image/gif")
++    } else {
++        None
++    }
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;

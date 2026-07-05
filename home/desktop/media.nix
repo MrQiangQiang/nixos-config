@@ -33,6 +33,8 @@ let
   # alx upstream flake.nix omits clang from nativeBuildInputs, but rquickjs-sys
   # uses bindgen which requires libclang.so + glibc headers (stdio.h etc.).
   # overrideAttrs patches the upstream derivation instead of forking.
+  # alx-cover-validation.patch: validate HTTP status + magic bytes before
+  #   embedding cover (upstream embeds 404 XML/JSON as image/jpeg).
   alxPkg =
     inputs.agent-lx-music.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
       (old: {
@@ -42,6 +44,7 @@ let
         ];
         LIBCLANG_PATH = "${lib.getLib pkgs.llvmPackages.libclang}/lib";
         BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${lib.getDev pkgs.glibc}/include";
+        patches = (old.patches or [ ]) ++ [ ./alx-cover-validation.patch ];
       });
 
   # One-shot sync after alx downloads:
