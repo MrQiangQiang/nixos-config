@@ -1,18 +1,30 @@
 # 媒体播放架构
 
-## 数据流
+## 架构
 
 ```
-desktop-1 (canonical):
-  alx → /data/annex/music (音频走 annex, .lrc 走 git)
-  music-sync → git commit + beet update + mpc update
-  beets → 元数据 DB (不移动文件)
-  yazi → mpc/mpv → mpd/pipewire/wayland
-  rmpc → mpd (读外置 .lrc + 内嵌封面)
+┌─ desktop-1 (canonical) ──────────────────────────────┐
+│                                                       │
+│  alx ──→ /data/annex/music (音频 + .lrc)             │
+│                                                       │
+│  music-sync → git commit + beet update + mpc update  │
+│                                                       │
+│  beets → 元数据 DB (不移动文件)                       │
+│                                                       │
+│  yazi ──音频──→ mpc ──→ mpd ──→ pipewire              │
+│   │              ↑ Unix socket                         │
+│   └──视频──→ mpv ──→ wayland                          │
+│                                                       │
+│  rmpc → mpd (外置 .lrc + 内嵌封面)                    │
+└───────────────────────────────────────────────────────┘
 
-laptop-1 (consumer):
-  git-annex-sync --no-content (每小时, .lrc 随 git 同步)
-  mpd + rmpc + mpdris2 (播放, 无 beets/alx/music-sync)
+┌─ laptop-1 (consumer) ────────────────────────────────┐
+│  git-annex-sync --no-content (每小时)                 │
+│    ├─ .lrc (git, 真实文件)                            │
+│    └─ 音频 (annex, 按需 get)                          │
+│                                                       │
+│  mpd + rmpc + mpdris2 (播放)                          │
+└───────────────────────────────────────────────────────┘
 ```
 
 ## 核心决策
