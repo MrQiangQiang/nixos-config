@@ -47,15 +47,16 @@ let
   # One-shot sync after alx downloads:
   #   - git annex add . : .lrc tracked by git (.gitattributes), audio by annex
   #   - git commit : persist metadata (.lrc content + annex pointer)
-  #   - beet update : refresh beets DB in place (no file move, no plugins)
-  #   - mpc update : rescan mpd tag_cache
+  #   - beet import -q -A -M -W : import new files (skip existing) without
+  #     autotag/move/write — alx already embedded metadata+cover
+  #   - mpc update --wait : rescan mpd tag_cache and wait for completion
   music-sync = pkgs.writeShellScriptBin "music-sync" ''
     set -e
     cd /data/annex
     git annex add .
     git commit -m "chore(music): sync $(date -Iseconds)" || echo "nothing to commit"
-    beet update
-    mpc update
+    beet import -q -A -M -W music/
+    mpc update --wait
   '';
 in
 lib.mkIf isDesktopEnabled {
