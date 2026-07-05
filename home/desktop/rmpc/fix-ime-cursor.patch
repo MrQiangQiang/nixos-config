@@ -1,0 +1,116 @@
+diff --git a/src/core/event_loop.rs b/src/core/event_loop.rs
+index cba121e..c7eae36 100644
+--- a/src/core/event_loop.rs
++++ b/src/core/event_loop.rs
+@@ -720,6 +720,11 @@ fn main_task<B: Backend + std::io::Write>(
+                     if let Err(err) = ui.render(frame, &mut ctx) {
+                         log::error!(error:? = err; "Failed to render a frame");
+                     }
++                    // Position the terminal cursor at the active input field
++                    // so IME candidate windows (fcitx5) anchor correctly.
++                    if let Some(pos) = ctx.input.take_cursor_position() {
++                        frame.set_cursor_position(pos);
++                    }
+                 })
+                 .expect("Expected render to succeed");
+ 
+diff --git a/src/ui/input/buffer.rs b/src/ui/input/buffer.rs
+index 519013c..2fa621f 100644
+--- a/src/ui/input/buffer.rs
++++ b/src/ui/input/buffer.rs
+@@ -37,6 +37,16 @@ impl InputBuffer {
+         &self.value
+     }
+ 
++    /// Returns the visible display-width offset of the cursor from the start
++    /// of the visible slice. Used to position the terminal cursor for IME.
++    pub fn visible_cursor_x(&self) -> u16 {
++        if self.cursor <= self.visible_slice.start {
++            return 0;
++        }
++        let end = self.cursor.min(self.visible_slice.end);
++        self.value[self.visible_slice.start..end].width() as u16
++    }
++
+     pub(super) fn set_value(&mut self, new_value: String) {
+         self.cursor = new_value.len();
+         self.value = new_value;
+diff --git a/src/ui/input/manager.rs b/src/ui/input/manager.rs
+index f835ea8..aa179bc 100644
+--- a/src/ui/input/manager.rs
++++ b/src/ui/input/manager.rs
+@@ -3,7 +3,7 @@ use std::{
+     collections::HashMap,
+ };
+ 
+-use ratatui::{style::Style, text::Span};
++use ratatui::{prelude::Position, style::Style, text::Span};
+ 
+ use crate::ui::input::{BufferId, InputEvent, InputResultEvent, buffer::InputBuffer};
+ 
+@@ -19,6 +19,9 @@ pub enum InputMode {
+ pub struct InputManager {
+     mode: Cell<InputMode>,
+     buffers: RefCell<HashMap<BufferId, InputBuffer>>,
++    /// Screen-space cursor position of the active input, set during render
++    /// so the terminal cursor can be positioned for IME candidate windows.
++    cursor_position: Cell<Option<Position>>,
+ }
+ 
+ macro_rules! buffer {
+@@ -65,6 +68,24 @@ impl InputManager {
+         }
+     }
+ 
++    /// Stores the terminal cursor position for the active input field.
++    /// Called during render; consumed by the event loop after `terminal.draw`.
++    pub fn set_cursor_position(&self, pos: Position) {
++        self.cursor_position.set(Some(pos));
++    }
++
++    /// Consumes the stored cursor position, if any. Returns None when no
++    /// input field was active during the last render.
++    pub fn take_cursor_position(&self) -> Option<Position> {
++        self.cursor_position.take()
++    }
++
++    /// Returns the display-width offset of the cursor within the visible
++    /// portion of the buffer with the given id.
++    pub fn visible_cursor_x(&self, id: BufferId) -> u16 {
++        self.buffers.borrow().get(&id).map_or(0, InputBuffer::visible_cursor_x)
++    }
++
+     pub fn destroy_buffer(&self, id: BufferId) {
+         self.normal_mode();
+         self.buffers.borrow_mut().remove(&id);
+diff --git a/src/ui/widgets/input.rs b/src/ui/widgets/input.rs
+index 87dd8ba..abe8f97 100644
+--- a/src/ui/widgets/input.rs
++++ b/src/ui/widgets/input.rs
+@@ -1,6 +1,6 @@
+ use bon::bon;
+ use ratatui::{
+-    prelude::{Constraint, Layout, Margin},
++    prelude::{Constraint, Layout, Margin, Position},
+     style::Style,
+     text::{Line, Span},
+     widgets::{Block, Borders, Paragraph, Widget, Wrap},
+@@ -140,5 +140,18 @@ impl Widget for Input<'_> {
+             text_area.inner(Margin { horizontal: 0, vertical: u16::from(!self.borderless) }),
+             buf,
+         );
++
++        // Position the real terminal cursor at the active input field so IME
++        // (e.g. fcitx5) can anchor its candidate window. Without this, the
++        // cursor stays wherever the last cell was drawn, causing the candidate
++        // window to jump around on every keystroke.
++        if let Some(id) = self.buffer_id
++            && self.ctx.input.is_active(id)
++        {
++            let border_offset = u16::from(!self.borderless);
++            let x = input_area.x + border_offset + self.ctx.input.visible_cursor_x(id);
++            let y = input_area.y + border_offset;
++            self.ctx.input.set_cursor_position(Position { x, y });
++        }
+     }
+ }
