@@ -1,0 +1,14 @@
+diff --git a/src/shared/mpd_client_ext.rs b/src/shared/mpd_client_ext.rs
+index 4a439b4..167c185 100644
+--- a/src/shared/mpd_client_ext.rs
++++ b/src/shared/mpd_client_ext.rs
+@@ -302,9 +302,6 @@ impl<T: MpdClient + MpdCommand + ProtoClient> MpdClientExt for T {
+     }
+ 
+     fn create_playlist(&mut self, name: &str, items: Vec<String>) -> Result<(), MpdError> {
+-        if items.is_empty() {
+-            return Ok(());
+-        }
+         self.send_start_cmd_list()?;
+         // MPD does not allow creating empty playlists. We work
+         // around it here by saving the current queue and then
