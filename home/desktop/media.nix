@@ -124,12 +124,15 @@ lib.mkIf isDesktopEnabled {
   #   fix-ime-cursor.patch — position terminal cursor at active input so IME
   #     candidate windows (fcitx5) anchor correctly (upstream uses a fake "█"
   #     cursor and never calls frame.set_cursor_position).
+  #   zh-cn-descriptions.patch — translate all keybind descriptions to Chinese
+  #     in the ? help modal (upstream descriptions are English-only).
   programs.rmpc = {
     enable = true;
     package = pkgs.rmpc.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [
         ./rmpc/fix-playlist-empty.patch
         ./rmpc/fix-ime-cursor.patch
+        ./rmpc/zh-cn-descriptions.patch
       ];
     });
     config = ''

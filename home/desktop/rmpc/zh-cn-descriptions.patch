@@ -1,0 +1,399 @@
+diff --git a/src/config/keys/actions.rs b/src/config/keys/actions.rs
+index 8f00dc7..ceb002a 100644
+--- a/src/config/keys/actions.rs
++++ b/src/config/keys/actions.rs
+@@ -176,48 +176,48 @@ impl From<GlobalActionFile> for GlobalAction {
+ impl ToDescription for GlobalAction {
+     fn to_description(&self) -> Cow<'static, str> {
+         match self {
+-            GlobalAction::Quit => "Exit rmpc".into(),
+-            GlobalAction::ShowOutputs => "Show MPD outputs config".into(),
+-            GlobalAction::ShowDecoders => "Show MPD decoder plugins".into(),
++            GlobalAction::Quit => "退出 rmpc".into(),
++            GlobalAction::ShowOutputs => "显示 MPD 输出配置".into(),
++            GlobalAction::ShowDecoders => "显示 MPD 解码器插件".into(),
+             GlobalAction::ShowCurrentSongInfo => {
+-                "Show metadata of the currently playing song in a modal popup".into()
++                "在弹窗中显示当前播放歌曲的元数据".into()
+             }
+-            GlobalAction::ShowDownloads => "Show current downloads".into(),
+-            GlobalAction::ToggleRepeat => "Toggle repeat".into(),
++            GlobalAction::ShowDownloads => "显示当前下载".into(),
++            GlobalAction::ToggleRepeat => "切换队列循环".into(),
+             GlobalAction::ToggleSingle => {
+-                "Whether to stop playing after single track or repeat track/playlist when repeat is on".into()
++                "切换单曲模式:播放一首后停止,或在队列循环开启时重复当前歌曲".into()
+             }
+-            GlobalAction::ToggleRandom => "Toggles random playback".into(),
+-            GlobalAction::ToggleConsume => "Remove song from the queue after playing".into(),
+-            GlobalAction::TogglePause => "Pause/Unpause playback".into(),
+-            GlobalAction::Stop => "Stop playback".into(),
+-            GlobalAction::VolumeUp => "Raise volume".into(),
+-            GlobalAction::VolumeDown => "Lower volume".into(),
+-            GlobalAction::CrossfadeUp => "Increase crossfade duration".into(),
+-            GlobalAction::CrossfadeDown => "Decrease crossfade duration".into(),
+-            GlobalAction::NextTrack => "Play next track in the queue".into(),
+-            GlobalAction::PreviousTrack => "Play previous track in the queue".into(),
+-            GlobalAction::SeekForward => "Seek currently playing track forwards".into(),
+-            GlobalAction::SeekBack => "Seek currently playing track backwards".into(),
+-            GlobalAction::SeekToStart => "Seek to the beginning of the currently playing track".into(),
+-            GlobalAction::Update => "Update music library".into(),
+-            GlobalAction::Rescan => "Rescan music library (incl. unmodified files)".into(),
+-            GlobalAction::NextTab => "Switch to next tab".into(),
+-            GlobalAction::PreviousTab => "Switch to previous tab".into(),
+-            GlobalAction::SwitchToTab(name) => Cow::Owned(format!("Switch directly to {name} tab")),
+-            GlobalAction::ShowHelp => "Show keybinds".into(),
+-            GlobalAction::CommandMode => "Enter command mode".into(),
+-            GlobalAction::Command { description: None, .. } => "Execute a command".into(),
++            GlobalAction::ToggleRandom => "切换随机播放".into(),
++            GlobalAction::ToggleConsume => "播放后从队列移除(消费模式)".into(),
++            GlobalAction::TogglePause => "播放/暂停".into(),
++            GlobalAction::Stop => "停止播放".into(),
++            GlobalAction::VolumeUp => "调高音量".into(),
++            GlobalAction::VolumeDown => "调低音量".into(),
++            GlobalAction::CrossfadeUp => "增加交叉淡入淡出时长".into(),
++            GlobalAction::CrossfadeDown => "减少交叉淡入淡出时长".into(),
++            GlobalAction::NextTrack => "播放队列下一首".into(),
++            GlobalAction::PreviousTrack => "播放队列上一首".into(),
++            GlobalAction::SeekForward => "当前歌曲快进".into(),
++            GlobalAction::SeekBack => "当前歌曲快退".into(),
++            GlobalAction::SeekToStart => "跳转到当前歌曲开头".into(),
++            GlobalAction::Update => "更新音乐库".into(),
++            GlobalAction::Rescan => "重新扫描音乐库(含未修改文件)".into(),
++            GlobalAction::NextTab => "切换到下一个标签页".into(),
++            GlobalAction::PreviousTab => "切换到上一个标签页".into(),
++            GlobalAction::SwitchToTab(name) => Cow::Owned(format!("直接切换到 {name} 标签页")),
++            GlobalAction::ShowHelp => "显示快捷键".into(),
++            GlobalAction::CommandMode => "进入命令模式".into(),
++            GlobalAction::Command { description: None, .. } => "执行命令".into(),
+             GlobalAction::Command { description: Some(desc), .. } => Cow::Owned(desc.to_owned()),
+             GlobalAction::ExternalCommand { description: None, .. } => {
+-                "Execute an external command".into()
++                "执行外部命令".into()
+             }
+             GlobalAction::ExternalCommand { description: Some(desc), .. } => Cow::Owned(desc.clone()),
+-            GlobalAction::AddRandom => "Add random songs to the queue".into(),
+-            GlobalAction::ToggleSingleOnOff => "Toggle single mode on or off, skipping oneshot".into(),
+-            GlobalAction::ToggleConsumeOnOff => "Toggle consume mode on or off, skipping oneshot".into(),
+-            GlobalAction::Partition { name: Some(name), .. }=> format!("Switch to '{name}' partition").into(),
+-            GlobalAction::Partition { name: None, .. }=> "Open partition management modal".into(),
++            GlobalAction::AddRandom => "添加随机歌曲到队列".into(),
++            GlobalAction::ToggleSingleOnOff => "切换单曲循环开关(跳过单次模式)".into(),
++            GlobalAction::ToggleConsumeOnOff => "切换消费模式开关(跳过单次模式)".into(),
++            GlobalAction::Partition { name: Some(name), .. }=> format!("切换到分区 '{name}'").into(),
++            GlobalAction::Partition { name: None, .. }=> "打开分区管理弹窗".into(),
+         }
+     }
+ }
+@@ -377,16 +377,16 @@ impl TryFrom<QueueActionsFile> for QueueActions {
+ impl ToDescription for QueueActions {
+     fn to_description(&self) -> Cow<'static, str> {
+         match self {
+-            QueueActions::Delete => "Remove song under cursor from the queue".into(),
+-            QueueActions::DeleteAll => "Clear current queue".into(),
+-            QueueActions::Play => "Play song under cursor".into(),
+-            QueueActions::Unused => "unused".into(),
++            QueueActions::Delete => "从队列中删除光标处的歌曲".into(),
++            QueueActions::DeleteAll => "清空当前队列".into(),
++            QueueActions::Play => "播放光标处的歌曲".into(),
++            QueueActions::Unused => "未使用".into(),
+             QueueActions::JumpToCurrent => {
+-                "Moves the cursor in Queue table to the currently playing song".into()
++                "将光标移动到当前正在播放的歌曲".into()
+             }
+-            QueueActions::Shuffle => "Shuffles the current queue".into(),
++            QueueActions::Shuffle => "随机打乱当前队列".into(),
+             QueueActions::SortByColumn(idx) => {
+-                format!("Sort the queue by the {idx}. column").into()
++                format!("按第 {idx} 列排序队列").into()
+             }
+         }
+     }
+@@ -438,27 +438,27 @@ impl std::fmt::Display for AddKind {
+ impl Default for AddKind {
+     fn default() -> Self {
+         AddKind::Modal(vec![
+-            ("At the end of queue".into(), AddOpts {
++            ("添加到队列末尾".into(), AddOpts {
+                 autoplay: AutoplayKind::None,
+                 position: Position::EndOfQueue,
+                 all: false,
+             }),
+-            ("At the start of queue".into(), AddOpts {
++            ("添加到队列开头".into(), AddOpts {
+                 autoplay: AutoplayKind::None,
+                 position: Position::StartOfQueue,
+                 all: false,
+             }),
+-            ("After the current song".into(), AddOpts {
++            ("添加到当前歌曲后".into(), AddOpts {
+                 autoplay: AutoplayKind::None,
+                 position: Position::AfterCurrentSong,
+                 all: false,
+             }),
+-            ("Replace the queue".into(), AddOpts {
++            ("替换队列".into(), AddOpts {
+                 autoplay: AutoplayKind::None,
+                 position: Position::Replace,
+                 all: false,
+             }),
+-            ("Replace the queue and play".into(), AddOpts {
++            ("替换队列并播放".into(), AddOpts {
+                 autoplay: AutoplayKind::First,
+                 position: Position::Replace,
+                 all: false,
+@@ -872,171 +872,171 @@ pub enum CommonAction {
+ impl ToDescription for CommonAction {
+     fn to_description(&self) -> Cow<'static, str> {
+         match self {
+-            CommonAction::Up => "Go up".into(),
+-            CommonAction::Down => "Go down".into(),
+-            CommonAction::UpHalf => "Jump by half a screen up".into(),
+-            CommonAction::DownHalf => "Jump by half a screen down".into(),
+-            CommonAction::PageUp => "Jump a screen up".into(),
+-            CommonAction::PageDown => "Jump a screen down".into(),
+-            CommonAction::MoveUp => "Move current item up, for example song in a queue".into(),
+-            CommonAction::MoveDown => "Move current item down, for example song in a queue".into(),
+-            CommonAction::Right => "Go right".into(),
+-            CommonAction::Left => "Go left".into(),
+-            CommonAction::Top => "Jump all the way to the top".into(),
+-            CommonAction::Bottom => "Jump all the way to the bottom".into(),
+-            CommonAction::EnterSearch => "Enter search mode".into(),
+-            CommonAction::NextResult => "When a filter is active, jump to the next result".into(),
+-            CommonAction::PreviousResult => "When a filter is active, jump to the previous result".into(),
++            CommonAction::Up => "上移".into(),
++            CommonAction::Down => "下移".into(),
++            CommonAction::UpHalf => "上移半屏".into(),
++            CommonAction::DownHalf => "下移半屏".into(),
++            CommonAction::PageUp => "上翻一页".into(),
++            CommonAction::PageDown => "下翻一页".into(),
++            CommonAction::MoveUp => "上移当前项(如队列中的歌曲)".into(),
++            CommonAction::MoveDown => "下移当前项(如队列中的歌曲)".into(),
++            CommonAction::Right => "右移".into(),
++            CommonAction::Left => "左移".into(),
++            CommonAction::Top => "跳到顶部".into(),
++            CommonAction::Bottom => "跳到底部".into(),
++            CommonAction::EnterSearch => "进入搜索模式".into(),
++            CommonAction::NextResult => "过滤激活时,跳到下一个结果".into(),
++            CommonAction::PreviousResult => "过滤激活时,跳到上一个结果".into(),
+             CommonAction::Select => {
+-                "Mark current item as selected in the browser, useful for example when you want to add multiple songs to a playlist".into()
++                "标记当前项为选中,用于多选(如批量添加歌曲到播放列表)".into()
+             }
+-            CommonAction::InvertSelection => "Inverts the current selected items".into(),
++            CommonAction::InvertSelection => "反选当前选中项".into(),
+             CommonAction::Delete => {
+-                "Delete. For example a playlist, song from a playlist or wipe the current queue".into()
++                "删除。如删除播放列表、播放列表中的歌曲或清空队列".into()
+             }
+-            CommonAction::Rename => "Rename. Currently only for playlists".into(),
++            CommonAction::Rename => "重命名。目前仅支持播放列表".into(),
+             CommonAction::Close => {
+-                "Close/Stop whatever action is currently going on. Cancel filter, close a modal, etc.".into()
++                "关闭/取消当前操作。如取消过滤、关闭弹窗等".into()
+             }
+             CommonAction::Confirm => {
+-                "Confirm whatever action is currently going on. In browser panes it either enters a directory or adds and plays a song under cursor".into()
++                "确认当前操作。在浏览器中,进入目录或添加并播放光标处的歌曲".into()
+             }
+             CommonAction::FocusInput => {
+-                "Focuses textbox if any is on the screen and is not focused".into()
++                "聚焦到屏幕上的文本框(如果未聚焦)".into()
+             }
+-            CommonAction::PaneDown => "Focus the pane below the current one".into(),
+-            CommonAction::PaneUp => "Focus the pane above the current one".into(),
+-            CommonAction::PaneRight => "Focus the pane to the right of the current one".into(),
+-            CommonAction::PaneLeft => "Focus the pane to the left of the current one".into(),
+-            CommonAction::AddOptions { kind: AddKind::Modal(items) } => format!("Open add menu modal with {} options", items.len()).into(),
++            CommonAction::PaneDown => "聚焦到下方窗格".into(),
++            CommonAction::PaneUp => "聚焦到上方窗格".into(),
++            CommonAction::PaneRight => "聚焦到右侧窗格".into(),
++            CommonAction::PaneLeft => "聚焦到左侧窗格".into(),
++            CommonAction::AddOptions { kind: AddKind::Modal(items) } => format!("打开添加菜单弹窗(共 {} 个选项)", items.len()).into(),
+             CommonAction::AddOptions { kind: AddKind::Action(opts) } => {
+-                let mut buf = String::from("Add");
++                let mut buf = String::from("添加");
+                 if opts.all {
+-                    buf.push_str(" all items");
++                    buf.push_str("全部项");
+                 } else {
+-                    buf.push_str(" item");
++                    buf.push_str("单项");
+                 }
+                 buf.push_str(match opts.position {
+-                    Position::AfterCurrentSong => " after the current song",
+-                    Position::BeforeCurrentSong => " before the current song",
+-                    Position::AfterCurrentAlbum => " after the current album",
+-                    Position::BeforeCurrentAlbum => " before the current album",
+-                    Position::StartOfQueue => " at the start of the queue",
+-                    Position::EndOfQueue => " at the end of the queue",
+-                    Position::Replace => " and replace the queue",
++                    Position::AfterCurrentSong => "到当前歌曲后",
++                    Position::BeforeCurrentSong => "到当前歌曲前",
++                    Position::AfterCurrentAlbum => "到当前专辑后",
++                    Position::BeforeCurrentAlbum => "到当前专辑前",
++                    Position::StartOfQueue => "到队列开头",
++                    Position::EndOfQueue => "到队列末尾",
++                    Position::Replace => "并替换队列",
+                 });
+ 
+                 buf.push_str(match opts.autoplay {
+-                    AutoplayKind::First => " and play the first item",
+-                    AutoplayKind::Hovered => " and play the hovered item",
+-                    AutoplayKind::HoveredOrFirst => " and play hovered item or first if no song is hovered",
++                    AutoplayKind::First => "并播放第一项",
++                    AutoplayKind::Hovered => "并播放光标处项",
++                    AutoplayKind::HoveredOrFirst => "并播放光标处项(无光标时播放第一项)",
+                     AutoplayKind::None => "",
+                 });
+ 
+                 buf.into()
+             },
+-            CommonAction::ShowInfo => "Show info about item under cursor in a modal popup".into(),
+-            CommonAction::ContextMenu => "Show context menu".into(),
++            CommonAction::ShowInfo => "在弹窗中显示光标处项的信息".into(),
++            CommonAction::ContextMenu => "显示右键菜单".into(),
+             CommonAction::Rate { kind: RateKind::Modal { .. }, current, .. } => {
+-                let mut buf = String::from("Open a modal popup with song rating options");
++                let mut buf = String::from("打开弹窗选择歌曲评分");
+                 if *current {
+-                    buf.push_str(" for the currently playing song");
++                    buf.push_str("(当前播放歌曲)");
+                 }
+                 buf.into()
+             },
+             CommonAction::Rate { kind: RateKind::Value(val), current, ..  } => {
+                 if *current {
+-                    format!("Set currently playing song's rating to {val}")
++                    format!("设置当前播放歌曲的评分为 {val}")
+                 } else {
+-                    format!("Set song rating to {val}")
++                    format!("设置歌曲评分为 {val}")
+                 }.into()
+             }
+             CommonAction::Rate { kind: k @ RateKind::Like() | k @ RateKind::Dislike() | k @ RateKind::Neutral(), current , .. } => {
+-                let mut buf = String::from("Set the ");
++                let mut buf = String::from("设置");
+                 if *current {
+-                    buf.push_str("currently playing song's");
++                    buf.push_str("当前播放歌曲的");
+                 } else {
+-                    buf.push_str("song's under the cursor");
++                    buf.push_str("光标处歌曲的");
+                 }
+-                buf.push_str(" like state to ");
++                buf.push_str("喜好状态为");
+                 match k {
+-                    RateKind::Like() => buf.push_str("like"),
+-                    RateKind::Dislike() => buf.push_str("dislike"),
+-                    RateKind::Neutral() => buf.push_str("neutral"),
++                    RateKind::Like() => buf.push_str("喜欢"),
++                    RateKind::Dislike() => buf.push_str("不喜欢"),
++                    RateKind::Neutral() => buf.push_str("中立"),
+                     _ => {}
+                 }
+ 
+                 buf.into()
+             },
+             CommonAction::Save { kind: SaveKind::Modal { all, duplicates_strategy } } => {
+-                let mut buf = String::from("Open a modal popup with options to save ");
++                let mut buf = String::from("打开弹窗,将");
+                 if *all {
+-                    buf.push_str("all items");
++                    buf.push_str("全部项");
+                 } else {
+-                    buf.push_str("the item under cursor");
++                    buf.push_str("光标处项");
+                 }
+-                buf.push_str(" to either a new or existing playlist. ");
++                buf.push_str("保存到新或现有播放列表。");
+ 
+                 match duplicates_strategy {
+-                    DuplicateStrategy::All => buf.push_str("All songs will all be added"),
+-                    DuplicateStrategy::None => buf.push_str("No songs will be added"),
+-                    DuplicateStrategy::NonDuplicate => buf.push_str("Only non-duplicate songs will be added"),
+-                    DuplicateStrategy::Ask => buf.push_str("A modal asking what to do will be shown"),
++                    DuplicateStrategy::All => buf.push_str("若目标播放列表中已存在歌曲,所有歌曲仍会被添加"),
++                    DuplicateStrategy::None => buf.push_str("若目标播放列表中已存在歌曲,不会添加任何歌曲"),
++                    DuplicateStrategy::NonDuplicate => buf.push_str("仅添加非重复歌曲"),
++                    DuplicateStrategy::Ask => buf.push_str("若目标播放列表中已存在歌曲,将显示弹窗询问"),
+                 }
+-                buf.push_str(" if any songs already exist in the target playlist.");
++                buf.push_str("。");
+ 
+                 buf.into()
+             },
+             CommonAction::Save { kind: SaveKind::Playlist { name, all, duplicates_strategy } } => {
+-                let mut buf = String::from("Save ");
++                let mut buf = String::from("将");
+                 if *all {
+-                    buf.push_str("all items");
++                    buf.push_str("全部项");
+                 } else {
+-                    buf.push_str("the item under cursor");
++                    buf.push_str("光标处项");
+                 }
+ 
+-                write!(buf, " to playlist '{name}'. ").expect("Write to string buf should never fail.");
++                write!(buf, "保存到播放列表 '{name}'。").expect("Write to string buf should never fail.");
+ 
+                 match duplicates_strategy {
+-                    DuplicateStrategy::All => buf.push_str("All songs will all be added"),
+-                    DuplicateStrategy::None => buf.push_str("No songs will be added"),
+-                    DuplicateStrategy::NonDuplicate => buf.push_str("Only non-duplicate songs will be added"),
+-                    DuplicateStrategy::Ask => buf.push_str("A modal asking what to do will be shown"),
++                    DuplicateStrategy::All => buf.push_str("若目标播放列表中已存在歌曲,所有歌曲仍会被添加"),
++                    DuplicateStrategy::None => buf.push_str("若目标播放列表中已存在歌曲,不会添加任何歌曲"),
++                    DuplicateStrategy::NonDuplicate => buf.push_str("仅添加非重复歌曲"),
++                    DuplicateStrategy::Ask => buf.push_str("若目标播放列表中已存在歌曲,将显示弹窗询问"),
+                 }
+-                buf.push_str(" if any songs already exist in the target playlist.");
++                buf.push_str("。");
+ 
+                 buf.into()
+             }
+             CommonAction::DeleteFromPlaylist { kind: DeleteKind::Modal { all, confirmation } } => {
+-                let mut buf = String::from("Open a modal popup to delete ");
++                let mut buf = String::from("打开弹窗删除");
+                 if *all {
+-                    buf.push_str("all items");
++                    buf.push_str("全部项");
+                 } else {
+-                    buf.push_str("the item under cursor");
++                    buf.push_str("光标处项");
+                 }
+                 if *confirmation {
+-                    buf.push_str(" with a confirmation");
++                    buf.push_str("(需确认)");
+                 } else {
+-                    buf.push_str(" without confirmation");
++                    buf.push_str("(无需确认)");
+                 }
+-                buf.push_str(" from the selected playlist.");
++                buf.push_str("从选中的播放列表。");
+ 
+                 buf.into()
+             }
+             CommonAction::DeleteFromPlaylist { kind: DeleteKind::Playlist { name ,all, confirmation } } => {
+-                let mut buf = String::from("Delete ");
++                let mut buf = String::from("删除");
+                 if *all {
+-                    buf.push_str("all items");
++                    buf.push_str("全部项");
+                 } else {
+-                    buf.push_str("the item under cursor");
++                    buf.push_str("光标处项");
+                 }
+ 
+-                write!(buf, " from playlist '{name}'. ").expect("Write to string buf should never fail.");
++                write!(buf, "从播放列表 '{name}'。").expect("Write to string buf should never fail.");
+ 
+                 if *confirmation {
+-                    buf.push_str("With a confirmation.");
++                    buf.push_str("需确认。");
+                 } else {
+-                    buf.push_str("Without confirmation.");
++                    buf.push_str("无需确认。");
+                 }
+ 
+                 buf.into()
