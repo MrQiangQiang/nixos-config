@@ -63,7 +63,7 @@ let
             symbols: ["█", "█", "█", " ", "█"],
             track_style: (fg: "#${colors.highlight_med}"),
             elapsed_style: (fg: "#${colors.pine}"),
-            thumb_style: (fg: "#${colors.rose}"),
+            thumb_style: (fg: "#${colors.foam}"),
             use_track_when_empty: true,
         ),
         scrollbar: (
