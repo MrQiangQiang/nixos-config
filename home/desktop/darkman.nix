@@ -74,6 +74,19 @@ let
       }) "${cfgHome}/foot/foot.ini"}
       ${signal (if isDark then "SIGUSR1" else "SIGUSR2") "foot"}
 
+      # rmpc: ln -sf theme + IPC broadcast (config_watcher ignores ln -sf).
+      ${link (theme {
+        dark = "theme/rmpc-dark.ron";
+        light = "theme/rmpc-light.ron";
+      }) "${cfgHome}/rmpc/themes/rose-pine.ron"}
+      ${pkgs.rmpc}/bin/rmpc remote set theme ${cfgHome}/rmpc/themes/rose-pine.ron 2>/dev/null || true
+
+      # mpv/uosc: ln -sf only (mpv reads config at startup, no runtime switch).
+      ${link (theme {
+        dark = "theme/uosc-dark.conf";
+        light = "theme/uosc-light.conf";
+      }) "${cfgHome}/mpv/script-opts/uosc.conf"}
+
       # GTK CSS override (tooltip colors + file picker accept button contrast).
       # Symlinked to ~/.config/gtk-3.0/gtk.css — GTK apps read it at startup.
       # Runtime switching does NOT work on Wayland (no GtkSettings bridge from

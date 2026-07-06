@@ -30,6 +30,8 @@
     ./polkit.nix
     ./media-keys.nix
     ./media.nix
+    ./rmpc.nix
+    ./mpv.nix
     ./keybind-help.nix
     ./tmp-cleanup.nix
   ];

@@ -115,42 +115,6 @@ lib.mkIf isDesktopEnabled {
     };
   };
 
-  # rmpc: lyrics_dir mirrors song_file path (flat → flat).
-  # album_art.order = EmbeddedFirst (default): alx embeds cover into tags,
-  #   no external cover.jpg needed.
-  # Patches (against upstream v0.11.0):
-  #   fix-playlist-empty.patch — allow creating playlists with no songs selected
-  #     (upstream silently returns Ok when items.is_empty()).
-  #   fix-ime-cursor.patch — position terminal cursor at active input so IME
-  #     candidate windows (fcitx5) anchor correctly (upstream uses a fake "█"
-  #     cursor and never calls frame.set_cursor_position).
-  #   zh-cn-descriptions.patch — translate all keybind descriptions to Chinese
-  #     in the ? help modal (upstream descriptions are English-only).
-  programs.rmpc = {
-    enable = true;
-    package = pkgs.rmpc.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [
-        ./rmpc/fix-playlist-empty.patch
-        ./rmpc/fix-ime-cursor.patch
-        ./rmpc/zh-cn-descriptions.patch
-      ];
-    });
-    config = ''
-      (
-          address: "${config.services.mpd.dataDir}/socket",
-          lyrics_dir: Some("${musicDir}"),
-      )
-    '';
-  };
-
-  programs.mpv = {
-    enable = true;
-    config = {
-      vo = "gpu-next";
-      hwdec = "auto-safe";
-    };
-  };
-
   # alx config (desktop-1 only):
   #   output_dir = /data/annex/music (write directly into annex repo)
   #   embed_cover = true    (cover in tag, rmpc EmbeddedFirst)
