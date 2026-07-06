@@ -79,7 +79,7 @@ let
         dark = "theme/rmpc-dark.ron";
         light = "theme/rmpc-light.ron";
       }) "${cfgHome}/rmpc/themes/rose-pine.ron"}
-      ${pkgs.rmpc}/bin/rmpc remote set theme ${cfgHome}/rmpc/themes/rose-pine.ron 2>/dev/null || true
+      ${config.programs.rmpc.package}/bin/rmpc remote set theme ${cfgHome}/rmpc/themes/rose-pine.ron 2>/dev/null || true
 
       # mpv/uosc: ln -sf only (mpv reads config at startup, no runtime switch).
       ${link (theme {

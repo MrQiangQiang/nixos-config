@@ -13,6 +13,13 @@
 #   fix-playlist-empty.patch — allow creating playlists with no songs selected
 #   fix-ime-cursor.patch — position terminal cursor for fcitx5 IME anchoring
 #   zh-cn-descriptions.patch — translate keybind descriptions to Chinese
+#   zxcv-icons-and-styles.patch — zxcv → Nerd Font icons (󰑖󰒝󰈸󰑘); removes
+#     decorative [] (icons are self-explanatory); adds trailing space in labels
+#     for icon spacing; on/off/oneshot styles: green+Bold / gray+Dim / yellow+Bold
+#     (off uses gray not dark_gray — dark_gray maps to bright_overlay #fffdf5,
+#     invisible on dawn base #faf4ed; gray maps to text, visible in both themes);
+#     volume slider track_style blue+Dim. Touches defaults.rs +
+#     assets/example_theme.ron (test example_theme_equals_default requires sync).
 {
   config,
   lib,
@@ -38,8 +45,8 @@ let
         modal_backdrop: false,
         preview_label_style: (fg: "#${colors.gold}"),
         preview_metadata_group_style: (fg: "#${colors.gold}", modifiers: "Bold"),
-        highlighted_item_style: (fg: "#${colors.subtle}", modifiers: "Bold"),
-        current_item_style: (fg: "#${colors.base}", bg: "#${colors.iris}", modifiers: "Bold"),
+        highlighted_item_style: (fg: "#${colors.pine}", modifiers: "Bold"),
+        current_item_style: (fg: "#${colors.base}", bg: "#${colors.pine}", modifiers: "Bold"),
         borders_style: (fg: "#${colors.highlight_high}"),
         highlight_border_style: (fg: "#${colors.rose}"),
         symbols: (
@@ -63,7 +70,7 @@ let
             symbols: ["█", "█", "█", " ", "█"],
             track_style: (fg: "#${colors.highlight_med}"),
             elapsed_style: (fg: "#${colors.pine}"),
-            thumb_style: (fg: "#${colors.foam}"),
+            thumb_style: (fg: "#${colors.pine}"),
             use_track_when_empty: true,
         ),
         scrollbar: (
@@ -73,7 +80,7 @@ let
             thumb_style: (fg: "#${colors.subtle}"),
         ),
         tab_bar: (
-            active_style: (fg: "#${colors.base}", bg: "#${colors.iris}", modifiers: "Bold"),
+            active_style: (fg: "#${colors.base}", bg: "#${colors.pine}", modifiers: "Bold"),
             inactive_style: (),
         ),
         lyrics: (
@@ -97,6 +104,7 @@ lib.mkIf isDesktopEnabled {
         ./rmpc/fix-playlist-empty.patch
         ./rmpc/fix-ime-cursor.patch
         ./rmpc/zh-cn-descriptions.patch
+        ./rmpc/zxcv-icons-and-styles.patch
       ];
     });
     config = ''

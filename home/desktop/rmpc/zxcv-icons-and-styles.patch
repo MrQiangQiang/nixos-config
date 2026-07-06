@@ -1,0 +1,226 @@
+diff --git a/assets/example_theme.ron b/assets/example_theme.ron
+index 994fb96..beb3f3b 100644
+--- a/assets/example_theme.ron
++++ b/assets/example_theme.ron
+@@ -181,7 +181,7 @@
+             direction: Horizontal,
+             panes: [
+                 (size: "1", pane: Pane(Property(content: [(kind: Text(""))]))),
+-                (size: "100%", pane: Pane(Volume(kind: Slider(symbols: (filled: "─", thumb: "●", track: "─"))))),
++                (size: "100%", pane: Pane(Volume(kind: Slider(symbols: (filled: "─", thumb: "●", track: "─"), track_style: (fg: "blue", modifiers: "Dim"))))),
+                 (size: "3", pane: Pane(Property(content: [(kind: Property(Status(Volume)), style: (fg: "blue"))], align: Right))),
+                 (size: "2", pane: Pane(Property(content: [(kind: Text("%"), style: (fg: "blue"))]))),
+             ]
+@@ -219,38 +219,36 @@
+                     pane: Pane(Property(content: [(kind: Property(Status(InputBuffer())), style: (fg: "blue"), align: Left)]))
+                 ),
+                 (
+-                    size: "6",
++                    size: "9",
+                     pane: Pane(Property(content: [
+-                        (kind: Text("["), style: (fg: "blue", modifiers: "Bold")),
+                         (kind: Property(Status(RepeatV2(
+-                            on_label: "z",
+-                            off_label: "z",
+-                            on_style: (fg: "yellow", modifiers: "Bold"),
+-                            off_style: (fg: "blue", modifiers: "Dim"),
++                            on_label: "󰑖 ",
++                            off_label: "󰑖 ",
++                            on_style: (fg: "green", modifiers: "Bold"),
++                            off_style: (fg: "gray", modifiers: "Dim"),
+                         )))),
+                         (kind: Property(Status(RandomV2(
+-                            on_label: "x",
+-                            off_label: "x",
+-                            on_style: (fg: "yellow", modifiers: "Bold"),
+-                            off_style: (fg: "blue", modifiers: "Dim"),
++                            on_label: "󰒝 ",
++                            off_label: "󰒝 ",
++                            on_style: (fg: "green", modifiers: "Bold"),
++                            off_style: (fg: "gray", modifiers: "Dim"),
+                         )))),
+                         (kind: Property(Status(ConsumeV2(
+-                            on_label: "c",
+-                            off_label: "c",
+-                            oneshot_label: "c",
+-                            on_style: (fg: "yellow", modifiers: "Bold"),
+-                            off_style: (fg: "blue", modifiers: "Dim"),
+-                            oneshot_style: (fg: "red", modifiers: "Dim"),
++                            on_label: "󰈸 ",
++                            off_label: "󰈸 ",
++                            oneshot_label: "󰈸 ",
++                            on_style: (fg: "green", modifiers: "Bold"),
++                            off_style: (fg: "gray", modifiers: "Dim"),
++                            oneshot_style: (fg: "yellow", modifiers: "Bold"),
+                         )))),
+                         (kind: Property(Status(SingleV2(
+-                            on_label: "v",
+-                            off_label: "v",
+-                            oneshot_label: "v",
+-                            on_style: (fg: "yellow", modifiers: "Bold"),
+-                            off_style: (fg: "blue", modifiers: "Dim"),
+-                            oneshot_style: (fg: "red", modifiers: "Bold"),
++                            on_label: "󰑘 ",
++                            off_label: "󰑘 ",
++                            oneshot_label: "󰑘 ",
++                            on_style: (fg: "green", modifiers: "Bold"),
++                            off_style: (fg: "gray", modifiers: "Dim"),
++                            oneshot_style: (fg: "yellow", modifiers: "Bold"),
+                         )))),
+-                        (kind: Text("]"), style: (fg: "blue", modifiers: "Bold")),
+                         ],
+                         align: Right
+                     ))
+diff --git a/src/config/defaults.rs b/src/config/defaults.rs
+index 537920a..5df37b7 100644
+--- a/src/config/defaults.rs
++++ b/src/config/defaults.rs
+@@ -292,7 +292,11 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                                 track: "─".to_string(),
+                                 end: None,
+                             },
+-                            track_style: None,
++                            track_style: Some(StyleFile {
++                                fg: Some("blue".to_string()),
++                                bg: None,
++                                modifiers: Some(Modifiers::Dim),
++                            }),
+                             filled_style: None,
+                             thumb_style: None,
+                         }),
+@@ -439,7 +443,7 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                     }),
+                 },
+                 SubPaneFile {
+-                    size: "6".to_string(),
++                    size: "9".to_string(),
+                     background_color: None,
+                     borders: BordersFile::NONE,
+                     border_style: None,
+@@ -452,27 +456,18 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                         align: Alignment::Right,
+                         scroll_speed: 0,
+                         content: vec![
+-                            PropertyFile {
+-                                kind: PropertyKindFileOrText::Text("[".to_string()),
+-                                style: Some(StyleFile {
+-                                    fg: Some("blue".to_string()),
+-                                    bg: None,
+-                                    modifiers: Some(Modifiers::Bold),
+-                                }),
+-                                default: None,
+-                            },
+                             PropertyFile {
+                                 kind: PropertyKindFileOrText::Property(PropertyKindFile::Status(
+                                     StatusPropertyFile::RepeatV2 {
+-                                        on_label: "z".to_string(),
+-                                        off_label: "z".to_string(),
++                                        on_label: "󰑖 ".to_string(),
++                                        off_label: "󰑖 ".to_string(),
+                                         on_style: Some(StyleFile {
+-                                            fg: Some("yellow".to_string()),
++                                            fg: Some("green".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Bold),
+                                         }),
+                                         off_style: Some(StyleFile {
+-                                            fg: Some("blue".to_string()),
++                                            fg: Some("gray".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Dim),
+                                         }),
+@@ -484,15 +479,15 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                             PropertyFile {
+                                 kind: PropertyKindFileOrText::Property(PropertyKindFile::Status(
+                                     StatusPropertyFile::RandomV2 {
+-                                        on_label: "x".to_string(),
+-                                        off_label: "x".to_string(),
++                                        on_label: "󰒝 ".to_string(),
++                                        off_label: "󰒝 ".to_string(),
+                                         on_style: Some(StyleFile {
+-                                            fg: Some("yellow".to_string()),
++                                            fg: Some("green".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Bold),
+                                         }),
+                                         off_style: Some(StyleFile {
+-                                            fg: Some("blue".to_string()),
++                                            fg: Some("gray".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Dim),
+                                         }),
+@@ -504,23 +499,23 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                             PropertyFile {
+                                 kind: PropertyKindFileOrText::Property(PropertyKindFile::Status(
+                                     StatusPropertyFile::ConsumeV2 {
+-                                        on_label: "c".to_string(),
+-                                        off_label: "c".to_string(),
+-                                        oneshot_label: "c".to_string(),
++                                        on_label: "󰈸 ".to_string(),
++                                        off_label: "󰈸 ".to_string(),
++                                        oneshot_label: "󰈸 ".to_string(),
+                                         on_style: Some(StyleFile {
+-                                            fg: Some("yellow".to_string()),
++                                            fg: Some("green".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Bold),
+                                         }),
+                                         off_style: Some(StyleFile {
+-                                            fg: Some("blue".to_string()),
++                                            fg: Some("gray".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Dim),
+                                         }),
+                                         oneshot_style: Some(StyleFile {
+-                                            fg: Some("red".to_string()),
++                                            fg: Some("yellow".to_string()),
+                                             bg: None,
+-                                            modifiers: Some(Modifiers::Dim),
++                                            modifiers: Some(Modifiers::Bold),
+                                         }),
+                                     },
+                                 )),
+@@ -530,21 +525,21 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                             PropertyFile {
+                                 kind: PropertyKindFileOrText::Property(PropertyKindFile::Status(
+                                     StatusPropertyFile::SingleV2 {
+-                                        on_label: "v".to_string(),
+-                                        off_label: "v".to_string(),
+-                                        oneshot_label: "v".to_string(),
++                                        on_label: "󰑘 ".to_string(),
++                                        off_label: "󰑘 ".to_string(),
++                                        oneshot_label: "󰑘 ".to_string(),
+                                         on_style: Some(StyleFile {
+-                                            fg: Some("yellow".to_string()),
++                                            fg: Some("green".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Bold),
+                                         }),
+                                         off_style: Some(StyleFile {
+-                                            fg: Some("blue".to_string()),
++                                            fg: Some("gray".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Dim),
+                                         }),
+                                         oneshot_style: Some(StyleFile {
+-                                            fg: Some("red".to_string()),
++                                            fg: Some("yellow".to_string()),
+                                             bg: None,
+                                             modifiers: Some(Modifiers::Bold),
+                                         }),
+@@ -553,15 +548,6 @@ pub fn components() -> HashMap<String, PaneOrSplitFile> {
+                                 style: None,
+                                 default: None,
+                             },
+-                            PropertyFile {
+-                                kind: PropertyKindFileOrText::Text("]".to_string()),
+-                                style: Some(StyleFile {
+-                                    fg: Some("blue".to_string()),
+-                                    bg: None,
+-                                    modifiers: Some(Modifiers::Bold),
+-                                }),
+-                                default: None,
+-                            },
+                         ],
+                     }),
+                 },
