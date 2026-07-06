@@ -7,7 +7,7 @@
 │                                                       │
 │  alx ──→ /data/annex/music (音频 + .lrc)             │
 │                                                       │
-│  music-sync → git commit + beet update + mpc update  │
+│  music-sync → git commit + beet import + mpc update  │
 │                                                       │
 │  beets → 元数据 DB (不移动文件)                       │
 │                                                       │
@@ -36,6 +36,8 @@ MPD 硬编码安全策略: TCP 连接拒绝 `mpc add` 传文件系统路径。ya
 ### beets 不重组目录
 
 alx 直接下载到 `/data/annex/music`(扁平结构),beets 只更新数据库。若 beets 移动音频文件,`.lrc` 不会跟随(beets importer 只移动音频),导致 rmpc 歌词路径不匹配。`group_albums` 按 tag 分组而非目录,兼容扁平结构。
+
+music-sync 用 `beet import` 而非 `beet update`:`update` 只刷新已有条目,无法导入新文件(alx 下载的新歌不在 DB 中,`update` 会报 "No matching items found")。
 
 laptop-1 的 git-annex 使用 `--no-content` 同步,文件内容修改不传回 canonical,因此 beets 只能在 desktop-1 运行。
 
