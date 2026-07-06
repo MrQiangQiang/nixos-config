@@ -19,7 +19,9 @@ let
 
   # uosc color format: key=rrggbb (no #), comma-separated.
   # curtain fixed to dark base (video matte should always be dark).
+  # timeline_style=bar: filled bar instead of default 2px line.
   mkUoscConfig = colors: ''
+    timeline_style=bar
     color=foreground=${colors.subtle},foreground_text=${colors.base},background=${colors.surface},background_text=${colors.text},window_border=${colors.highlight_high},curtain=${d.base},success=${colors.foam},error=${colors.love},match=${colors.iris},heatmap=${colors.pine}
     chapter_ranges=openings:${colors.iris}64,endings:${colors.iris}64,ads:${colors.love}80
   '';
@@ -34,6 +36,9 @@ lib.mkIf isDesktopEnabled {
       osc = "no"; # disable native OSC, uosc takes over
       osd-bar = "no"; # uosc provides its own seek/volume indicators
       border = "no"; # uosc draws window controls
+      # letterbox/background: Rose Pine base instead of default black tiles
+      background = "color";
+      background-color = "#${d.base}";
       # OSD/subtitle fixed dark (readable on any video background)
       osd-color = "#${d.text}";
       osd-border-color = "#${d.base}";
