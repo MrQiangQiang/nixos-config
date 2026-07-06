@@ -216,7 +216,7 @@ lib.mkIf isDesktopEnabled {
       mpc
       yt-dlp
       python3Packages.mpv
-      python3Packages.mpd2
+      python3Packages."python-mpd2"
     ]
     ++ lib.optionals isDesktop1 [
       alxPkg
