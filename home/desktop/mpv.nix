@@ -32,14 +32,15 @@ lib.mkIf isDesktopEnabled {
       vo = "gpu-next";
       hwdec = "auto-safe";
       osc = "no"; # disable native OSC, uosc takes over
+      osd-bar = "no"; # uosc provides its own seek/volume indicators
       border = "no"; # uosc draws window controls
       # OSD/subtitle fixed dark (readable on any video background)
       osd-color = "#${d.text}";
       osd-border-color = "#${d.base}";
       osd-back-color = "#${d.base}";
-      osd-shadow-color = "#${d.base}";
       sub-color = "#${d.text}";
       sub-border-color = "#${d.base}";
+      sub-back-color = "#${d.base}";
     };
   };
 
