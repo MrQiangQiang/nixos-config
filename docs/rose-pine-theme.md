@@ -43,6 +43,7 @@ palette.nix（唯一来源：三套色值）
 | shell hook | fish_prompt 设 env var，新进程读取（无 OSC 11 支持） | fzf（FZF_DEFAULT_OPTS，bash 静态 dark） |
 | Portal | XDG color-scheme（darkman → gsettings → Portal） | Firefox（CSS `light-dark()`）、Spotify、GTK |
 | bootstrap | 监听 darkman mode.txt（Portal 对 Electron 不可靠） | Obsidian、Trae CN |
+| 应用自定义 | ln -sf + 应用特定运行时机制 | rmpc（IPC broadcast）、mpv（仅 ln -sf） |
 
 ### 为什么 starship 用 palette.ansi 语义映射
 
@@ -119,6 +120,30 @@ NixOS Firefox 编译时 `MOZ_REQUIRE_SIGNING=true`，所有未签名扩展被拒
 
 覆盖 Firefox CSS 自定义属性（design tokens），让 Firefox 内部 CSS 自动消费。变量覆盖 = 面向未来（内部重构不影响主题）、唯一来源（每色定义一次）。
 
+## rmpc 集成
+
+### 为什么 IPC broadcast 而非 signal
+
+rmpc 的 `config_watcher` 只接受 `Close(Write)` 事件（源码验证：`config_watcher.rs`）。`ln -sf` 替换 symlink 不产生此事件，无法触发重载。darkman 额外执行 `rmpc remote set theme <path>`：CLI 读取 theme.ron → 反序列化为 `UiConfigFile` → 通过 Unix socket 广播 `ThemeChanged` 到所有运行中实例（扫描 `/tmp/rmpc-*.sock`）。
+
+### 为什么 IPC 必须用 patched binary
+
+`mkRmpcTheme` 生成的 theme.ron 不含 `components` 字段，反序列化时 `#[serde(default)]` 从 `UiConfigFile::default()` → `defaults::components()` 填充。未 patch 的 CLI 返回原始 `[zxcv]` 文字标签，会覆盖运行中实例的整个 theme。darkman.nix 用 `${config.programs.rmpc.package}`（patched binary）执行 IPC 命令。
+
+## mpv 集成
+
+### 为什么仅 ln -sf（无 signal）
+
+mpv 启动时读 config，无 watcher。每次播放是新进程（短会话模式），darkman `ln -sf` 后下次启动自动生效。
+
+### 为什么 background-color 走 include
+
+mpv config 将 `#` 视为注释起始。`programs.mpv.config` 中 home-manager 的转义机制处理此问题，但 include 的文件不享受此机制。解决方案：值加引号（`background-color="#232136"`）保留 `#`，通过 `include=~~/theme-colors.conf` 引入，darkman 切换 symlink 实现跟随。
+
+### 为什么 OSD/字幕固定 dark
+
+视频背景色多变，固定 dark palette（`text` on `base`）确保 overlay 文字始终高对比。uosc 的 curtain 随 darkman 切换（通过 uosc config ln -sf）。
+
 ## 诚实边界
 
 | 应用 | 自动化 | 说明 |
@@ -128,10 +153,12 @@ NixOS Firefox 编译时 `MOZ_REQUIRE_SIGNING=true`，所有未签名扩展被拒
 | bat | ✅ 完全 | 每次新进程检测 OSC 11 |
 | fzf | ✅ 完全 | fish_prompt hook 设 FZF_DEFAULT_OPTS，下次调用生效 |
 | Firefox | ✅ 完全 | CSS light-dark() + Dark Reader |
+| Obsidian/Trae CN | ✅ 完全 | bootstrap.cjs 监听 darkman mode.txt |
+| rmpc | ✅ 完全 | ln -sf + IPC broadcast，运行中实例即时生效 |
 | yazi | ⚠️ 启动时 | OSC 11 启动检测；运行中不切换 |
 | lazygit | ⚠️ 新实例 | ANSI 自动跟随；持久 TUI 运行中可能不重绘，新实例正确 |
+| mpv | ⚠️ 启动时 | 无 watcher，下次启动生效（短会话模式可接受） |
 | Qt 应用 | ⚠️ 近似 | `platformTheme = gtk` |
-| Obsidian/Trae CN | ✅ 完全 | bootstrap.cjs 监听 darkman mode.txt |
 
 ## 跨文档引用
 
