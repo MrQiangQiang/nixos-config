@@ -179,6 +179,7 @@ lib.mkIf isDesktopEnabled {
     [
       mpc
       yt-dlp
+      ffmpeg
       python3Packages.mpv
       python3Packages."python-mpd2"
     ]

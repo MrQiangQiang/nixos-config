@@ -34,7 +34,6 @@ let
     (
         background_color: "#${colors.base}",
         text_color: "#${colors.text}",
-        header_background_color: "#${colors.surface}",
         modal_background_color: "#${colors.surface}",
         modal_backdrop: false,
         preview_label_style: (fg: "#${colors.gold}"),
@@ -71,7 +70,7 @@ let
             symbols: ["│", "█", "▲", "▼"],
             track_style: (fg: "#${colors.highlight_med}"),
             ends_style: (fg: "#${colors.subtle}"),
-            thumb_style: (fg: "#${colors.highlight_high}"),
+            thumb_style: (fg: "#${colors.subtle}"),
         ),
         tab_bar: (
             active_style: (fg: "#${colors.base}", bg: "#${colors.iris}", modifiers: "Bold"),

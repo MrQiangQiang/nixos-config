@@ -87,6 +87,12 @@ let
         light = "theme/uosc-light.conf";
       }) "${cfgHome}/mpv/script-opts/uosc.conf"}
 
+      # mpv background-color: ln -sf (letterbox follows darkman via include).
+      ${link (theme {
+        dark = "theme/mpv-colors-dark.conf";
+        light = "theme/mpv-colors-light.conf";
+      }) "${cfgHome}/mpv/theme-colors.conf"}
+
       # GTK CSS override (tooltip colors + file picker accept button contrast).
       # Symlinked to ~/.config/gtk-3.0/gtk.css — GTK apps read it at startup.
       # Runtime switching does NOT work on Wayland (no GtkSettings bridge from
