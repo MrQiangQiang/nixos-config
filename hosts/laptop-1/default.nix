@@ -34,11 +34,10 @@
   # ── Hardware ──────────────────────────────────────────────
 
   # Skylake HD 530 i915 驱动 workaround
-  # 禁用 RC6/PSR/FBC 电源管理，防止 KMS 初始化时死锁
+  # 禁用 PSR 防止 KMS 初始化死锁
+  # (enable_rc6/powersave 在内核 6.18+ 已移除,日志报 unknown parameter ignored)
   boot.kernelParams = [
-    "i915.enable_rc6=0"
     "i915.enable_psr=0"
-    "i915.powersave=0"
   ];
 
   hardware.graphics.extraPackages = with pkgs; [
