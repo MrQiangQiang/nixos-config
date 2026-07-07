@@ -13,6 +13,13 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot/efi";
+              # fmask=0077/dmask=0077: ESP 权限 700,防止 bootctl 警告
+              # random-seed 文件 world accessible(理论 RNG 预测风险)。
+              # 与 laptop-1 hardware-configuration.nix 对齐。
+              mountOptions = [
+                "fmask=0077"
+                "dmask=0077"
+              ];
             };
           };
           boot = {
