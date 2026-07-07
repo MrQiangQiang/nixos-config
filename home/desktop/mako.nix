@@ -12,6 +12,7 @@ let
   d = palette.dark;
   l = palette.dawn;
   mkMakoConfig = colors: {
+    layer = "overlay";
     font = "monospace 12";
     background-color = "#${colors.overlay}ff";
     text-color = "#${colors.text}ff";
@@ -31,7 +32,10 @@ let
   '';
 in
 lib.mkIf isDesktopEnabled {
-  home.packages = [ pkgs.mako ];
+  home.packages = [
+    pkgs.mako
+    pkgs.libnotify
+  ];
 
   # Hand-written systemd service instead of services.mako:
   # services.mako creates a read-only ~/.config/mako/config symlink,

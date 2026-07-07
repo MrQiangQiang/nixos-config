@@ -52,27 +52,23 @@ lib.mkIf isDesktopEnabled {
     '')
 
     # Media control (MPRIS)
+    # Success: mpdris2 (notifications=true) sends D-Bus notifications with
+    # title+artist+cover. Failure: notify-send reports the error.
     pkgs.playerctl
     (pkgs.writeShellScriptBin "media-play-pause" ''
-      ${pkgs.playerctl}/bin/playerctl play-pause 2>/dev/null
-      status=$(${pkgs.playerctl}/bin/playerctl status 2>/dev/null)
-      ${pkgs.libnotify}/bin/notify-send "播放控制" "''${status:-无播放器}"
+      if ! ${pkgs.playerctl}/bin/playerctl play-pause 2>/dev/null; then
+        ${pkgs.libnotify}/bin/notify-send "播放控制" "无播放器"
+      fi
     '')
     (pkgs.writeShellScriptBin "media-next" ''
       if ! ${pkgs.playerctl}/bin/playerctl next 2>/dev/null; then
         ${pkgs.libnotify}/bin/notify-send "下一曲" "当前播放器不支持切歌"
-        exit 0
       fi
-      title=$(${pkgs.playerctl}/bin/playerctl metadata title 2>/dev/null)
-      ${pkgs.libnotify}/bin/notify-send "下一曲" "''${title:-未知}"
     '')
     (pkgs.writeShellScriptBin "media-prev" ''
       if ! ${pkgs.playerctl}/bin/playerctl previous 2>/dev/null; then
         ${pkgs.libnotify}/bin/notify-send "上一曲" "当前播放器不支持切歌"
-        exit 0
       fi
-      title=$(${pkgs.playerctl}/bin/playerctl metadata title 2>/dev/null)
-      ${pkgs.libnotify}/bin/notify-send "上一曲" "''${title:-未知}"
     '')
   ];
 }

@@ -38,7 +38,6 @@ lib.mkIf isDesktopEnabled {
   home.packages = with pkgs; [
     kwm
     kwim
-    libnotify
   ];
 
   xdg.configFile."theme/kwm-config-dark.zon".source = darkZON;
