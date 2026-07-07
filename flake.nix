@@ -50,7 +50,6 @@
             inherit system;
             overlays = [
               inputs.self.overlays.default
-              inputs.nix-vscode-extensions.overlays.default
             ];
             config.allowUnfree = true;
           };
