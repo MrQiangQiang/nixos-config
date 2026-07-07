@@ -3,7 +3,7 @@
 # LiteLLM 代理从此文件读取 provider 配置，自动生成 model_list 和路由规则。
 # 修改 provider 定义（url/key_ref/models）→ LiteLLM 配置自动更新 → 所有工具立即可用。
 #
-# 新增 provider → 在 providers attrset 加一项 + modules/opencode.nix 声明 agenix 密钥。
+# 新增 provider → 在 providers attrset 加一项 + modules/ai-secrets.nix 声明 agenix 密钥。
 # 新增模型 → mkModel { input = X; output = Y; }（必填，漏写构建失败）
 # 切换工具后端 → 运行时选择模型即可（所有模型对所有工具可见）。
 #

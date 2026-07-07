@@ -17,11 +17,11 @@ lib.nixosSystem {
     ../modules/core-utils.nix
     ../modules/disk-health.nix
     ../modules/fonts.nix
-    ../modules/opencode.nix
+    ../modules/ai-secrets.nix
     ../modules/system.nix
     ../modules/ssh.nix
     ../modules/users.nix
-    ../modules/analysis.nix
+    ../modules/cleanup.nix
     ../modules/git-annex.nix
     # ollama.nix: options 全局可见（nixpkgs module-list.nix 模式），
     # config 由 lib.mkIf cfg.enable 按需激活。home-manager 层直接读

@@ -1,6 +1,6 @@
 # Delete git repos in /tmp older than 10d (parent dir mtime).
 #
-# Why a separate service instead of relying on modules/analysis.nix's
+# Why a separate service instead of relying on modules/cleanup.nix's
 # systemd-tmpfiles "d /tmp mM:10d" rule:
 #   - tmpfiles "d" cleans individual files recursively, not whole directory
 #     trees as atomic units.  A git repo with mixed mtimes (old source files,
