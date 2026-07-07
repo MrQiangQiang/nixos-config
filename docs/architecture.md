@@ -68,18 +68,3 @@ lib/mkHost.nix     → host constructor (single source for defaults)
 ## Secrets
 
 `secrets/keys.nix` = single source of truth for all SSH public keys. `secrets/secrets.nix` declares which key encrypts which age file. `agenix -r` rekeys when adding a host.
-
-## Remote deploy
-
-```
-nixos-rebuild switch --flake .#desktop-1 --target-host root@desktop-1.tail0f7af0.ts.net
-```
-
-Builds on laptop-1, deploys to desktop-1 via Tailscale. No deploy-rs needed; two-host scale is trivial.
-
-| Decision | Rationale |
-|----------|-----------|
-| `root@` not `fugui@` | SSH directly as root via key; no sudo needed |
-| `PermitRootLogin = "prohibit-password"` | Key-only root login (no password) |
-| Root SSH key from laptop-1 `fugui` | Deploy key lives in user space, not a shared secret |
-| Rejected: `wheelNeedsPassword = false` | Full wheel-group passwordless sudo = silent root backdoor for any user-level process |

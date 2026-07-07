@@ -21,10 +21,6 @@ dGPU (nvidia)  ←── Ollama, CUDA, nvidia-offload
 | `nvidia_drm.modeset=1` | Set via `hardware.nvidia.modesetting.enable`; no raw kernel param needed |
 | PRIME offload | `nvidia-offload <cmd>` runs single app on 5090. Wayland native |
 
-## Source of truth
-
-`hosts/desktop-1/default.nix` L37-70
-
 ## GSP 固件说明
 
 Blackwell 架构（RTX 5090）**强制要求 GSP（GPU System Processor）固件**，无法禁用。

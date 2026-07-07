@@ -163,6 +163,5 @@ mpv config 将 `#` 视为注释起始。`programs.mpv.config` 中 home-manager �
 ## 跨文档引用
 
 - 调色板色值定义：`rose-pine-palette.md`
-- Firefox CSS 变量映射：`firefox-theme-reference.md`
-- KWM SIGUSR1 patch + River 启动时序：`kwm-desktop-plan.md`
+- KWM SIGUSR1 patch + River 启动时序：`river-kwm-desktop.md`
 - River CSD 边框处理：`river-server-side-decoration.md`

@@ -74,11 +74,3 @@ TTY 环境下 run0 使用 pkttyagent(文本输入),但 TTY 无 NoNewPrivs,直接
 | **高内聚低耦合** | polkit + PAM 服务同文件;FHS 环境配置在 package 层 |
 | **多主机** | desktop.nix 通过 `custom.desktop.enable` 选项,所有桌面主机自动生效 |
 | **成熟新技术** | run0(systemd 256+,2024-06),2026 年已成熟 |
-
----
-
-## 源码真理
-
-- `modules/desktop.nix` — `security.pam.services.systemd-run0` + `security.polkit.enable`
-- `packages/trae-cn.nix` — `extraBwrapArgs` 暴露宿主机 PAM 配置
-- `home/desktop/polkit.nix` — polkit-gnome authentication agent(GUI 密码框)

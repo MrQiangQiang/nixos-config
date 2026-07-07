@@ -44,10 +44,3 @@ ollama-prewarm.service (after ollama.service)
 ## CUDA context 与模型加载
 
 ollama 服务启动即创建 CUDA context（GPU 功耗 ~20W → ~50-90W DVFS 跳变）。模型加载到 VRAM 几乎不增加功耗（<0.02 W/GB）。模型常驻 VRAM 不影响显存寿命（GDDR6 是易失性内存，无写入次数限制）。
-
-## Source of truth
-
-- `modules/ollama.nix` — ollama 模块（options + prewarm service，`custom.ollama.contextLength` SSOT）
-- `hosts/desktop-1/default.nix` — `custom.ollama.enable = true`
-- `home/dev/qmd.nix` — `QMD_LLAMA_GPU=cuda`
-- `home/dev/codex.nix` — 读 `osConfig.custom.ollama.contextLength` 传入 catalog

@@ -34,9 +34,3 @@ sda (HDD 1TB)  GPT  disko
 | boot 2G | multiple kernel generations; safe margin over 512M minimum |
 | HDD `nofail` | boot proceeds if HDD fails; git-annex data non-critical for boot |
 | HDD btrfs | consistent with NVMe; autoScrub covers both |
-
-## Source of truth
-
-`hosts/desktop-1/disk-config.nix`
-`hosts/desktop-1/default.nix` (zramSwap, autoScrub)
-`modules/disk-health.nix` (smartd, 所有主机共享)
