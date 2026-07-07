@@ -1,0 +1,15 @@
+diff --git a/river/LayerShellOutput.zig b/river/LayerShellOutput.zig
+index 590a221..5401ec0 100644
+--- a/river/LayerShellOutput.zig
++++ b/river/LayerShellOutput.zig
+@@ -112,9 +112,7 @@ fn sendConfigures(
+             assert(node.type == .tree);
+             const node_data: *SceneNodeData = @ptrCast(@alignCast(node.data orelse continue));
+             const layer_surface = node_data.data.layer_surface;
+-            if (!layer_surface.wlr_layer_surface.surface.mapped and
+-                !layer_surface.wlr_layer_surface.initial_commit)
+-            {
++            if (!layer_surface.wlr_layer_surface.initialized) {
+                 continue;
+             }
+             if (layer_surface.wlr_layer_surface.output != output.wlr_output) {
