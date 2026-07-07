@@ -106,6 +106,11 @@ in
     # polkit-gnome agent(见 home/desktop/polkit.nix)提供 GUI 密码提示。
     # TTY/普通终端无 NoNewPrivs,sudo 已可用,无需 run0。
     security.pam.services.systemd-run0 = { };
+
+    # FUSE: xdg-document-portal 通过 fusermount3 挂载 /run/user/<uid>/doc,
+    # 缺失会导致 portal 启动失败(exit-code 6/NOTCONFIGURED)。
+    programs.fuse.enable = true;
+
     xdg.portal = {
       enable = true;
       wlr.enable = true;

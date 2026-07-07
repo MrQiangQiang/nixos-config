@@ -15,6 +15,10 @@
     pulse.enable = true;
   };
 
+  # RTKit: pipewire/wireplumber 通过它获取实时调度优先级,
+  # 缺失会降级到 priority=1/nice=0,CPU 紧张时可能爆音。
+  security.rtkit.enable = true;
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
