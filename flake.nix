@@ -54,7 +54,7 @@
             config.allowUnfree = true;
           };
 
-          formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt;
+          formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt-tree;
 
           apps.disko = {
             type = "app";
