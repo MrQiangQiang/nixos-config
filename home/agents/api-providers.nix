@@ -212,11 +212,11 @@ let
             "high"
             "max"
           ];
-           # thinking mode 由 Go 代理内部控制 — extra_body 参数已移除。
-           # 原因为 LiteLLM 的 Chat Completions 转发到 Go 代理时 extra_body
-           # 被合并到请求体顶层（与 Go 内部翻译路径不同），导致 DeepSeek 400。
-           # Go 代理基于 Responses API reasoning parameter 自行设置 thinking。
-         };
+          # thinking mode 由 Go 代理内部控制 — extra_body 参数已移除。
+          # 原因为 LiteLLM 的 Chat Completions 转发到 Go 代理时 extra_body
+          # 被合并到请求体顶层（与 Go 内部翻译路径不同），导致 DeepSeek 400。
+          # Go 代理基于 Responses API reasoning parameter 自行设置 thinking。
+        };
         "deepseek-v4-flash" = mkModel {
           input = 0.14;
           output = 0.28;

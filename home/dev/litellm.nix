@@ -65,9 +65,7 @@ let
 
   # Ollama 上游：本机启用走 localhost，否则经 tailnet 连 desktop-1（唯一 GPU 服务器）
   ollamaApiBase =
-    if osConfig.custom.ollama.enable
-    then "http://localhost:11434/v1"
-    else "http://desktop-1:11434/v1";
+    if osConfig.custom.ollama.enable then "http://localhost:11434/v1" else "http://desktop-1:11434/v1";
 
   # Ollama model_list entries
   ollamaModelList = map (m: {
