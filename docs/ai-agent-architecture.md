@@ -201,7 +201,7 @@ VRAM 分配策略详见 `docs/desktop-1/ollama.md`
 ## CLI 工具模型路由（统一代理架构）
 
 ```
-所有工具 → LiteLLM (localhost:4000) → opencode-go ($10/月, 13模型)
+所有工具 → LiteLLM (localhost:4000) → opencode-go ($10/月, 14模型)
                                       ├── DeepSeek API (按量)
                                       ├── GLM Coding Plan (未来)
                                       └── Ollama (本地, 免费)
@@ -238,6 +238,17 @@ home/dev/codex.nix        → model_provider: litellm（settings.profiles 预留
 - LiteLLM 单进程运行（不需要 Redis/PostgreSQL，仅 nixpkgs 1.89.0 基础包）
 - 配置从 Nix SSOT 自动生成，零手动维护
 
+### LiteLLM patch 策略
+
+LiteLLM 1.89.0 有两个截至 v1.93.0 未上游修复的 bug，通过 `overrideAttrs` 打补丁（litellm.nix）：
+
+- **responses-fix**: Responses API 流式传输空 choices chunk 导致 IndexError
+- **opencode-go-fix**: Responses→Chat 转换不合并 message output item，产生连续 assistant message 被 Go 代理拒绝
+
+补丁仅针对 opencode-go provider（通过 `api_base` 含 `opencode.ai` 识别），不影响其他 provider。
+升级 LiteLLM 时需验证上游是否已修复（检查对应源码行），已修复则移除补丁。
+补丁细节（源码位置、根因）见 litellm.nix 注释。
+
 ### 为什么不用 cc-switch-cli
 
 - SQLite DB 配置（非声明式），API key 明文入库，与 agenix 冲突
@@ -247,7 +258,7 @@ home/dev/codex.nix        → model_provider: litellm（settings.profiles 预留
 ### Go 套餐真实性价比
 
 Go 定价含 cache_read（编程 agent 80%+ token 为缓存读取，必须计入）。
-**全部 13 个 Go 模型均比同级直连 API 便宜**——Go 的 cache 价格远低于多数官方 API。
+**全部 14 个 Go 模型均比同级直连 API 便宜**——Go 的 cache 价格远低于多数官方 API。
 具体价格见 api-providers.nix 注释（来源 opencode.ai/docs/zh-cn/go）。
 
 ## 模型成本追踪
@@ -292,7 +303,7 @@ OpenCode 1.17.7 的 `@ai-sdk/openai-compatible` 不对 `/v1/models` 做 auto-dis
 
 ## 为什么 Codex 走代理而非仅 --oss
 
-- 代理使 Codex 可访问 Go 套餐 13 个云模型（非仅本地）
+- 代理使 Codex 可访问 Go 套餐 14 个云模型（非仅本地）
 - LiteLLM 自动桥接 Responses→Chat 以支持 Chat-only 后端
 - 保留 `codex-oss` 别名作为代理不可用时的后备
 
