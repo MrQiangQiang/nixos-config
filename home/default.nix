@@ -8,7 +8,7 @@
 
 let
   palette = import ./desktop/palette.nix { inherit osConfig; };
-  keybinds = import ./desktop/keybind-registry.nix { inherit lib; };
+  keybinds = import ./desktop/keybinds { inherit lib; };
 in
 {
   imports = [

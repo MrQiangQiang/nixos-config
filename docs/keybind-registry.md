@@ -6,7 +6,7 @@
 
 ## 设计原则
 
-1. **唯一来源**：`keybind-registry.nix` 是所有快捷键语义描述的唯一来源
+1. **唯一来源**：`keybinds/` 目录是所有快捷键语义描述的唯一来源
 2. **职责单一**：各应用管自己的快捷键配置，注册表只管编目和搜索
 3. **简单优雅**：不发明跨应用统一键绑定层，不引入 keyd/xremap 等额外依赖
 4. **面向未来**：新增应用 = 在注册表添加条目，无需改架构
@@ -60,7 +60,7 @@
 ```
 ┌───────────────────────────────────────────────────────────────┐
 │                    语义注册表 (Semantic Registry)              │
-│                    唯一来源：home/desktop/keybind-registry.nix │
+│                    唯一来源：home/desktop/keybinds/            │
 │                                                               │
 │  ┌─────────────────────┐    ┌──────────────────────────────┐ │
 │  │  Managed 托管绑定    │    │  Documented 编目绑定          │ │
@@ -113,7 +113,7 @@ opencode 使用 `<leader>` 键（默认 Ctrl+X）实现双键顺序和弦（先�
 注册表遵循 `palette.nix` 的注入模式：
 
 ```
-home/desktop/keybind-registry.nix  ← 数据源（唯一定义点）
+home/desktop/keybinds/             ← 数据源（唯一定义点）
         │
         ▼  home/default.nix 中 import + _module.args.keybinds 注入
         │
@@ -233,23 +233,6 @@ kwm 的默认快捷键内部自洽（F=Floating 全家桶、Shift=破坏性、Al
 
 ---
 
-## 文件结构
-
-```
-home/desktop/
-  keybind-registry.nix          ← 唯一来源：语义注册表
-  keybind-help.nix              ← 速查脚本：keybind-cheatsheet（fuzzel dmenu）
-  kwm/config.zon              ← KWM 快捷键配置（直写 ZON）
-  kwm.nix                       ← replaceVars 生成 dark/light ZON
-  media-keys.nix                ← 音量/亮度/媒体控制脚本
-  networkmanager-dmenu.nix      ← WiFi 选择器配置（fuzzel 后端）
-  screenshot.nix                ← 截图/取色脚本
-  foot.nix                      ← foot 配置
-  fuzzel.nix                    ← fuzzel 配置
-
-home/default.nix                ← 注入 keybinds（与 palette 同模式）
-```
-
-### 为什么 keybind-help.nix 独立而非放在 kwm.nix 中
+## 为什么 keybind-help.nix 独立而非放在 kwm.nix 中
 
 kwm.nix 职责是生成 ZON 配置，速查脚本与 ZON 生成无关。未来其他 WM 也可能需要速查。

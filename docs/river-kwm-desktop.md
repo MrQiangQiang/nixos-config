@@ -344,7 +344,7 @@ home/desktop/
   wlsunset.nix           ← HM systemd（原生 Wayland 色温调节）
   polkit.nix             ← polkit-gnome wrapper 脚本
   media-keys.nix         ← 音量/亮度脚本（写入 wob socket）
-  keybind-registry.nix   ← 快捷键语义注册表（唯一来源）
+  keybinds/              ← 快捷键语义注册表（唯一来源）
   keybind-help.nix       ← 快捷键速查脚本（fuzzel dmenu）
   firefox.nix            ← firefox 包
   filemanager.nix        ← yazi + thunar + yazi 图标
