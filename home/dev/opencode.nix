@@ -12,7 +12,7 @@
 #     自动禁用 50 个付费模型（cost.input > 0）→ 仅展示 21 个免费模型
 #     与 LiteLLM 零重叠（Zen free ∩ api-providers.nix = ∅）
 #
-#   opencode-go   — models.dev 附带注入，13/13 模型与 LiteLLM 100% 重叠
+#   opencode-go   — models.dev 附带注入，14/14 模型与 LiteLLM 100% 重叠
 #     无 API key 不可用，为无副作用展示（不删除不配置）
 #
 # 运行时切换模型：在 OpenCode 中 /model 即可选择

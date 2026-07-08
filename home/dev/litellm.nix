@@ -1,7 +1,7 @@
 # LiteLLM — 本地 LLM 代理网关
 #
 # 统一入口 (localhost:4000)，所有 AI 工具通过代理访问全部后端：
-#   - opencode-go 套餐（$10/月，13 模型）
+#   - opencode-go 套餐（$10/月，14 模型）
 #   - DeepSeek API（按量计费）
 #   - GLM Coding Plan（未来）
 #   - Ollama 本地模型
@@ -105,12 +105,25 @@ let
   configFile = configYaml.generate "litellm-config.yaml" litellmConfig;
 
   # 配置目录（config.yaml + callback .py 同目录，get_instance_fn 相对解析）
-  # 单一 derivation 保证两文件来源一致，符合 SSOT 原则
+  # 单一 derivation 保证所有文件来源一致，符合 SSOT 原则
   litellmConfigDir = pkgs.runCommand "litellm-config" { } ''
     mkdir -p $out
     cp ${configFile} $out/config.yaml
     cp ${./litellm-tool-filter.py} $out/litellm_tool_filter.py
   '';
+
+  # LiteLLM 补丁：
+  # - litellm-responses-fix.patch: 修复 /v1/responses 流式传输时空 choices chunk 导致 IndexError
+  #   源码：streaming_iterator.py:1153（1.89.0）/ :1036（>=1.90.0），截至 main cd6e8cd (v1.93.0) 未修复
+  # - litellm-opencode-go-fix.patch: 修复 Codex Responses→Chat 转换的 messages 格式问题
+  #   根因：transformation.py:391-434 只合并 function_call，不合并 message output item
+  #   修复：合并连续 assistant message（Go 代理拒绝连续两个 assistant message）
+  patchedLitellm = pkgs.litellm.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      ./litellm-responses-fix.patch
+      ./litellm-opencode-go-fix.patch
+    ];
+  });
 
   # agenix 密钥路径
   goKeyPath = osConfig.age.secrets."opencode-go-key".path;
@@ -120,7 +133,7 @@ let
 in
 {
   # LiteLLM 配置文件 + callback（只读 symlink 到 Nix store）
-  # 两文件必须同目录：get_instance_fn 相对 config.yaml 解析 callback 模块
+  # 所有文件必须同目录：get_instance_fn 相对 config.yaml 解析 callback 模块
   home.file.".config/litellm/config.yaml".source = "${litellmConfigDir}/config.yaml";
   home.file.".config/litellm/litellm_tool_filter.py".source =
     "${litellmConfigDir}/litellm_tool_filter.py";
@@ -148,7 +161,7 @@ in
       X-Restart-Triggers = [ "${litellmConfigDir}/config.yaml" ];
     };
     Service = {
-      ExecStart = "${pkgs.litellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port 4000";
+      ExecStart = "${patchedLitellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port 4000";
       EnvironmentFile = "%h/.config/litellm/env";
       # 绕过 LiteLLM 1.89.0 Messages→Chat→Messages 双桥 bug
       # Bug：responses_adapters/transformation.py:415-518 的 isinstance(item, dict)

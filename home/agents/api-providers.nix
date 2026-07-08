@@ -72,10 +72,10 @@ let
 
   ## Provider 注册表
   providers = {
-    # OpenCode Go — $10/月，13 个开源模型，$60 月额度
+    # OpenCode Go — $10/月，14 个开源模型，$60 月额度
     # 仅 OpenAI Chat Completions 端点
     # 定价与直连 API 不同（Go 有加价），以下为 Go 官方定价
-    # 模型列表 + 定价文档：https://opencode.ai/docs/zh-cn/go
+    # 模型列表 + 定价文档：https://opencode.ai/docs/zh-cn/go（2026-07-08 更新）
     # 检查模型：curl -s https://opencode.ai/zen/go/v1/models | jq '[.data[].id]'
     opencode-go = {
       openai_url = "https://opencode.ai/zen/go/v1";
@@ -159,6 +159,14 @@ let
           contextWindow = 204800;
           # 无 reasoning_effort API（opencode transform.ts:707 排除）
         };
+        "minimax-m2.5" = mkModel {
+          input = 0.30;
+          output = 1.20;
+          cache_read = 0.06;
+          cache_write = 0.375;
+          contextWindow = 204800;
+          # 无 reasoning_effort API（同 m2.7，opencode transform.ts:707 排除）
+        };
         "qwen3.7-max" = mkModel {
           input = 2.50;
           output = 7.50;
@@ -168,6 +176,10 @@ let
           # 无 reasoning_effort API（opencode transform.ts:711 排除）
         };
         "qwen3.7-plus" = mkModel {
+          # 分层定价（官方 2026-07-08）：
+          #   ≤256K: input $0.40, output $1.60, cache_read $0.04, cache_write $0.50
+          #   >256K: input $1.20, output $4.80, cache_read $0.12, cache_write $1.50
+          # 以下为 ≤256K 价格（多数请求在 256K 以内，cost 仅用于 UI 显示预估）
           input = 0.40;
           output = 1.60;
           cache_read = 0.04;
@@ -176,6 +188,10 @@ let
           # 无 reasoning_effort API（opencode transform.ts:711 排除）
         };
         "qwen3.6-plus" = mkModel {
+          # 分层定价（官方 2026-07-08）：
+          #   ≤256K: input $0.50, output $3.00, cache_read $0.05, cache_write $0.625
+          #   >256K: input $2.00, output $6.00, cache_read $0.20, cache_write $2.50
+          # 以下为 ≤256K 价格（多数请求在 256K 以内，cost 仅用于 UI 显示预估）
           input = 0.50;
           output = 3.00;
           cache_read = 0.05;
@@ -196,19 +212,11 @@ let
             "high"
             "max"
           ];
-          # DeepSeek V4 思考模式参数（官方文档 26-06-29）：
-          #   - thinking 默认 enabled，reasoning_content 与 content 同级返回
-          #   - Agent 请求（Claude Code/OpenCode/Codex）自动 effort=max
-          #   - effort=max 时简单问题也消耗 400+ token 思考
-          #   - 客户端 max_tokens 较小（200-500）时 reasoning 耗尽 → content 为空
-          # 方案：保留 thinking=enabled（不阉割模型能力），
-          #       通过 reasoning_effort=high 覆盖 Agent 自动 max，
-          #       降为普通请求默认值（与直连 API 普通请求一致）。
-          # LiteLLM 1.89.0 适配层 bug：reasoning_effort 被 pop 丢弃
-          # (transformation.py:49-63)，必须用 extra_body 绕过。
-          extra_body.thinking.type = "enabled";
-          extra_body.reasoning_effort = "high";
-        };
+           # thinking mode 由 Go 代理内部控制 — extra_body 参数已移除。
+           # 原因为 LiteLLM 的 Chat Completions 转发到 Go 代理时 extra_body
+           # 被合并到请求体顶层（与 Go 内部翻译路径不同），导致 DeepSeek 400。
+           # Go 代理基于 Responses API reasoning parameter 自行设置 thinking。
+         };
         "deepseek-v4-flash" = mkModel {
           input = 0.14;
           output = 0.28;
@@ -219,8 +227,7 @@ let
             "high"
             "max"
           ];
-          extra_body.thinking.type = "enabled";
-          extra_body.reasoning_effort = "high";
+          # thinking mode 由 Go 代理内部控制，原因同 deepseek-v4-pro
         };
       };
     };

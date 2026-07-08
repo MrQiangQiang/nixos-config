@@ -1,0 +1,37 @@
+--- a/litellm/responses/litellm_completion_transformation/handler.py
++++ b/litellm/responses/litellm_completion_transformation/handler.py
+@@ -112,6 +112,34 @@
+         acompletion_args.update(kwargs)
+         acompletion_args.update(litellm_completion_request)
+
++        # opencode-go provider: Go proxy rejects consecutive assistant
++        # messages that LiteLLM Responses->Chat transform produces.
++        # LiteLLM creates separate messages for function_call and message
++        # output items; only function_call items are merged upstream
++        # (transformation.py:391-434). Merge message output items here.
++        # Router replaces model with litellm_params.model (e.g. openai/...),
++        # so identify opencode-go via api_base from deployment litellm_params.
++        _api_base = acompletion_args.get("api_base", "") or ""
++        if "opencode.ai" in _api_base:
++            _messages = acompletion_args.get("messages")
++            if isinstance(_messages, list):
++                _i = 1
++                while _i < len(_messages):
++                    _prev, _curr = _messages[_i - 1], _messages[_i]
++                    if (
++                        isinstance(_prev, dict)
++                        and isinstance(_curr, dict)
++                        and _prev.get("role") == "assistant"
++                        and _curr.get("role") == "assistant"
++                    ):
++                        if _curr.get("content") is not None and _prev.get("content") is None:
++                            _prev["content"] = _curr["content"]
++                        if _curr.get("tool_calls"):
++                            _prev["tool_calls"] = _prev.get("tool_calls", []) + _curr["tool_calls"]
++                        _messages.pop(_i)
++                    else:
++                        _i += 1
++
+         litellm_completion_response: Union[
+             ModelResponse, litellm.CustomStreamWrapper
+         ] = await litellm.acompletion(
