@@ -1,7 +1,6 @@
 {
   hostName,
   system,
-  users ? { },
   extraModules ? [ ],
   inputs,
   ...
@@ -82,8 +81,6 @@ lib.nixosSystem {
 
       # Flakes 时代禁用传统 channel,避免双来源(唯一来源原则)
       nix.channel.enable = false;
-
-      users.users = users;
 
       home-manager = {
         useGlobalPkgs = true;
