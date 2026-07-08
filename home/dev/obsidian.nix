@@ -102,7 +102,7 @@ let
     );
 
   snippetVars = mkSnippetVars "dark" palette.dark // mkSnippetVars "light" palette.dawn;
-  rosePineSnippet = pkgs.replaceVars ./rose-pine-obsidian.css snippetVars;
+  rosePineSnippet = pkgs.replaceVars ./obsidian/rose-pine.css snippetVars;
 
   # Starter screen CSS (vault switcher + version info modal).
   # starter.html hardcodes <body class="theme-dark"> and only loads app.css —
@@ -134,7 +134,7 @@ let
         ]
     );
   starterVars = mkStarterVars "dark" palette.dark // mkStarterVars "light" palette.dawn;
-  rosePineStarterCSS = pkgs.replaceVars ./rose-pine-obsidian-starter.css starterVars;
+  rosePineStarterCSS = pkgs.replaceVars ./obsidian/rose-pine-starter.css starterVars;
 in
 {
   # Override pkgs.obsidian (already has bootstrap.cjs injected via overlay) to

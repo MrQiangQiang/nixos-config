@@ -209,5 +209,5 @@ lib.mkIf isDesktopEnabled {
     };
   };
 
-  xdg.dataFile."icons/hicolor/scalable/apps/yazi.svg".source = ./filemanager.svg;
+  xdg.dataFile."icons/hicolor/scalable/apps/yazi.svg".source = ./filemanager/yazi.svg;
 }

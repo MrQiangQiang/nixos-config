@@ -109,19 +109,19 @@ let
   litellmConfigDir = pkgs.runCommand "litellm-config" { } ''
     mkdir -p $out
     cp ${configFile} $out/config.yaml
-    cp ${./litellm-tool-filter.py} $out/litellm_tool_filter.py
+    cp ${./litellm/tool-filter.py} $out/litellm_tool_filter.py
   '';
 
   # LiteLLM 补丁：
-  # - litellm-responses-fix.patch: 修复 /v1/responses 流式传输时空 choices chunk 导致 IndexError
+  # - responses-fix.patch: 修复 /v1/responses 流式传输时空 choices chunk 导致 IndexError
   #   源码：streaming_iterator.py:1153（1.89.0）/ :1036（>=1.90.0），截至 main cd6e8cd (v1.93.0) 未修复
-  # - litellm-opencode-go-fix.patch: 修复 Codex Responses→Chat 转换的 messages 格式问题
+  # - opencode-go-fix.patch: 修复 Codex Responses→Chat 转换的 messages 格式问题
   #   根因：transformation.py:391-434 只合并 function_call，不合并 message output item
   #   修复：合并连续 assistant message（Go 代理拒绝连续两个 assistant message）
   patchedLitellm = pkgs.litellm.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
-      ./litellm-responses-fix.patch
-      ./litellm-opencode-go-fix.patch
+      ./litellm/responses-fix.patch
+      ./litellm/opencode-go-fix.patch
     ];
   });
 
