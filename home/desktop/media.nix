@@ -28,7 +28,7 @@
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   isDesktop1 = osConfig.networking.hostName == "desktop-1";
-  musicDir = if isDesktop1 then "/data/annex/music" else "/home/fugui/annex/music";
+  musicDir = if isDesktop1 then "/data/annex/music" else "${config.home.homeDirectory}/annex/music";
 
   # alx upstream flake.nix omits clang from nativeBuildInputs, but rquickjs-sys
   # uses bindgen which requires libclang.so + glibc headers (stdio.h etc.).
