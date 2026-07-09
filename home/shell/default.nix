@@ -103,6 +103,11 @@ in
 
   # 确保 SSH_AUTH_SOCK 在所有终端中可用（包括 IDE 集成终端）
   home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
+  # 启用 OpenCode 内建 websearch 工具（Exa 引擎，免费免 API key）
+  # 源码：packages/core/src/tool/websearch.ts:79-80 — Exa + Parallel 双引擎
+  # 两者可共存；selectProvider 优先 Parallel（websearch.ts:88-97）
+  # 显式选择用 OPENCODE_WEBSEARCH_PROVIDER=exa|parallel
+  home.sessionVariables.OPENCODE_ENABLE_EXA = "1";
 
   programs.vim = {
     enable = true;

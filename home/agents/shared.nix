@@ -40,8 +40,21 @@ let
   ##     tools = [ "Read" "Grep" ];     # 可选
   ##     color = "green";               # Claude Code 可选
   ##   };
+  ## context（常驻上下文）硬性约束：
+  ##   - 合计 ≤100 行（严于 ECC 309 行 advisory；ECC/Superpowers 源码验证：常驻越短模型遵循越可靠）
+  ##   - 只放行为准则，不放方法论（方法论放 skill，按需加载）
+  ##   - 少即是多：每加一条规则都摊薄已有规则的权重
   commandMeta = { };
-  skillMeta = { };
+  skillMeta = {
+    research = {
+      description = "Systematic research on technical topics, tool comparisons, framework evaluations, and latest developments. Use when the user wants research, comparisons, deep dives, or evidence-backed answers - 技术调研/方案对比/工具选型/最新动态调研";
+    };
+  };
+  ## skill/MCP 总量控制（少即是多）：
+  ##   - skill description 常驻 catalog，每条 ~30 tokens；数量多了不触发也占 context，
+  ##     且选择过多导致模型无法准确触发——保持个位数
+  ##   - MCP tool schema 每会话常驻，每个工具 ~500 tokens；新增必须通过 ECC 两轮测试
+  ##     (Universal + MCP-genuinely-beats-CLI)，否则用 skill 包 CLI
   agentMeta = { };
   contextNames = [ "guidelines" ];
 

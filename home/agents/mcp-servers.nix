@@ -11,6 +11,14 @@
 #                    requires `tailscale serve --bg 8181` on desktop-1.
 #         Non-desktop-1 machines connect via Tailscale mesh; no SSH tunnel needed.
 #
+#   parallel-search — 全网搜索 (LLM-optimized web search MCP)
+#         web_search 一次调用返回 URL + 引文摘录（search+fetch 合一），另有 web_fetch 获取全文。
+#         免费匿名使用，无需 API key。ECC v2.0.0 (github.com/affaan-m/ECC) 背书为 opt-in MCP。
+#
+#   context7 — 文档搜索引擎 (library/framework 官方文档)
+#         远程 MCP: https://mcp.context7.com/mcp
+#         免费匿名 tier（IP 速率限制），API key 仅用于提升速率上限
+#
 # AGENTS.md: git-cloned with ~/knowledge/ repo (Karpathy pattern)
 { config, lib, ... }:
 let
@@ -25,6 +33,12 @@ in
           "http://localhost:${toString qmdPort}/mcp"
         else
           "https://desktop-1.tail0f7af0.ts.net/mcp";
+    };
+    servers.context7 = {
+      url = "https://mcp.context7.com/mcp";
+    };
+    servers.parallel-search = {
+      url = "https://search.parallel.ai/mcp";
     };
   };
 }

@@ -153,10 +153,11 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ traePkg ];
 
-    # sandbox — read-only security policy (home.file: Nix store symlink)
-    # context — symlink from shared.nix SSOT (read-only)
-    #           Trae CN reads ~/.trae-cn/user_rules/<name>.md (any .md file in this dir)
-    #           全局 user_rules 是常驻上下文（非项目级 rules），UI 写入的 rule-<timestamp>.md 保留
+    # context — ~/.trae-cn/user_rules/<name>.md（常驻上下文，每次对话加载）
+    # skills — ~/.trae-cn/skills/<name>/SKILL.md（按需加载，agent 扫描 description
+    #          后仅在任务相关时加载全文，不占用常驻 context）
+    #          格式与 builtin_skills/ 一致：YAML frontmatter + markdown body
+    # sandbox — Nix store symlink (read-only security policy)
     home.file = lib.mkMerge [
       {
         ".trae-cn/sandbox.json".text = builtins.toJSON {
@@ -177,6 +178,12 @@ in
           source = pkgs.writeText "${name}.md" content;
         }
       ) shared.context)
+      (lib.mapAttrs' (
+        name: content:
+        lib.nameValuePair ".trae-cn/skills/${name}/SKILL.md" {
+          source = pkgs.writeText "${name}-SKILL.md" content;
+        }
+      ) shared.skills)
     ];
 
     # MCP — writable merge (home.activation: preserves IDE runtime writes from UI)
