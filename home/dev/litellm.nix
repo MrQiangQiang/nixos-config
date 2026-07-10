@@ -23,6 +23,8 @@
   ...
 }:
 let
+  cfg = config.custom.litellm;
+
   api = import ../agents/api-providers.nix;
 
   # Provider 到环境变量映射
@@ -134,46 +136,54 @@ let
   gptKeyPath = osConfig.age.secrets."glm-coding-plan-key".path;
 in
 {
-  # LiteLLM 配置文件 + callback（只读 symlink 到 Nix store）
-  # 所有文件必须同目录：get_instance_fn 相对 config.yaml 解析 callback 模块
-  home.file.".config/litellm/config.yaml".source = "${litellmConfigDir}/config.yaml";
-  home.file.".config/litellm/litellm_tool_filter.py".source =
-    "${litellmConfigDir}/litellm_tool_filter.py";
+  options.custom.litellm.port = lib.mkOption {
+    type = lib.types.port;
+    default = 4000;
+    description = "LiteLLM proxy server port";
+  };
 
-  # 环境变量文件（密钥从 agenix 读取，不写入 Nix store）
-  # 每次 home-manager switch 时更新
-  home.activation.litellmEnv = lib.hm.dag.entryAfter [ "agenixInstall" ] ''
-    run mkdir -p $HOME/.config/litellm
-    printf 'OPENCODE_GO_KEY=%s\n' "$(cat ${goKeyPath} 2>/dev/null || echo PLACEHOLDER)" > $HOME/.config/litellm/env
-    printf 'DEEPSEEK_KEY=%s\n' "$(cat ${deepseekKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
-    printf 'GLM_CODING_PLAN_KEY=%s\n' "$(cat ${gptKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
-    printf 'LITELLM_MASTER_KEY=litellm-local\n' >> $HOME/.config/litellm/env
-    chmod 600 $HOME/.config/litellm/env
-  '';
+  config = {
+    # LiteLLM 配置文件 + callback（只读 symlink 到 Nix store）
+    # 所有文件必须同目录：get_instance_fn 相对 config.yaml 解析 callback 模块
+    home.file.".config/litellm/config.yaml".source = "${litellmConfigDir}/config.yaml";
+    home.file.".config/litellm/litellm_tool_filter.py".source =
+      "${litellmConfigDir}/litellm_tool_filter.py";
 
-  # Systemd user service — 本地代理网关，监听 127.0.0.1:4000
-  # LiteLLM 单进程运行，不需要 Redis/PostgreSQL
-  systemd.user.services.litellm = {
-    Unit = {
-      Description = "LiteLLM proxy — LLM gateway (localhost:4000)";
-      After = [ "network.target" ];
-      # Restart to apply config.yaml changes
-      X-Restart-Triggers = [ "${litellmConfigDir}/config.yaml" ];
-    };
-    Service = {
-      ExecStart = "${patchedLitellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port 4000";
-      EnvironmentFile = "%h/.config/litellm/env";
-      # 绕过 LiteLLM 1.89.0 Messages→Chat→Messages 双桥 bug
-      # Bug：responses_adapters/transformation.py:415-518 的 isinstance(item, dict)
-      # 检查失败（GenericResponseOutputItem 是 Pydantic BaseModel 非 dict），
-      # 导致 content 被丢弃为 []。走单桥路径（adapters/transformation.py:1255-1361）
-      # 用独立 if 添加 content，不吞掉。截至 main 48b5a5a (2026-06-28) 未修复。
-      Environment = [ "LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES=true" ];
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-    Install = {
-      WantedBy = [ "default.target" ];
+    # 环境变量文件（密钥从 agenix 读取，不写入 Nix store）
+    # 每次 home-manager switch 时更新
+    home.activation.litellmEnv = lib.hm.dag.entryAfter [ "agenixInstall" ] ''
+      run mkdir -p $HOME/.config/litellm
+      printf 'OPENCODE_GO_KEY=%s\n' "$(cat ${goKeyPath} 2>/dev/null || echo PLACEHOLDER)" > $HOME/.config/litellm/env
+      printf 'DEEPSEEK_KEY=%s\n' "$(cat ${deepseekKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
+      printf 'GLM_CODING_PLAN_KEY=%s\n' "$(cat ${gptKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
+      printf 'LITELLM_MASTER_KEY=litellm-local\n' >> $HOME/.config/litellm/env
+      chmod 600 $HOME/.config/litellm/env
+    '';
+
+    # Systemd user service — 本地代理网关，监听 127.0.0.1:4000
+    # LiteLLM 单进程运行，不需要 Redis/PostgreSQL
+    systemd.user.services.litellm = {
+      Unit = {
+        Description = "LiteLLM proxy — LLM gateway (localhost:${toString cfg.port})";
+        After = [ "network.target" ];
+        # Restart to apply config.yaml changes
+        X-Restart-Triggers = [ "${litellmConfigDir}/config.yaml" ];
+      };
+      Service = {
+        ExecStart = "${patchedLitellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port ${toString cfg.port}";
+        EnvironmentFile = "%h/.config/litellm/env";
+        # 绕过 LiteLLM 1.89.0 Messages→Chat→Messages 双桥 bug
+        # Bug：responses_adapters/transformation.py:415-518 的 isinstance(item, dict)
+        # 检查失败（GenericResponseOutputItem 是 Pydantic BaseModel 非 dict），
+        # 导致 content 被丢弃为 []。走单桥路径（adapters/transformation.py:1255-1361）
+        # 用独立 if 添加 content，不吞掉。截至 main 48b5a5a (2026-06-28) 未修复。
+        Environment = [ "LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES=true" ];
+        Restart = "on-failure";
+        RestartSec = 5;
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
     };
   };
 }

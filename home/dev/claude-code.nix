@@ -10,6 +10,7 @@
 #
 # 切换模型：在 Claude Code 中 /model <name> 或通过 ANTHROPIC_DEFAULT_* 环境变量
 {
+  config,
   lib,
   ...
 }:
@@ -23,7 +24,7 @@ in
 
     settings = {
       env = {
-        ANTHROPIC_BASE_URL = "http://localhost:4000";
+        ANTHROPIC_BASE_URL = "http://localhost:${toString config.custom.litellm.port}";
         ANTHROPIC_API_KEY = "litellm-local";
         ANTHROPIC_DEFAULT_SONNET_MODEL = "opencode-go/deepseek-v4-pro";
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "opencode-go/deepseek-v4-flash";

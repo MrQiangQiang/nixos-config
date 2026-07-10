@@ -76,7 +76,7 @@ in
           npm = "@ai-sdk/openai-compatible";
           name = "LiteLLM Proxy";
           options = {
-            baseURL = "http://localhost:4000/v1";
+            baseURL = "http://localhost:${toString config.custom.litellm.port}/v1";
             apiKey = "litellm-local";
           };
           models = litellmCloudModels // {

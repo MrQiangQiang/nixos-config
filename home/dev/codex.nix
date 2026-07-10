@@ -98,7 +98,7 @@ let
     model_catalog_json = "${config.home.homeDirectory}/.codex/model-catalog.json";
     model_providers.litellm = {
       name = "LiteLLM Proxy";
-      base_url = "http://localhost:4000/v1";
+      base_url = "http://localhost:${toString config.custom.litellm.port}/v1";
       wire_api = "responses";
       requires_openai_auth = false;
       env_key = "LITELLM_API_KEY";
