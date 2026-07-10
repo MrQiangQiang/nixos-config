@@ -4,6 +4,9 @@
   pkgs,
   ...
 }:
+let
+  keys = import ../../secrets/keys.nix;
+in
 {
   imports = [
     ../../modules/desktop.nix
@@ -53,4 +56,13 @@
   # ── User ──────────────────────────────────────────────────
 
   # 共享 home-manager 配置见 lib/mkHost.nix
+
+  # ── Remote deploy ──────────────────────────────────────────
+  # 通过 root SSH 密钥登录实现远程部署(nixos-rebuild --target-host root@laptop-1),
+  # 与 desktop-1 对称:部署密钥来自 desktop-1 的 fugui 用户。
+  # 仅允许密钥登录(ProhibitRootLogin),覆盖 modules/ssh.nix 的默认 "no"。
+  services.openssh.settings.PermitRootLogin = "prohibit-password";
+  users.users.root.openssh.authorizedKeys.keys = [
+    keys.users.fugui-desktop
+  ];
 }
