@@ -1,7 +1,7 @@
 { checkConflicts }:
 
 {
-  tier = "legacy";
+  tier = "documented";
   desc = "Vim (已降级) — 仅系统恢复使用，主编辑器已切换为 Helix";
   bindings = checkConflicts "vim" [
     {
