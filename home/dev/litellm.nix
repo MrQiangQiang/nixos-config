@@ -1,6 +1,6 @@
 # LiteLLM — 本地 LLM 代理网关
 #
-# 统一入口 (localhost:4000)，所有 AI 工具通过代理访问全部后端：
+# 统一入口 (port via custom.litellm.port)，所有 AI 工具通过代理访问全部后端：
 #   - opencode-go 套餐（$10/月，14 模型）
 #   - DeepSeek API（按量计费）
 #   - GLM Coding Plan（未来）

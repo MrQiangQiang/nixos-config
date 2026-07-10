@@ -1,6 +1,6 @@
 # Codex CLI — OpenAI 的终端编码 agent
 #
-# 通过 LiteLLM 代理 (localhost:4000) 访问全部后端模型
+# 通过 LiteLLM 代理 (port via custom.litellm.port) 访问全部后端模型
 # 免登录：自定义 provider requires_openai_auth=false
 #
 # 模型命名（对应 LiteLLM model_name）：

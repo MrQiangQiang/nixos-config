@@ -1,6 +1,6 @@
 # Claude Code — Anthropic 的终端编码 agent
 #
-# 通过 LiteLLM 代理 (localhost:4000) 访问全部后端模型
+# 通过 LiteLLM 代理 (port via custom.litellm.port) 访问全部后端模型
 # 免登录：hasCompletedOnboarding=true 跳过 OAuth 引导
 #
 # 模型命名（对应 LiteLLM model_name）：

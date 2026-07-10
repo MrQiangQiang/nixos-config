@@ -63,15 +63,16 @@ in
   # 仅非 desktop-1 主机执行: desktop-1 自身是 canonical 仓库 (/data/annex), 无需 clone 自己。
   # init description 用主机名 (osConfig.networking.hostName) 而非硬编码, 支持未来新增主机。
   # init/group 仅第一次 (实验验证非幂等, 每次产生 1 commit 垃圾); sync 幂等 (无变化零 commit)。
+  # tailnet 域名 SSOT: osConfig.custom.tailnet.domain (modules/tailscale.nix)
   home.activation.cloneAnnexRepo = lib.hm.dag.entryAfter [ "clonePersonalRepos" ] (
     lib.optionalString (osConfig.networking.hostName != "desktop-1") ''
       export PATH="${pkgs.git}/bin:${pkgs.git-annex}/bin:$PATH"
       if [ ! -d '${home}/annex/.git' ]; then
-        if GIT_SSH_COMMAND='${ssh}' run ${git} clone 'fugui@desktop-1.tail0f7af0.ts.net:/data/annex' '${home}/annex'; then
+        if GIT_SSH_COMMAND='${ssh}' run ${git} clone 'fugui@desktop-1.${osConfig.custom.tailnet.domain}:/data/annex' '${home}/annex'; then
           :
         else
           echo "Warning: annex clone failed, run manually:" >&2
-          echo "  git clone fugui@desktop-1.tail0f7af0.ts.net:/data/annex ${home}/annex" >&2
+          echo "  git clone fugui@desktop-1.${osConfig.custom.tailnet.domain}:/data/annex ${home}/annex" >&2
         fi
       fi
       if [ -d '${home}/annex/.git' ]; then

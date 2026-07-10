@@ -38,7 +38,7 @@ home/dev/claude-code.nix  → context + commands + agents + skills
 ```
 
 shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各自 import，Nix 求值缓存复用。
-空集时对所有工具零副作用（当前 shared/ 全部为 .gitkeep）。
+空集时对所有工具零副作用（shared/ 为空时无内容生成）。
 
 内容设计遵循 ai-nixCfg 模式：技能正文平台无关，工具特定映射（如 frontmatter 字段）放在 *Meta attrset 中。
 CLI 工具支持全局配置，IDE 工具 skills 保持项目级（符合工具设计）。
@@ -177,7 +177,7 @@ desktop-1: Ollama (CUDA, qwen3.6:27b-q4_K_M)
            host=0.0.0.0 + firewall tailscale0:11434
            syncModels=true (nix 配置是模型清单唯一来源)
            KEEP_ALIVE=-1 + ollama-prewarm.service (永久驻留 VRAM)
-laptop-1:  opencode → LiteLLM (localhost:4000) → Ollama via Tailscale (desktop-1:11434)
+laptop-1:  opencode → LiteLLM (localhost:<litellm-port>) → Ollama via Tailscale (desktop-1:<ollama-port>)
 ```
 
 VRAM 分配策略详见 `docs/desktop-1/ollama.md`
@@ -201,7 +201,7 @@ VRAM 分配策略详见 `docs/desktop-1/ollama.md`
 ## CLI 工具模型路由（统一代理架构）
 
 ```
-所有工具 → LiteLLM (localhost:4000) → opencode-go ($10/月, 14模型)
+所有工具 → LiteLLM (localhost:<litellm-port>) → opencode-go ($10/月, 14模型)
                                       ├── DeepSeek API (按量)
                                       ├── GLM Coding Plan (未来)
                                       └── Ollama (本地, 免费)
@@ -220,11 +220,11 @@ OpenAI Responses    ← Codex        /v1/responses → 自动桥接 Chat
 home/agents/api-providers.nix  → providers 注册表 + models 列表（唯一来源）
     │
     ▼  LiteLLM 读取 → 生成 config.yaml → model_list（静态列表，非 wildcard）
-home/dev/litellm.nix   → systemd user service (localhost:4000) + 密钥注入
+home/dev/litellm.nix   → systemd user service (localhost:<litellm-port>) + 密钥注入
     │
     ▼  所有 consumer 指向同一端点
 home/dev/opencode.nix     → provider: litellm（模型列表从 api-providers.nix 派生）+ ollama 后备
-home/dev/claude-code.nix  → ANTHROPIC_BASE_URL=localhost:4000
+home/dev/claude-code.nix  → ANTHROPIC_BASE_URL=localhost:<litellm-port>
 home/dev/codex.nix        → model_provider: litellm（settings 弃用，config.toml 通过 activation 种子化）+ codex-oss 后备
 ```
 

@@ -10,13 +10,13 @@
 #   - Index DB at ~/.cache/qmd/index.sqlite (auto-managed)
 #   - Model cache at ~/.cache/qmd/models/ (auto-managed): Qwen3-Embedding-0.6B + Reranker + query-expansion
 #   - Config at ~/.config/qmd/index.yml (declarative, read-only symlink)
-#   - MCP HTTP server on localhost:8181 (systemd user service, foreground)
+#   - MCP HTTP server (systemd user service, port via custom.qmd.port)
 #   - Index refresh every 5 min (systemd user timer, incremental)
 #
 # Only enabled on desktop-1 (7x24, model inference).
 # Non-desktop-1 machines access qmd MCP via Tailscale Serve:
 #   desktop-1: tailscale serve --bg 8181
-#   laptop-1:  programs.mcp.servers.qmd.url = https://desktop-1.tail0f7af0.ts.net/mcp
+#   laptop-1:  programs.mcp.servers.qmd.url = https://desktop-1.<tailnet-domain>/mcp
 # (URL forks automatically in mcp-servers.nix via config.custom.qmd.enable.)
 #
 # ~/knowledge/ is git-cloned on ALL machines (for Obsidian browsing, AGENTS.md).
