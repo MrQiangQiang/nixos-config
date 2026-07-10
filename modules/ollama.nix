@@ -28,6 +28,12 @@ in
       default = "0";
       description = "CUDA_VISIBLE_DEVICES value";
     };
+
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 11434;
+      description = "Ollama API server port";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -37,6 +43,7 @@ in
       user = "ollama"; # 静态用户（btrfs 子卷需要 chown，DynamicUser 不可行）
       group = "ollama";
       host = "0.0.0.0"; # 靠防火墙收口到 tailscale0
+      port = cfg.port;
       loadModels = [ cfg.model ]; # 显式锁定量化（NixOS 可复现性）
       syncModels = true; # 强制声明==实际，移除未声明模型
       environmentVariables = {
@@ -74,9 +81,9 @@ in
       script = ''
         # 等待 ollama API 就绪
         for i in $(seq 1 60); do
-          if curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
+          if curl -sf http://localhost:${toString cfg.port}/api/tags >/dev/null 2>&1; then
             # 预加载模型到 VRAM：keep_alive=-1（永久驻留）
-            curl -sf -X POST http://localhost:11434/api/generate \
+            curl -sf -X POST http://localhost:${toString cfg.port}/api/generate \
               -d '{"model":"${cfg.model}","prompt":" ","stream":false,"keep_alive":-1,"options":{"num_ctx":${toString cfg.contextLength}}}' \
               >/dev/null 2>&1
             exit 0
@@ -88,6 +95,6 @@ in
       '';
     };
 
-    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 11434 ];
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ cfg.port ];
   };
 }

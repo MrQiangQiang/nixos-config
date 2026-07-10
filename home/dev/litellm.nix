@@ -64,8 +64,13 @@ let
   ollamaModels = [ ollamaModel ];
 
   # Ollama 上游：本机启用走 localhost，否则经 tailnet 连 desktop-1（唯一 GPU 服务器）
+  # Port SSOT: modules/ollama.nix → custom.ollama.port
+  ollamaPort = toString osConfig.custom.ollama.port;
   ollamaApiBase =
-    if osConfig.custom.ollama.enable then "http://localhost:11434/v1" else "http://desktop-1:11434/v1";
+    if osConfig.custom.ollama.enable then
+      "http://localhost:${ollamaPort}/v1"
+    else
+      "http://desktop-1:${ollamaPort}/v1";
 
   # Ollama model_list entries
   ollamaModelList = map (m: {
@@ -123,11 +128,10 @@ let
     ];
   });
 
-  # agenix 密钥路径
+  # agenix 密钥路径（ai-secrets.nix 无条件声明全部三个密钥）
   goKeyPath = osConfig.age.secrets."opencode-go-key".path;
   deepseekKeyPath = osConfig.age.secrets."deepseek-key".path;
-  hasGptKey = osConfig.age.secrets ? "glm-coding-plan-key";
-  gptKeyPath = if hasGptKey then osConfig.age.secrets."glm-coding-plan-key".path else null;
+  gptKeyPath = osConfig.age.secrets."glm-coding-plan-key".path;
 in
 {
   # LiteLLM 配置文件 + callback（只读 symlink 到 Nix store）
@@ -142,9 +146,7 @@ in
     run mkdir -p $HOME/.config/litellm
     printf 'OPENCODE_GO_KEY=%s\n' "$(cat ${goKeyPath} 2>/dev/null || echo PLACEHOLDER)" > $HOME/.config/litellm/env
     printf 'DEEPSEEK_KEY=%s\n' "$(cat ${deepseekKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
-    ${lib.optionalString hasGptKey ''
-      printf 'GLM_CODING_PLAN_KEY=%s\n' "$(cat ${gptKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
-    ''}
+    printf 'GLM_CODING_PLAN_KEY=%s\n' "$(cat ${gptKeyPath} 2>/dev/null || echo PLACEHOLDER)" >> $HOME/.config/litellm/env
     printf 'LITELLM_MASTER_KEY=litellm-local\n' >> $HOME/.config/litellm/env
     chmod 600 $HOME/.config/litellm/env
   '';

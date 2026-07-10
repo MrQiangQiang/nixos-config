@@ -16,7 +16,10 @@
 # tailscaled-autoconnect unit. Restart=on-failure keeps retrying
 # until tailscale comes up (mihomo/Tailscale boot ordering).
 # Ref: https://github.com/tailscale/tailscale/issues/11504
-{ pkgs, ... }:
+{ config, pkgs, ... }:
+let
+  qmdPort = config.home-manager.users.fugui.custom.qmd.port;
+in
 {
   systemd.services.tailscale-serve-qmd = {
     description = "Tailscale Serve for QMD MCP (port SSOT: home/dev/qmd.nix → custom.qmd.port)";
@@ -33,7 +36,7 @@
     script = ''
       for i in $(seq 1 60); do
         if tailscale status --peers=false >/dev/null 2>&1; then
-          exec tailscale serve --bg localhost:8181
+          exec tailscale serve --bg localhost:${toString qmdPort}
         fi
         sleep 1
       done

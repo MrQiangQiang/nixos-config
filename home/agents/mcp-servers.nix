@@ -32,6 +32,8 @@ in
         if config.custom.qmd.enable or false then
           "http://localhost:${toString qmdPort}/mcp"
         else
+          # tailnet 域名硬编码：tail0f7af0.ts.net 由 Tailscale 控制台分配，不可 nixify。
+          # desktop-1 是唯一 qmd 索引节点，tailscale-serve.nix 暴露端口到 tailnet。
           "https://desktop-1.tail0f7af0.ts.net/mcp";
     };
     servers.context7 = {
