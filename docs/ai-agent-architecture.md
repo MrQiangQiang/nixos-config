@@ -225,7 +225,7 @@ home/dev/litellm.nix   → systemd user service (localhost:4000) + 密钥注入
     ▼  所有 consumer 指向同一端点
 home/dev/opencode.nix     → provider: litellm（模型列表从 api-providers.nix 派生）+ ollama 后备
 home/dev/claude-code.nix  → ANTHROPIC_BASE_URL=localhost:4000
-home/dev/codex.nix        → model_provider: litellm（settings.profiles 预留备用）+ codex-oss 后备
+home/dev/codex.nix        → model_provider: litellm（settings 弃用，config.toml 通过 activation 种子化）+ codex-oss 后备
 ```
 
 修改 api-providers.nix → LiteLLM 配置自动更新 → 所有工具立即可用。

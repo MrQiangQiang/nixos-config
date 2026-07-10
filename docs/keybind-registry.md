@@ -11,7 +11,7 @@
 3. **简单优雅**：不发明跨应用统一键绑定层，不引入 keyd/xremap 等额外依赖
 4. **面向未来**：新增应用 = 在注册表添加条目，无需改架构
 5. **像拼图**：每个应用是独立的拼图块，注册表是拼图板
-6. **可验证**：注册表与配置的一致性可自动校验，不依赖人工记忆
+6. **可验证**：同应用内快捷键冲突可在构建时自动检测（Nix assertions）
 
 ---
 
@@ -68,7 +68,7 @@
 │  │  Nix 定义 + 生成配置  │    │  Nix 定义 + 仅用于文档       │ │
 │  │  ✅ 当前由 Nix 管理   │    │  ⚠️ 可控但当前未管理         │ │
 │  │  ✅ 冲突检测          │    │  ✅ 可搜索                   │ │
-│  │  ✅ 生成应用配置      │    │  ✅ 冲突预警                 │ │
+│  │  ✅ 生成应用配置      │    │  ✅ 冲突预警（跨应用 Super+） │ │
 │  │                      │    │                              │ │
 │  │  • kwm               │    │  • conventions（行业约定）   │ │
 │  │                      │    │  • fcitx5（输入法快捷键）    │ │
@@ -170,14 +170,14 @@ home/desktop/kwm.nix              ← 消费者：keybinds 作为函数参数（
 `Super+/` 触发 fuzzel dmenu 模式，显示所有应用的快捷键：
 
 ```
-M kwm focus       Super+j       聚焦下一个窗口(focus next)
-M kwm app         Print         区域截图(screenshot region)
-D conventions edit Ctrl+c       复制(copy)
-D fcitx5 ime       Ctrl+Shift+f  简繁切换(simplified traditional toggle)
-D firefox nav     Ctrl+l        聚焦地址栏(address bar url)
-D foot clipboard  Ctrl+Shift+c  复制(copy)
-D opencode session Leader+n      新建会话(session new)
-D trae-cn nav     F12           跳转到定义(goto definition)
+Super+j       聚焦下一个窗口(focus next)       M kwm focus
+Print         区域截图(screenshot region)      M kwm app
+Ctrl+c        复制(copy)                       D conventions edit
+Ctrl+Shift+f  简繁切换(simplified traditional toggle)  D fcitx5 ime
+Ctrl+l        聚焦地址栏(address bar url)      D firefox nav
+Ctrl+Shift+c  复制(copy)                       D foot clipboard
+Leader+n      新建会话(session new)            D opencode session
+F12           跳转到定义(goto definition)      D trae-cn nav
 ```
 
 `M` = 托管绑定（可通过 Nix 修改），`D` = 编目绑定（只读文档）。
