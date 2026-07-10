@@ -21,6 +21,9 @@ in
     ./tailscale-serve.nix
   ];
 
+  # stateVersion 记录安装时的 NixOS 版本,永不更改 (architecture.md)。
+  # desktop-1 装于 nixos-unstable (26.05 发布后跟踪 26.11pre),故为 "26.11"。
+  # laptop-1 装于 25.11 周期,故为 "25.11"。两主机差异是预期行为。
   system.stateVersion = "26.11";
   home-manager.users.fugui.home.stateVersion = "26.11";
 
