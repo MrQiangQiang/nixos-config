@@ -22,7 +22,7 @@
 # AGENTS.md: git-cloned with ~/knowledge/ repo (Karpathy pattern)
 { config, lib, ... }:
 let
-  qmdPort = lib.attrByPath [ "custom" "qmd" "port" ] 8181 config;
+  qmdPort = config.custom.qmd.port;
 in
 {
   programs.mcp = {
