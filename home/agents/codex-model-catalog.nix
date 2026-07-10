@@ -105,8 +105,8 @@ let
   mkEntry =
     provider: modelName: modelMeta:
     let
-      ctxWin = modelMeta.contextWindow or defaultContextWindow;
-      efforts = modelMeta.reasoningEfforts or null;
+      ctxWin = if modelMeta.contextWindow != null then modelMeta.contextWindow else defaultContextWindow;
+      efforts = modelMeta.reasoningEfforts;
       reasoningLevels = if efforts != null then mkReasoningLevels efforts else defaultReasoningLevels;
     in
     (common ctxWin)

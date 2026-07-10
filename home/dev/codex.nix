@@ -89,7 +89,7 @@ let
     in
     clean;
   transformedMcpServers = lib.optionalAttrs mcpEnabled (
-    lib.mapAttrs (_name: filterMcpServer) (config.programs.mcp.servers or { })
+    lib.mapAttrs (_name: filterMcpServer) config.programs.mcp.servers
   );
 
   codexSettings = {

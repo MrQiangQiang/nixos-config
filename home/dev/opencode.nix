@@ -51,8 +51,8 @@ let
       modelName: modelMeta:
       lib.nameValuePair "${providerName}/${modelName}" {
         name = "${providerLabel.${providerName} or providerName}: ${modelName}";
-        cost = modelMeta.cost or { }; # mkModel 保证必有一致，or {} 仅防意外
-        reasoning = modelMeta.reasoning or false; # SSOT: 控制 variant 选择器显隐
+        cost = modelMeta.cost;
+        reasoning = modelMeta.reasoning; # SSOT: 控制 variant 选择器显隐
       }
     ) provider.models
   ) { } (builtins.attrNames apiProviders);

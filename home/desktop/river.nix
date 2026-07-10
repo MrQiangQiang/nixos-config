@@ -9,7 +9,7 @@
 
 let
   isDesktopEnabled = osConfig.custom.desktop.enable;
-  schemaDir = osConfig.custom.desktop.schemaDir or "";
+  schemaDir = osConfig.custom.desktop.schemaDir;
   dataHome = config.xdg.dataHome;
   sessionVars = config.home.sessionVariablesPackage;
 in
