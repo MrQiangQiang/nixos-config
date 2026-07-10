@@ -35,7 +35,7 @@
   ...
 }:
 let
-  api = import ./api-providers.nix { inherit lib; };
+  api = import ./api-providers.nix;
 
   defaultContextWindow = 131072; # fallback: 128k
 

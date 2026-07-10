@@ -24,7 +24,7 @@
 }:
 let
   shared = import ../agents/shared.nix { inherit lib; };
-  apiProviders = (import ../agents/api-providers.nix { inherit lib; }).providers;
+  apiProviders = (import ../agents/api-providers.nix).providers;
 
   # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama.model）
   ollamaModel = osConfig.custom.ollama.model;

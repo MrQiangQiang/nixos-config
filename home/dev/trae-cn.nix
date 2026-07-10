@@ -51,7 +51,6 @@ let
   mkExtEntry =
     {
       id,
-      dir,
       publisher,
       version ? "1.0.0",
     }:
@@ -84,7 +83,6 @@ let
   nixExts = [
     (mkExtEntry {
       id = "mvllow.rose-pine";
-      dir = rosePineExtDir;
       publisher = "mvllow";
       version = rosePineExt.version;
     })

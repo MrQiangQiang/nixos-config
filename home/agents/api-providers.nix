@@ -24,8 +24,6 @@
 #   minimax-m2.7    https://platform.minimaxi.com/docs/                      →   204,800
 #   mimo-v2.5*      OpenRouter/HuggingFace card                              → 1,000,000
 
-{ lib }:
-
 let
   ## 模型构造器 — 强制每个模型声明 cost，可选 contextWindow/extra_body
   ## 价格单位：$/1M tokens，上下文窗口单位：tokens

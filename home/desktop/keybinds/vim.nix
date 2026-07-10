@@ -1,4 +1,4 @@
-{ lib, checkConflicts }:
+{ checkConflicts }:
 
 {
   tier = "legacy";

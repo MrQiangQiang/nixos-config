@@ -23,7 +23,7 @@
   ...
 }:
 let
-  api = import ../agents/api-providers.nix { inherit lib; };
+  api = import ../agents/api-providers.nix;
 
   # Provider 到环境变量映射
   providerEnvKeys = {

@@ -75,8 +75,9 @@
               # toString 将 path 字面量转为 store path 字符串,供 statix --config 读取
               settings.config = toString ./statix.toml;
             };
-            # noLambdaPatternNames: 抑制 callPackage 模式的 lambda 参数误报
-            # (packages/*.nix 中 { pkgs, lib, ... }: 参数由 callPackage 注入,非显式使用)
+            # noLambdaPatternNames: 抑制 NixOS module 标准参数的未使用误报
+            # (module 系统 { config, lib, pkgs, ... }: 参数是接口约定,即使未使用也保留)
+            # 这是 home-manager 社区标准实践(官方 treefmt.toml 同样配置)
             deadnix = {
               enable = true;
               settings.noLambdaPatternNames = true;
