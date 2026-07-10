@@ -20,7 +20,7 @@
 #         免费匿名 tier（IP 速率限制），API key 仅用于提升速率上限
 #
 # AGENTS.md: git-cloned with ~/knowledge/ repo (Karpathy pattern)
-{ config, lib, ... }:
+{ config, ... }:
 let
   qmdPort = config.custom.qmd.port;
 in
