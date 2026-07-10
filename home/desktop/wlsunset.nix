@@ -7,7 +7,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
 in
 lib.mkIf isDesktopEnabled {
   # WAYLAND_DISPLAY from systemd manager environment (set by import-environment)

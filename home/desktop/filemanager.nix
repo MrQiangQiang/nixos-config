@@ -26,7 +26,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
 
   # flavor.toml uses: base surface overlay muted subtle text love gold rose pine foam iris highlight_low highlight_high
   # tmtheme.xml uses: name base surface highlight_low highlight_med highlight_high subtle text gold pine foam rose iris love

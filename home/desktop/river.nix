@@ -8,7 +8,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   schemaDir = osConfig.custom.desktop.schemaDir or "";
   dataHome = config.xdg.dataHome;
   sessionVars = config.home.sessionVariablesPackage;

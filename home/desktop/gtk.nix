@@ -8,7 +8,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   schemaDir = osConfig.custom.desktop.schemaDir or "";
   d = palette.dark;
   l = palette.dawn;

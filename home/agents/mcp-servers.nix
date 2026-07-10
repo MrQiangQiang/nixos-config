@@ -29,7 +29,7 @@ in
     enable = true;
     servers.qmd = {
       url =
-        if config.custom.qmd.enable or false then
+        if config.custom.qmd.enable then
           "http://localhost:${toString qmdPort}/mcp"
         else
           # tailnet 域名硬编码：tail0f7af0.ts.net 由 Tailscale 控制台分配，不可 nixify。

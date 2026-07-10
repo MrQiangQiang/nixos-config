@@ -6,7 +6,7 @@
 }:
 
 let
-  isDesktopEnabled = config.custom.desktop.enable or false;
+  isDesktopEnabled = config.custom.desktop.enable;
 in
 lib.mkIf isDesktopEnabled {
   i18n.inputMethod = {

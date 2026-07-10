@@ -30,7 +30,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   d = palette.dark;
   l = palette.dawn;
 

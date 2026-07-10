@@ -7,7 +7,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
 in
 lib.mkIf isDesktopEnabled {
   home.packages = [ pkgs.waylock ];

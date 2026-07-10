@@ -26,7 +26,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   isDesktop1 = osConfig.networking.hostName == "desktop-1";
   musicDir = if isDesktop1 then "/data/annex/music" else "${config.home.homeDirectory}/annex/music";
 

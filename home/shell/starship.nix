@@ -8,7 +8,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   s = palette.ansi;
 in
 lib.mkIf isDesktopEnabled {

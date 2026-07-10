@@ -19,7 +19,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
 
   mkBatThemeVars = c: {
     inherit (c)

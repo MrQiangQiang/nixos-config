@@ -7,7 +7,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   wobSock = "$XDG_RUNTIME_DIR/wob.sock";
 
   getVolume = ''

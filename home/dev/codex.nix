@@ -55,7 +55,7 @@ let
   #   url → streamable HTTP: 去除 command/args/env
   #   command → stdio: 去除 url
   #   同时过滤 null、空表、空数组。
-  mcpEnabled = config.programs.mcp.enable or false;
+  mcpEnabled = config.programs.mcp.enable;
   filterMcpServer =
     server:
     let

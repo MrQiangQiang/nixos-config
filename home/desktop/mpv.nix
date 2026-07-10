@@ -14,7 +14,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   d = palette.dark; # fixed dark for OSD/subtitle
   l = palette.dawn; # light variant for uosc + mpv background
 

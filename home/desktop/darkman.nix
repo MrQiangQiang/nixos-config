@@ -8,7 +8,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
   cfgHome = config.xdg.configHome;
 
   # rm -f before ln -sf prevents self-referencing symlinks when target

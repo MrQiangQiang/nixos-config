@@ -17,7 +17,7 @@
 }:
 
 let
-  isDesktopEnabled = osConfig.custom.desktop.enable or false;
+  isDesktopEnabled = osConfig.custom.desktop.enable;
 
   mkHelixTheme = c: {
     # --- UI ---
