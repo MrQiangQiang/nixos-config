@@ -49,7 +49,7 @@ let
   kwmDefaultBindings = lib.filter (b: (b.mode or "default") == "default") keybinds.kwm.bindings;
   kwmIds = map (b: "${formatMods b.mods}+${b.key}") kwmDefaultBindings;
 
-  documentedApps = lib.filterAttrs (app: data: data.tier == "documented") keybinds;
+  documentedApps = lib.filterAttrs (_: data: data.tier == "documented") keybinds;
 
   crossConflicts = lib.flatten (
     lib.mapAttrsToList (

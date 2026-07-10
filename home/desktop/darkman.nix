@@ -10,7 +10,6 @@
 let
   isDesktopEnabled = osConfig.custom.desktop.enable or false;
   cfgHome = config.xdg.configHome;
-  dataHome = config.xdg.dataHome;
 
   # rm -f before ln -sf prevents self-referencing symlinks when target
   # already exists as a symlink to a directory (the -f flag on ln does not

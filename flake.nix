@@ -15,7 +15,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix";
+      # 仓库已更名为 git-hooks.nix (cachix/git-hooks.nix)。
+      # flakeModule 选项仍为 pre-commit.settings (未改名,保留别名兼容)。
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -67,6 +69,18 @@
 
           pre-commit.settings.hooks = {
             nixfmt.enable = true;
+            statix = {
+              enable = true;
+              # 显式指定 statix.toml 路径(hook 不会自动发现配置文件)
+              # toString 将 path 字面量转为 store path 字符串,供 statix --config 读取
+              settings.config = toString ./statix.toml;
+            };
+            # noLambdaPatternNames: 抑制 callPackage 模式的 lambda 参数误报
+            # (packages/*.nix 中 { pkgs, lib, ... }: 参数由 callPackage 注入,非显式使用)
+            deadnix = {
+              enable = true;
+              settings.noLambdaPatternNames = true;
+            };
           };
         };
     };

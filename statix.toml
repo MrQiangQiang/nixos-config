@@ -1,0 +1,11 @@
+# statix lint 配置
+# https://github.com/nerdypepper/statix
+
+disabled = [
+  "empty_pattern",       # W10: { ... }: 是 NixOS 模块标准写法(不使用参数的模块)
+  "repeated_keys",       # W20: 重复属性键是 NixOS 模块标准(mkMerge/条件赋值/多 block)
+  "manual_inherit",      # W03: 误报 uuid = ""; (字符串字面量不能用 inherit)
+  "manual_inherit_from", # W04: 现有代码用 x = pkgs.x; 而非 inherit (pkgs) x; (带注释说明)
+]
+
+ignore = [ ".direnv" ]
