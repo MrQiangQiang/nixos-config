@@ -52,13 +52,18 @@ in
   # iGPU (HD 530) 驱动显示,dGPU 通过 nvidia-offload cmd 按需调用。
   services.xserver.videoDrivers = [ "nvidia" ];
   boot.blacklistedKernelModules = [ "nouveau" ];
-  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.kernelModules = [
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_uvm"
+    "nvidia_drm"
+  ];
 
   hardware.nvidia = {
-    open = false;                    # Maxwell 不支持 open kernel module
+    open = false; # Maxwell 不支持 open kernel module
     modesetting.enable = true;
     powerManagement.enable = true;
-    powerManagement.finegrained = false;  # Maxwell 不支持精细电源管理
+    powerManagement.finegrained = false; # Maxwell 不支持精细电源管理
     package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     prime = {
       offload = {
