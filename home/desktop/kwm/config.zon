@@ -6,6 +6,8 @@
 
     .background = 0x@base@ff,
 
+    .auto_swallow = false,
+
     .bar = .{
         .scheme = .{
             .normal = .{

@@ -24,6 +24,7 @@ let
         pkgs.openssh
       ]
     }"
+    export GIT_SSH_COMMAND="ssh -o ConnectTimeout=10 -o ConnectionAttempts=1"
     if [ -d "$HOME/annex/.git" ]; then
       cd "$HOME/annex"
       git annex sync --no-content
