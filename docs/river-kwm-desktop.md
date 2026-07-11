@@ -264,6 +264,37 @@ KWM 不原生支持 SIGUSR1 reload。本地 patch 增强了三处：
 
 ---
 
+## auto_swallow 临时禁用
+
+**状态**：`auto_swallow = false`（临时，等待上游修复）
+
+KWM 0.3.0 在退出时存在 `context.deinit()` 崩溃。根因在 `window.zig:980-994`：
+
+```zig
+// context.zig:deinit() 遍历所有 window 调用 destroy()
+var it = ctx.windows.safeIterator(.forward);
+while (it.next()) |window| {
+    window.destroy();   // → 调用 self.unswallow()
+}
+
+// window.zig:unswallow() — 当 self.swallowing 非空时
+fn unswallow(self: *Self) void {
+    if (self.swallowing) |window| {
+        window.link.remove();        // ← 删除兄弟元素 (非法!)
+        self.link.insert(&window.link);  // ← 重新插入兄弟元素 (非法!)
+    }
+}
+```
+
+zig-wayland 安全迭代器合约明确禁止修改非当前元素。unswallow 修改的是被 swallow 的兄弟窗口链接，违反合约 → 悬挂指针 → `unwrapNull` panic → SIGABRT。
+上游 master 在 v0.3.0 后无相关修复（2026-07-11 仅 4 个提交，均不涉及 swallow/deinit）。
+
+**影响**：swallow 是终端窗口嵌入子 GUI 应用的可选特性，非核心窗口管理功能。禁用后 GUI 应用作为独立窗口出现在 tile 布局中，所有核心功能（平铺/标签/浮动/全屏/键绑定/状态栏）不受影响。
+
+**恢复条件**：kwm 上游发布修复 swallow deinit 崩溃的新版本后，可将 `auto_swallow = false` 移除。
+
+---
+
 ## River 启动时序
 
 ```
