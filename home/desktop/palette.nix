@@ -165,7 +165,6 @@ let
   };
 in
 {
-  _file = ./palette.nix;
   inherit
     dark
     dawn
