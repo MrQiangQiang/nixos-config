@@ -15,7 +15,7 @@ home/agents/mcp-servers.nix  → programs.mcp.servers (唯一来源)
     │
     ▼  home-manager programs.mcp 模块 (26.05 标准)
     │
-home/dev/trae-cn.nix         → traeMcpServers 过滤消费 (writable merge)
+home/dev/trae-cn.nix         → traeMcpServers 过滤消费 (always-overwrite)
 home/dev/opencode.nix        → enableMcpIntegration 消费
 home/dev/codex.nix           → 手动 transform (filterMcpServer) 消费
 ```
@@ -24,7 +24,7 @@ home/dev/codex.nix           → 手动 transform (filterMcpServer) 消费
 
 Trae CN 是 VSCode fork, MCP 配置读取 `~/.config/Trae CN/User/mcp.json` (User settings dir,
 由 product.json nameLong 决定), 非 `~/.trae-cn/mcp.json` (数据目录, 由 dataFolderName 决定)。
-用 home.activation writable merge 保留 IDE 运行时写入能力 (UI 添加的 MCP 服务器)。
+用 home.activation always-overwrite (Nix SSOT 完全控制)；deep-merge 无法删除已移除的服务器，故弃用。
 
 ## 共享内容 SSOT
 
@@ -128,6 +128,38 @@ Codex 源码确认：`SlashCommand` 是 Rust 枚举，`config_toml.rs` 无 `comm
 Codex 用 `skills`、`hooks`、`plugins` 做扩展，不用自定义斜杠命令。
 
 **工具本身不支持，非 hm 限制。**
+
+### disable-model-invocation 跨工具支持
+
+`disable-model-invocation: true` 将 skill 从模型上下文中移除，用户仍可通过 `/skill-name` 手动调用。
+用于 13 个 user-invoked skills（需求对齐、交接、规格等），减少上下文负担并防止模型自动触发。
+
+| 工具 | 支持 | 实现机制 |
+|------|:---:|------|
+| Claude Code | ✅ | frontmatter 字段，ToolSearch 过滤（需第一方 Anthropic API） |
+| Trae-CN | ✅ | Rust 层 libai_agent.so 过滤 |
+| Codex | ✅ | agents/openai.yaml（`allow_implicit_invocation=false`），shared.nix 自动生成 |
+| OpenCode | ❌ | 官方不支持，frontmatter 只识别 name/description/license/compatibility/metadata |
+
+**OpenCode 限制**（源码验证 v1.17.12）：
+
+- `packages/opencode/src/skill/index.ts:53-59` `isSkillFrontmatter` 只检查 name 和 description
+- `packages/opencode/src/skill/index.ts:37-42` `Info` schema 无 disable-model-invocation 字段
+- `packages/opencode/src/skill/index.ts:321-322` `fmt` 函数只过滤 `description === undefined`
+- 官方文档明确声明未知 frontmatter 字段被忽略
+
+**社区方案**（obra/superpowers）：通过 OpenCode 插件机制重建 skill 系统（自定义 `use_skill`/`find_skills` 工具），
+与 Nix SSOT 架构冲突，未采纳。
+
+**决策**：接受 OpenCode 限制，不做特殊处理。符合"不做未被要求的抽象层"原则。
+
+**影响**：
+
+- OpenCode 上下文包含全部 22 条 skill description（其他 3 工具仅 9 条）
+- 13 个 user-invoked skills 在 OpenCode 中对模型可见，模型可能主动调用
+- skill tool 按 name 从 `state.skills` 查找，不依赖 `available_skills` 列表（源码确认）
+
+**长期方案**：向 sst/opencode 贡献 PR（feature request 已 open，截至 2026-07-13 未合并）。
 
 ## qmd 知识库
 

@@ -20,10 +20,11 @@
   config,
   osConfig,
   lib,
+  pkgs,
   ...
 }:
 let
-  shared = import ../agents/shared.nix { inherit lib; };
+  shared = import ../agents/shared.nix { inherit lib pkgs; };
   apiProviders = (import ../agents/api-providers.nix).providers;
 
   # Ollama 本地模型（SSOT: modules/ollama.nix → osConfig.custom.ollama.model）

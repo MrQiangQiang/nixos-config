@@ -109,7 +109,7 @@ let
   traeMcpPath = "${config.home.homeDirectory}/.config/Trae CN/User/mcp.json";
 
   # ── Shared content (from SSOT) ──
-  shared = import ../agents/shared.nix { inherit lib; };
+  shared = import ../agents/shared.nix { inherit lib pkgs; };
 in
 {
   options.custom.trae-cn = {
@@ -177,26 +177,23 @@ in
         }
       ) shared.context)
       (lib.mapAttrs' (
-        name: content:
-        lib.nameValuePair ".trae-cn/skills/${name}/SKILL.md" {
-          source = pkgs.writeText "${name}-SKILL.md" content;
+        name: skillDir:
+        lib.nameValuePair ".trae-cn/skills/${name}" {
+          source = skillDir;
+          recursive = true;
         }
       ) shared.skills)
     ];
 
-    # MCP — writable merge (home.activation: preserves IDE runtime writes from UI)
+    # MCP — always-overwrite (nix SSOT fully controls MCP config)
     # Source: programs.mcp.servers (SSOT in home/agents/mcp-servers.nix)
     # To add/modify MCP servers, edit home/agents/mcp-servers.nix (not this file)
-    # nix SSOT servers deep-merged into IDE-written mcp.json (nix side authoritative on conflict)
+    # Rebuild always restores nix SSOT; UI writes to mcp.json are discarded.
+    # Previous deep-merge (jq '.[0] * .[1]') could not delete removed servers, causing stale entries.
     home.activation.traeMcp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p "$(dirname ${lib.escapeShellArg traeMcpPath})"
-      if [ -f ${lib.escapeShellArg traeMcpPath} ]; then
-        merged=$(${lib.getExe pkgs.jq} -s '.[0] * .[1]' ${lib.escapeShellArg traeMcpPath} ${traeMcpJson})
-        printf '%s\n' "$merged" > ${lib.escapeShellArg traeMcpPath}
-      else
-        run cp ${traeMcpJson} ${lib.escapeShellArg traeMcpPath}
-        run chmod u+w ${lib.escapeShellArg traeMcpPath}
-      fi
+      run cp ${traeMcpJson} ${lib.escapeShellArg traeMcpPath}
+      run chmod u+w ${lib.escapeShellArg traeMcpPath}
     '';
 
     # settings — writable merge (home.activation: preserves IDE runtime writes)

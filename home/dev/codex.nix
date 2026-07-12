@@ -40,7 +40,7 @@
   ...
 }:
 let
-  shared = import ../agents/shared.nix { inherit lib; };
+  shared = import ../agents/shared.nix { inherit lib pkgs; };
   catalog = import ../agents/codex-model-catalog.nix {
     inherit lib;
     ollamaContextLength = osConfig.custom.ollama.contextLength;

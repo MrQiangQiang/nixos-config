@@ -12,10 +12,11 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
-  shared = import ../agents/shared.nix { inherit lib; };
+  shared = import ../agents/shared.nix { inherit lib pkgs; };
 in
 {
   programs.claude-code = {
