@@ -54,7 +54,7 @@ let
           api_key = "os.environ/${envKey}";
           use_chat_completions_api = true;
         }
-        // (lib.optionalAttrs (modelMeta.extra_body != null) {
+        // (lib.optionalAttrs (modelMeta.extra_body or null != null) {
           inherit (modelMeta) extra_body;
         });
       }) provider.models
@@ -84,9 +84,35 @@ let
     };
   }) ollamaModels;
 
+  # Claude Code gateway model discovery 只显示以 "claude" 或 "anthropic" 开头的模型 ID
+  # 源码：Free-Claude-Code api/gateway_model_ids.py GATEWAY_MODEL_ID_PREFIX = "anthropic"
+  # 为每个模型创建 anthropic/ 前缀的 alias，使其出现在 /v1/models 中供 Claude Code /model 菜单发现
+  # OpenCode（opencode.nix:64）和 Codex（codex.nix:98）不查询 /v1/models，使用显式配置的原始 ID，不受影响
+  # 原始 model_name 保留，供 OpenCode/Codex 使用
+  # hidden: false 必填 — LiteLLM 1.89.0 router.py:10007 直接访问 _model_value["hidden"]，缺失则 KeyError
+  modelGroupAlias = builtins.listToAttrs (
+    lib.concatLists (
+      lib.mapAttrsToList (
+        providerName: provider:
+        lib.mapAttrsToList (modelName: _: lib.nameValuePair "anthropic/${providerName}/${modelName}" {
+          model = "${providerName}/${modelName}";
+          hidden = false;
+        }) provider.models
+      ) api.providers
+    )
+    ++ map (m: lib.nameValuePair "anthropic/ollama/${m}" {
+      model = "ollama/${m}";
+      hidden = false;
+    }) ollamaModels
+  );
+
   # 完整的 LiteLLM YAML 配置
   litellmConfig = {
     model_list = modelList ++ ollamaModelList;
+
+    router_settings = {
+      model_group_alias = modelGroupAlias;
+    };
 
     litellm_settings = {
       drop_params = true;
@@ -123,10 +149,19 @@ let
   # - opencode-go-fix.patch: 修复 Codex Responses→Chat 转换的 messages 格式问题
   #   根因：transformation.py:391-434 只合并 function_call，不合并 message output item
   #   修复：合并连续 assistant message（Go 代理拒绝连续两个 assistant message）
+  # - thinking-route-fix.patch: 修复 thinking 请求绕过环境变量强制走双桥路径
+  #   根因：adapters/handler.py:307-352 不检查 LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES
+  #   导致 thinking 请求被前缀 responses/ 走双桥，触发 content 丢失（截至 v1.91.0 未修复）
+  # - empty-choices-fix.patch: 修复 /v1/messages 流式传输时空 choices chunk 导致 IndexError
+  #   根因：adapters/streaming_iterator.py:346/594/819 和 transformation.py:1401/1603 不检查 choices 是否为空
+  #   触发条件：上游返回错误时（如 400），流式响应包含空 choices chunk
+  #   与 responses-fix.patch 不同：responses-fix 修复 Responses API 路径，本补丁修复 Anthropic Messages 路径
   patchedLitellm = pkgs.litellm.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
       ./litellm/responses-fix.patch
       ./litellm/opencode-go-fix.patch
+      ./litellm/thinking-route-fix.patch
+      ./litellm/empty-choices-fix.patch
     ];
   });
 
@@ -172,11 +207,11 @@ in
       Service = {
         ExecStart = "${patchedLitellm}/bin/litellm --config %h/.config/litellm/config.yaml --host 127.0.0.1 --port ${toString cfg.port}";
         EnvironmentFile = "%h/.config/litellm/env";
-        # 绕过 LiteLLM 1.89.0 Messages→Chat→Messages 双桥 bug
-        # Bug：responses_adapters/transformation.py:415-518 的 isinstance(item, dict)
-        # 检查失败（GenericResponseOutputItem 是 Pydantic BaseModel 非 dict），
-        # 导致 content 被丢弃为 []。走单桥路径（adapters/transformation.py:1255-1361）
-        # 用独立 if 添加 content，不吞掉。截至 main 48b5a5a (2026-06-28) 未修复。
+        # /v1/messages 走单桥路径（Anthropic→Chat Completions），避免双桥路径的
+        # content 丢失 bug（responses_adapters/transformation.py:415-518 的
+        # isinstance(item, dict) 检查失败，截至 main 48b5a5a 2026-06-28 未修复）。
+        # thinking-route-fix.patch 修复 thinking 路由绕过此环境变量的 bug
+        # （adapters/handler.py:307-352 不检查此 env var，强制走双桥，截至 v1.91.0 未修复）。
         Environment = [ "LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES=true" ];
         Restart = "on-failure";
         RestartSec = 5;

@@ -1,0 +1,15 @@
+--- a/litellm/llms/anthropic/experimental_pass_through/adapters/handler.py
++++ b/litellm/llms/anthropic/experimental_pass_through/adapters/handler.py
+@@ -321,6 +321,12 @@
+         through to the OpenAI reasoning params (opt-in per OpenAI spec).
+         """
+         custom_llm_provider = completion_kwargs.get("custom_llm_provider")
++
++        # Respect explicit single-bridge preference (LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES).
++        # Without this, thinking requests bypass the env var and force the double-bridge path.
++        if litellm.use_chat_completions_url_for_anthropic_messages:
++            return
++
+         if custom_llm_provider is None:
+             try:
+                 _, inferred_provider, _, _ = litellm.utils.get_llm_provider(

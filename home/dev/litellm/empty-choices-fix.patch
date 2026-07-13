@@ -1,0 +1,49 @@
+--- a/litellm/llms/anthropic/experimental_pass_through/adapters/streaming_iterator.py	2026-07-13 01:05:28.286120842 +0800
++++ b/litellm/llms/anthropic/experimental_pass_through/adapters/streaming_iterator.py	2026-07-13 02:39:44.768795057 +0800
+@@ -343,7 +343,7 @@
+                     self.holding_stop_reason_chunk is not None
+                     and getattr(chunk, "usage", None) is not None
+                 )
+-                is_final_chunk = chunk.choices[0].finish_reason is not None
++                is_final_chunk = bool(chunk.choices) and chunk.choices[0].finish_reason is not None
+                 processed_chunk = LiteLLMAnthropicMessagesAdapter().translate_streaming_openai_response_to_anthropic(
+                     response=chunk,
+                     current_content_block_index=self.current_content_block_index,
+@@ -591,7 +591,7 @@
+                     self.holding_stop_reason_chunk is not None
+                     and getattr(chunk, "usage", None) is not None
+                 )
+-                is_final_chunk = chunk.choices[0].finish_reason is not None
++                is_final_chunk = bool(chunk.choices) and chunk.choices[0].finish_reason is not None
+                 processed_chunk = LiteLLMAnthropicMessagesAdapter().translate_streaming_openai_response_to_anthropic(
+                     response=chunk,
+                     current_content_block_index=self.current_content_block_index,
+@@ -816,7 +816,7 @@
+ 
+         # Example logic - customize based on your needs:
+         # If chunk indicates a tool call
+-        if chunk.choices[0].finish_reason is not None:
++        if not chunk.choices or chunk.choices[0].finish_reason is not None:
+             return False
+ 
+         (
+--- a/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py	2026-07-13 01:05:28.286120842 +0800
++++ b/litellm/llms/anthropic/experimental_pass_through/adapters/transformation.py	2026-07-13 02:44:27.524933929 +0800
+@@ -1398,7 +1398,7 @@
+ 
+         ## extract finish reason
+         anthropic_finish_reason = self._translate_openai_finish_reason_to_anthropic(
+-            openai_finish_reason=response.choices[0].finish_reason  # type: ignore
++            openai_finish_reason=(response.choices[0].finish_reason if response.choices else None)  # type: ignore
+         )
+         # extract usage
+         usage: Usage = getattr(response, "usage")
+@@ -1600,7 +1600,7 @@
+         applied_edits: Optional[List[AppliedEdit]] = None,
+     ) -> Union[ContentBlockDelta, MessageBlockDelta]:
+         ## base case - final chunk w/ finish reason
+-        if response.choices[0].finish_reason is not None:
++        if response.choices and response.choices[0].finish_reason is not None:
+             delta = MessageDelta(
+                 stop_reason=self._translate_openai_finish_reason_to_anthropic(
+                     response.choices[0].finish_reason

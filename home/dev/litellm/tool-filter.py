@@ -36,6 +36,13 @@ class NonFunctionToolFilter(CustomLogger):
 
     ALLOWED_TOOL_TYPES = {"function"}
 
+    # Anthropic Messages 端点 (/v1/messages) 的 tools 使用 Anthropic 格式：
+    #   function 工具无 type 字段（{"name": ..., "input_schema": ...}）
+    #   非函数工具有 type 字段（{"type": "web_search_20260209", ...}）
+    # LiteLLM 内部的 LiteLLMMessagesToCompletionTransformationHandler 会将 Anthropic 格式
+    # 转换为 OpenAI function 格式。跳过此 callback，避免误删所有 function 工具。
+    SKIP_CALL_TYPES = {"anthropic_messages"}
+
     async def async_pre_call_hook(
         self,
         user_api_key_dict: UserAPIKeyAuth,
@@ -43,6 +50,9 @@ class NonFunctionToolFilter(CustomLogger):
         data: dict,
         call_type: CallTypesLiteral,
     ) -> Optional[dict]:
+        if call_type in self.SKIP_CALL_TYPES:
+            return None
+
         tools = data.get("tools")
         if not isinstance(tools, list) or not tools:
             return None
