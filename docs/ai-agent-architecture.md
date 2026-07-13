@@ -38,7 +38,7 @@ home/dev/claude-code.nix  → context + commands + agents + skills
 ```
 
 shared.nix 是 lib 函数模块（非 module option）——多个 consumer 各自 import，Nix 求值缓存复用。
-空集时对所有工具零副作用（当前 shared/ 全部为 .gitkeep）。
+空集时对所有工具零副作用（shared/ 为空时无内容生成）。
 
 内容设计遵循 ai-nixCfg 模式：技能正文平台无关，工具特定映射（如 frontmatter 字段）放在 *Meta attrset 中。
 CLI 工具支持全局配置，IDE 工具 skills 保持项目级（符合工具设计）。

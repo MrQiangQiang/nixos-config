@@ -54,7 +54,7 @@ let
           api_key = "os.environ/${envKey}";
           use_chat_completions_api = true;
         }
-        // (lib.optionalAttrs (modelMeta.extra_body or null != null) {
+        // (lib.optionalAttrs (modelMeta.extra_body != null) {
           inherit (modelMeta) extra_body;
         });
       }) provider.models
