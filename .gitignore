@@ -1,3 +1,4 @@
 /result*
 *.log
 /.trae/
+__pycache__/
