@@ -40,11 +40,15 @@ let
     '';
   };
 
-  zigDeps = zig_0_16.fetchDeps {
+  # nixpkgs fetcher.nix 的 nativeBuildInputs 不含 cacert,沙箱中无 CA 证书
+  # 导致 Zig std TLS 握手失败 (TlsInitializationFailed)
+  zigDeps = (zig_0_16.fetchDeps {
     inherit pname version;
     src = patchedSrc;
     hash = "sha256-Nb0iscPQV8P49vaI7hZQvSEtM/ZpXsWb7w/rpH79lTg=";
-  };
+  }).overrideAttrs (old: {
+    nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.cacert ];
+  });
 
   zigPostConfigure = import ./zig-post-configure.nix zigDeps;
 in

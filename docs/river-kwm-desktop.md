@@ -81,6 +81,10 @@ kwm-config.zon 支持 KWM 预处理器（`@if hostname=...` / `@include`）和�
 
 nixpkgs 更新滞后，自建时 nixpkgs 中还没有 river 0.4.5。当前 nixpkgs 虽已有 river 0.4.5 官方包，但自建 overlay 保留了控制权（可禁用 xwayland、控制构建选项）。River 上游 0.5.0-dev 正在开发中，overlay 便于跟踪。
 
+### 为什么 fetchDeps 需要 cacert
+
+nixpkgs `fetcher.nix` 的 `nativeBuildInputs = [ zig ]` 缺少 `cacert`，Nix 沙箱中 `SSL_CERT_FILE=/no-cert-file.crt`，Zig std TLS 握手失败（`TlsInitializationFailed`）。`overrideAttrs` 添加 `cacert`，其 setup-hook 覆盖 `SSL_CERT_FILE` 为真实路径。上游修复后可移除。
+
 ---
 
 ## KWM spawn 机制
