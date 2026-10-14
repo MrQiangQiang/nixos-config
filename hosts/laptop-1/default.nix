@@ -90,12 +90,12 @@ in
   ];
 
   # ── Journal ─────────────────────────────────────────────────
-  services.journald.extraConfig = ''
-    SystemMaxUse=512M
-    SystemKeepFree=2G
-    SystemMaxFileSize=100M
-    MaxRetentionSec=30day
-  '';
+  services.journald.settings = {
+    SystemMaxUse = "512M";
+    SystemKeepFree = "2G";
+    SystemMaxFileSize = "100M";
+    MaxRetentionSec = "30day";
+  };
 
   # ── Tailscale DERP log spam ────────────────────────────────
   # 上游已知 bug (github.com/tailscale/tailscale/issues/14623):
