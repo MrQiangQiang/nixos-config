@@ -90,7 +90,7 @@ in
   ];
 
   # ── Journal ─────────────────────────────────────────────────
-  services.journald.settings = {
+  services.journald.settings.Journal = {
     SystemMaxUse = "512M";
     SystemKeepFree = "2G";
     SystemMaxFileSize = "100M";
