@@ -157,6 +157,8 @@ let
   #   注：transformation.py:1494 已由上游修复（if response.choices else "stop"），本补丁不再覆盖
   #   触发条件：上游返回错误时（如 400），流式响应包含空 choices chunk
   #   与 responses-fix.patch 不同：responses-fix 修复 Responses API 路径，本补丁修复 Anthropic Messages 路径
+  #   注：patch 只覆盖 sync __next__ 和 transformation.py；async __anext__ 和
+  #   _should_start_new_content_block 因上下文与 sync 版镜像（patch 无法区分）改用 postPatch 替换
   patchedLitellm = pkgs.litellm.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
       ./litellm/responses-fix.patch
@@ -164,6 +166,16 @@ let
       ./litellm/thinking-route-fix.patch
       ./litellm/empty-choices-fix.patch
     ];
+    postPatch = ''
+      substituteInPlace litellm/llms/anthropic/experimental_pass_through/adapters/streaming_iterator.py \
+        --replace-fail \
+          "is_final_chunk = chunk.choices[0].finish_reason is not None" \
+          "is_final_chunk = bool(chunk.choices) and chunk.choices[0].finish_reason is not None"
+      substituteInPlace litellm/llms/anthropic/experimental_pass_through/adapters/streaming_iterator.py \
+        --replace-fail \
+          "if chunk.choices[0].finish_reason is not None:" \
+          "if not chunk.choices or chunk.choices[0].finish_reason is not None:"
+    '';
   });
 
   # agenix 密钥路径（ai-secrets.nix 无条件声明全部三个密钥）
