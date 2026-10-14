@@ -145,15 +145,16 @@ let
 
   # LiteLLM 补丁：
   # - responses-fix.patch: 修复 /v1/responses 流式传输时空 choices chunk 导致 IndexError
-  #   源码：streaming_iterator.py:1153（1.89.0）/ :1036（>=1.90.0），截至 main cd6e8cd (v1.93.0) 未修复
+  #   源码：streaming_iterator.py:1230（1.102.1），截至 v1.102.1 未修复
   # - opencode-go-fix.patch: 修复 Codex Responses→Chat 转换的 messages 格式问题
   #   根因：transformation.py:391-434 只合并 function_call，不合并 message output item
   #   修复：合并连续 assistant message（Go 代理拒绝连续两个 assistant message）
   # - thinking-route-fix.patch: 修复 thinking 请求绕过环境变量强制走双桥路径
-  #   根因：adapters/handler.py:307-352 不检查 LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES
-  #   导致 thinking 请求被前缀 responses/ 走双桥，触发 content 丢失（截至 v1.91.0 未修复）
+  #   根因：adapters/handler.py:325-385 不检查 LITELLM_USE_CHAT_COMPLETIONS_URL_FOR_ANTHROPIC_MESSAGES
+  #   导致 thinking 请求被前缀 responses/ 走双桥，触发 content 丢失（截至 v1.102.1 未修复）
   # - empty-choices-fix.patch: 修复 /v1/messages 流式传输时空 choices chunk 导致 IndexError
-  #   根因：adapters/streaming_iterator.py:346/594/819 和 transformation.py:1401/1603 不检查 choices 是否为空
+  #   根因：adapters/streaming_iterator.py:576/811/1115 和 transformation.py:1651 不检查 choices 是否为空
+  #   注：transformation.py:1494 已由上游修复（if response.choices else "stop"），本补丁不再覆盖
   #   触发条件：上游返回错误时（如 400），流式响应包含空 choices chunk
   #   与 responses-fix.patch 不同：responses-fix 修复 Responses API 路径，本补丁修复 Anthropic Messages 路径
   patchedLitellm = pkgs.litellm.overrideAttrs (old: {

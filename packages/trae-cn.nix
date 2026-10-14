@@ -47,7 +47,6 @@ let
     nspr
     nss
     openssl
-    openssl_1_1_unsecure
     pango
     stdenv.cc.cc.lib
     udev

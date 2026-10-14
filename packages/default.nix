@@ -6,6 +6,7 @@
       river = pkgs.callPackage ./river.nix { };
       trae-cn = pkgs.callPackage ./trae-cn.nix { };
       obsidian = pkgs.obsidian; # from overlay (prev.obsidian + overrideAttrs)
+      rose-pine-gtk-theme = pkgs.callPackage ./rose-pine-gtk-theme.nix { };
     };
   };
 
@@ -14,16 +15,9 @@
     kwim = final.callPackage ./kwim.nix { };
     river = final.callPackage ./river.nix { };
     trae-cn = final.callPackage ./trae-cn.nix { };
+    rose-pine-gtk-theme = final.callPackage ./rose-pine-gtk-theme.nix { };
     # import + prev.obsidian avoids circular dependency (callPackage would
     # auto-fill obsidian from final.obsidian = this very definition).
     obsidian = (import ./obsidian.nix) prev.obsidian;
-
-    # trae-cn 是预编译 Electron 应用,运行时依赖 openssl 1.1(EOL,有已知漏洞)。
-    # nixpkgs 在 openssl_1_1 的 meta.knownVulnerabilities 中标记了这些漏洞,
-    # 会导致 nix build 报错。此处移除 knownVulnerabilities 以允许构建。
-    # 安全缓解:仅在 trae-cn 的 buildFHSEnv 沙箱内使用,不暴露给系统其他部分。
-    openssl_1_1_unsecure = prev.openssl_1_1.overrideAttrs (old: {
-      meta = builtins.removeAttrs old.meta [ "knownVulnerabilities" ];
-    });
   };
 }

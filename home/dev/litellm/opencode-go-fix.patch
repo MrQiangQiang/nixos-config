@@ -1,9 +1,10 @@
 --- a/litellm/responses/litellm_completion_transformation/handler.py
 +++ b/litellm/responses/litellm_completion_transformation/handler.py
-@@ -112,6 +112,34 @@
+@@ -106,7 +106,35 @@
          acompletion_args.update(kwargs)
          acompletion_args.update(litellm_completion_request)
-
+         acompletion_args["_skip_responses_api_bridge"] = True
+ 
 +        # opencode-go provider: Go proxy rejects consecutive assistant
 +        # messages that LiteLLM Responses->Chat transform produces.
 +        # LiteLLM creates separate messages for function_call and message
@@ -32,6 +33,6 @@
 +                    else:
 +                        _i += 1
 +
-         litellm_completion_response: Union[
-             ModelResponse, litellm.CustomStreamWrapper
-         ] = await litellm.acompletion(
+         litellm_completion_response: Final[ModelResponse | litellm.CustomStreamWrapper] = await litellm.acompletion(
+             **acompletion_args,
+         )

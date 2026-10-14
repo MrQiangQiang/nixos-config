@@ -1,6 +1,6 @@
 --- a/litellm/llms/anthropic/experimental_pass_through/adapters/handler.py
 +++ b/litellm/llms/anthropic/experimental_pass_through/adapters/handler.py
-@@ -321,6 +321,12 @@
+@@ -336,6 +336,12 @@
          through to the OpenAI reasoning params (opt-in per OpenAI spec).
          """
          custom_llm_provider = completion_kwargs.get("custom_llm_provider")
